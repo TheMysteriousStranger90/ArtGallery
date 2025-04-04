@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'artgallery.webapi'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['artgallery.webapi:8080']

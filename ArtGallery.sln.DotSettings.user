@@ -1,0 +1,10 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=102b8ed0_002D60cd_002D4daf_002Da540_002Db51f9a5748aa/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ArtistsControllerTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;xUnit::8763266E-65A0-4BA9-93A7-538BD142BA95::net8.0::ArtGallery.WebAPI.Tests.ArtistsControllerTests&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+    &lt;ProjectFile&gt;8763266E-65A0-4BA9-93A7-538BD142BA95/f:PaintingsControllerTests.cs&lt;/ProjectFile&gt;&#xD;
+    &lt;ProjectFile&gt;8763266E-65A0-4BA9-93A7-538BD142BA95/f:ExhibitionsControllerTests.cs&lt;/ProjectFile&gt;&#xD;
+  &lt;/Or&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

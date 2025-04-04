@@ -1,0 +1,99 @@
+﻿version: '3.8'
+
+services:
+  artgallery.webapi:
+    image: artgallery.webapi
+    build:
+      context: .
+      dockerfile: ArtGallery.WebAPI/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__ArtGalleryDbConnection=Server=sqlserver;Database=ArtGalleryDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;
+      - ConnectionStrings__ArtGalleryIdentityDbConnection=Server=sqlserver;Database=ArtGalleryIdentityDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;
+      - ElasticsearchSettings__Uri=http://elasticsearch:9200
+      - OpenTelemetry__OtlpEndpoint=http://otel-collector:4317
+    depends_on:
+      - sqlserver
+      - elasticsearch
+      - otel-collector
+    networks:
+      - art-gallery-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Password
+    networks:
+      - art-gallery-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - art-gallery-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.4
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - art-gallery-network
+
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - art-gallery-network
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - art-gallery-network
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.91.0
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    ports:
+      - "4317:4317"
+    networks:
+      - art-gallery-network
+
+volumes:
+  elasticsearch-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  art-gallery-network:
+    driver: bridge
