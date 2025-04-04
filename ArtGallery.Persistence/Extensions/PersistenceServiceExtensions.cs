@@ -16,7 +16,14 @@ public static class PersistenceServiceExtensions
         services.AddDbContext<ArtGalleryDbContext>(options =>
         {
             options.UseSqlServer(configuration.GetConnectionString("ArtGalleryDbConnection"),
-                b => b.MigrationsAssembly(typeof(ArtGalleryDbContext).Assembly.FullName));
+                sqlServerOptionsAction: sqlOptions =>
+                {
+                    sqlOptions.MigrationsAssembly(typeof(ArtGalleryDbContext).Assembly.FullName);
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 10,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                });
         });
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

@@ -23,7 +23,14 @@ public static class IdentityServiceExtensions
 
         services.AddDbContext<ArtGalleryIdentityDbContext>(options => options.UseSqlServer(
             configuration.GetConnectionString("ArtGalleryIdentityDbConnection"),
-            b => b.MigrationsAssembly(typeof(ArtGalleryIdentityDbContext).Assembly.FullName)));
+            sqlServerOptionsAction: sqlOptions =>
+            {
+                sqlOptions.MigrationsAssembly(typeof(ArtGalleryIdentityDbContext).Assembly.FullName);
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 10,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+            }));
         
         
         services.AddIdentityCore<ApplicationUser>(opt =>

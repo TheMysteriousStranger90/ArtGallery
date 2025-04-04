@@ -1,12 +1,15 @@
 using System.Diagnostics;
 using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Extensions;
+using ArtGallery.Identity.Context;
 using ArtGallery.Identity.Extensions;
 using ArtGallery.Infrastructure.Extensions;
+using ArtGallery.Persistence.Context;
 using ArtGallery.Persistence.Extensions;
 using ArtGallery.WebAPI.Extensions;
 using ArtGallery.WebAPI.Services;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -183,13 +186,30 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
+        logger.LogInformation("Starting database initialization...");
+        
+        // Get DbContext instances
+        var artGalleryContext = services.GetRequiredService<ArtGalleryDbContext>();
+        var identityContext = services.GetRequiredService<ArtGalleryIdentityDbContext>();
+        
+        // Ensure databases are created
+        await artGalleryContext.Database.EnsureCreatedAsync();
+        await identityContext.Database.EnsureCreatedAsync();
+        
+        // Then run migrations
+        await artGalleryContext.Database.MigrateAsync();
+        await identityContext.Database.MigrateAsync();
+        
+        logger.LogInformation("Database initialization completed.");
+        
+        // Now seed data
         logger.LogInformation("Starting application seeding...");
         await ArtGallery.Identity.SeedData.SeedDataUserInitializer.Initialize(services);
         logger.LogInformation("Application seeding completed.");
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "An error occurred during application seeding.");
+        logger.LogError(ex, "An error occurred during database initialization or application seeding.");
     }
 }
 
