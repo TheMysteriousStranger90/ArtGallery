@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+version: "3.8"
+services:
+  artgallery.webapi:
+    build:
+      context: "D:\\OtherProjects\\ArtGallery"
+      dockerfile: "ArtGallery.WebAPI/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/ArtGallery.WebAPI.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "artgallery.webapi:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\User\\.nuget\\packages:/home/app/.nuget/packages"
+    - "D:\\OtherProjects\\ArtGallery\\ArtGallery.WebAPI:/app:rw"
+    - "D:\\OtherProjects\\ArtGallery:/src:rw"
+    working_dir: "/app"

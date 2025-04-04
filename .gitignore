@@ -7,5 +7,4 @@ riderModule.iml
 
 ArtGallery.WebAPI/logs/
 ArtGallery.WebAPI/appsettings.json
-ArtGallery.WebAPI/appsettings.Development.json
 ArtGallery.WebAPI/appsettings.Production.json

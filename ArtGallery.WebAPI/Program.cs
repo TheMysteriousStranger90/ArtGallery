@@ -8,6 +8,7 @@ using ArtGallery.Persistence.Context;
 using ArtGallery.Persistence.Extensions;
 using ArtGallery.WebAPI.Extensions;
 using ArtGallery.WebAPI.Services;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
@@ -19,14 +20,34 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog with conditional Elasticsearch
-builder.Services.ConfigureSerilog(builder.Configuration);
-builder.Host.UseSerilog();
+try
+{
+    builder.Services.ConfigureSerilog(builder.Configuration);
+    builder.Host.UseSerilog();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error configuring Serilog: {ex.Message}");
+
+    // Fallback to basic logging
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+        .WriteTo.Console()
+        .WriteTo.File("logs/error-.txt", rollingInterval: RollingInterval.Day));
+}
 
 // Add services to the container.
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
+
+
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"/home/app/.aspnet/DataProtection-Keys"))
+    .SetApplicationName("ArtGalleryAPI");
+
+
 
 builder.Services.AddMemoryCache();
 
@@ -81,7 +102,7 @@ try
                 .AddSource(serviceName)
                 .AddAspNetCoreInstrumentation(options => { options.RecordException = true; })
                 .AddHttpClientInstrumentation();
-            
+
             try
             {
                 var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ??
@@ -187,21 +208,23 @@ using (var scope = app.Services.CreateScope())
     try
     {
         logger.LogInformation("Starting database initialization...");
-        
+
         // Get DbContext instances
         var artGalleryContext = services.GetRequiredService<ArtGalleryDbContext>();
         var identityContext = services.GetRequiredService<ArtGalleryIdentityDbContext>();
         
+        /*
         // Ensure databases are created
         await artGalleryContext.Database.EnsureCreatedAsync();
         await identityContext.Database.EnsureCreatedAsync();
+        */
         
         // Then run migrations
         await artGalleryContext.Database.MigrateAsync();
         await identityContext.Database.MigrateAsync();
-        
+
         logger.LogInformation("Database initialization completed.");
-        
+
         // Now seed data
         logger.LogInformation("Starting application seeding...");
         await ArtGallery.Identity.SeedData.SeedDataUserInitializer.Initialize(services);

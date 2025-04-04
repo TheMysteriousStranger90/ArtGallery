@@ -4,6 +4,12 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys \
+    && mkdir -p /tmp/serilog-buffer \
+    && chown -R app:app /home/app/.aspnet \
+    && chmod -R 755 /home/app/.aspnet \
+    && chmod -R 755 /tmp/serilog-buffer
+
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src

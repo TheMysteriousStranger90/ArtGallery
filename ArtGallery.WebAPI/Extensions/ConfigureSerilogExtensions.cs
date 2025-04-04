@@ -1,8 +1,11 @@
 ﻿using System.Reflection;
+using Elastic.Channels;
+using Elastic.Ingest.Elasticsearch;
+using Elastic.Ingest.Elasticsearch.DataStreams;
+using Elastic.Serilog.Sinks;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Exceptions;
-using Serilog.Sinks.Elasticsearch;
 
 namespace ArtGallery.WebAPI.Extensions;
 
@@ -10,13 +13,9 @@ public static class ConfigureSerilogExtensions
 {
     public static void ConfigureSerilog(this IServiceCollection services, IConfiguration configuration)
     {
-        // Enable Serilog self-logging for troubleshooting
         SelfLog.Enable(Console.Error);
-
-        // Get application name from assembly
         var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-        
-        // Start building the logger configuration
+
         var loggerConfiguration = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
             .Enrich.FromLogContext()
@@ -26,74 +25,79 @@ public static class ConfigureSerilogExtensions
             .Enrich.WithThreadId()
             .Enrich.WithExceptionDetails()
             .Enrich.WithProperty("Application", assemblyName)
-            .WriteTo.Console();
-        
-        // Only use Elasticsearch in Production or if explicitly enabled
-        var useElasticsearch = configuration.GetValue<bool>("ElasticsearchSettings:Enabled");
-        var isProduction = configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT") == "Production";
-        
-        if ((isProduction || useElasticsearch) && !string.IsNullOrEmpty(configuration["ElasticsearchSettings:Uri"]))
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}");
+
+        var elasticSettings = configuration.GetSection("ElasticsearchSettings");
+        if (ShouldEnableElasticsearch(elasticSettings))
         {
-            try
-            {
-                // Test connection to Elasticsearch (with a short timeout)
-                var connectionAvailable = TestElasticsearchConnection(configuration["ElasticsearchSettings:Uri"]);
-                
-                if (connectionAvailable)
-                {
-                    var elasticsearchSettings = configuration.GetSection("ElasticsearchSettings");
-                    
-                    loggerConfiguration.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["ElasticsearchSettings:Uri"]))
-                    {
-                        IndexFormat = $"{assemblyName.ToLower()}-{DateTime.UtcNow:yyyy-MM}",
-                        AutoRegisterTemplate = true,
-                        NumberOfReplicas = 1,
-                        NumberOfShards = 2,
-                        ModifyConnectionSettings = conn =>
-                        {
-                            if (!string.IsNullOrEmpty(elasticsearchSettings["Username"]) && 
-                                !string.IsNullOrEmpty(elasticsearchSettings["Password"]))
-                            {
-                                conn.BasicAuthentication(elasticsearchSettings["Username"], elasticsearchSettings["Password"]);
-                            }
-                            return conn;
-                        },
-                        BatchAction = ElasticOpType.Create,
-                        EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
-                                          EmitEventFailureHandling.WriteToFailureSink |
-                                          EmitEventFailureHandling.RaiseCallback,
-                        FailureCallback = e => SelfLog.WriteLine("Unable to submit event to Elasticsearch: {0}", e.MessageTemplate),
-                        BufferBaseFilename = Path.Combine(AppContext.BaseDirectory, "logs", "buffer"),
-                        BufferLogShippingInterval = TimeSpan.FromSeconds(5),
-                    });
-                    
-                    SelfLog.WriteLine("Elasticsearch sink configured successfully");
-                }
-                else
-                {
-                    SelfLog.WriteLine("Elasticsearch connection test failed - using fallback logging only");
-                }
-            }
-            catch (Exception ex)
-            {
-                SelfLog.WriteLine("Error configuring Elasticsearch sink: {0}", ex);
-            }
+            ConfigureElasticsearchSink(loggerConfiguration, assemblyName, elasticSettings);
         }
-        
+
         Log.Logger = loggerConfiguration.CreateLogger();
     }
-    
-    private static bool TestElasticsearchConnection(string uri)
+
+    private static bool ShouldEnableElasticsearch(IConfigurationSection elasticSettings)
+    {
+        return elasticSettings.GetValue<bool>("Enabled") && 
+               !string.IsNullOrEmpty(elasticSettings["Uri"]);
+    }
+
+    private static void ConfigureElasticsearchSink(
+        LoggerConfiguration loggerConfig,
+        string assemblyName,
+        IConfigurationSection elasticSettings)
     {
         try
         {
-            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
-            var response = client.GetAsync(uri).GetAwaiter().GetResult();
-            return response.IsSuccessStatusCode;
+            var uri = elasticSettings["Uri"];
+            var username = elasticSettings["Username"];
+            var password = elasticSettings["Password"];
+            
+            // Use the new Elastic.Serilog.Sinks configuration
+            loggerConfig.WriteTo.Elasticsearch(
+                new[] { new Uri(uri) },
+                opts =>
+                {
+                    // Configure datastream for the application
+                    opts.DataStream = new DataStreamName(
+                        "logs", 
+                        "dotnet", 
+                        assemblyName.ToLower());
+                    
+                    // Set bootstrap method based on configuration
+                    opts.BootstrapMethod = elasticSettings.GetValue<bool>("EnableResiliency") 
+                        ? BootstrapMethod.Silent 
+                        : BootstrapMethod.None;
+                    
+                    // Configure channel for buffer options
+                    opts.ConfigureChannel = channelOpts =>
+                    {
+                        channelOpts.BufferOptions = new BufferOptions
+                        {
+
+                        };
+                    };
+                },
+                transport =>
+                {
+                    // Configure authentication if credentials are provided
+                    if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+                    {
+                        transport.Authentication(new Elastic.Transport.BasicAuthentication(username, password));
+                    }
+                    
+                    // Optional: Configure TLS validation
+                    transport.ServerCertificateValidationCallback((o, cert, chain, errors) => true);
+                }
+            );
+            
+            SelfLog.WriteLine("Elasticsearch sink configured successfully");
+            Console.WriteLine("Elasticsearch sink configured successfully");
         }
-        catch
+        catch (Exception ex)
         {
-            return false;
+            SelfLog.WriteLine($"Elasticsearch configuration error: {ex}");
+            Log.Warning(ex, "Failed to configure Elasticsearch sink");
         }
     }
 }
