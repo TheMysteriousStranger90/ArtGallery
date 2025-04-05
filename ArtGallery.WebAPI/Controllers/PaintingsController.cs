@@ -235,26 +235,26 @@ public class PaintingsController : ControllerBase
     /// <summary>
     /// Update an existing painting
     /// </summary>
-    /// <param name="id">Painting ID</param>
+    /// <param name="paintingId">Painting ID</param>
     /// <param name="command">Updated painting information</param>
     /// <returns>Updated painting information</returns>
-    [HttpPut("{id}")]
+    [HttpPut("{paintingId}")]
     [Authorize(Policy = "RequireAdminRole")]
     [ProducesResponseType(typeof(PaintingDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<PaintingDto>> UpdatePainting(Guid id, [FromForm] UpdatePaintingCommand command)
+    public async Task<ActionResult<PaintingDto>> UpdatePainting(Guid paintingId, [FromForm] UpdatePaintingCommand command)
     {
-        if (id != command.Id)
+        if (paintingId != command.Id)
         {
             return BadRequest("The ID in the URL must match the ID in the request body");
         }
 
-        command.Id = id;
+        command.Id = paintingId;
 
-        _logger.LogInformation("Updating painting with ID: {PaintingId}", id);
+        _logger.LogInformation("Updating painting with ID: {PaintingId}", paintingId);
 
         var response = await _mediator.Send(command);
 
@@ -273,7 +273,7 @@ public class PaintingsController : ControllerBase
 
             if (response.Message?.Contains(nameof(Painting)) == true)
             {
-                throw new NotFoundException($"Painting with ID {id} not found");
+                throw new NotFoundException($"Painting with ID {paintingId} not found");
             }
 
             throw new BadRequestException(response.Message ?? "Error updating painting");
@@ -283,7 +283,7 @@ public class PaintingsController : ControllerBase
         InvalidatePaintingsCache();
 
         // Also remove specific painting detail cache
-        var detailCacheKey = $"{PaintingsCacheKey}_Detail_{id}";
+        var detailCacheKey = $"{PaintingsCacheKey}_Detail_{paintingId}";
         _memoryCache.Remove(detailCacheKey);
         _cacheKeyService.RemoveKey(detailCacheKey);
 
