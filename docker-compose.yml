@@ -8,7 +8,9 @@ services:
       dockerfile: ArtGallery.WebAPI/Dockerfile
     ports:
       - "8080:8080"
+      - "8081:8081"
     environment:
+      - CERTIFICATE_PATH=/certificates
       - JwtSettings__Key=your_secure_jwt_key_that_is_at_least_32_characters_long
       - JwtSettings__Issuer=ArtGalleryAPI
       - JwtSettings__Audience=ArtGalleryUsers
@@ -27,6 +29,7 @@ services:
         condition: service_started
     volumes:
       - dataprotection-keys:/home/app/.aspnet/DataProtection-Keys
+      - ./certificates:/certificates
     networks:
       - art-gallery-network
 

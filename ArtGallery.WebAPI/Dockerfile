@@ -1,14 +1,18 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys \
+    && mkdir -p /tmp/serilog-buffer \
+    && mkdir -p /certificates \
+    && chown -R 1000:1000 /home/app/.aspnet \
+    && chown -R 1000:1000 /certificates \
+    && chmod -R 755 /home/app/.aspnet \
+    && chmod -R 755 /certificates \
+    && chmod -R 755 /tmp/serilog-buffer
+
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
-
-RUN mkdir -p /home/app/.aspnet/DataProtection-Keys \
-    && mkdir -p /tmp/serilog-buffer \
-    && chown -R app:app /home/app/.aspnet \
-    && chmod -R 755 /home/app/.aspnet \
-    && chmod -R 755 /tmp/serilog-buffer
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release

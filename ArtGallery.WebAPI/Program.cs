@@ -10,14 +10,75 @@ using ArtGallery.WebAPI.Extensions;
 using ArtGallery.WebAPI.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Prometheus;
 using Serilog;
+using TlsCertificateLoader.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure HTTPS with TlsCertificateLoader
+if (builder.Environment.IsProduction())
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        // HTTP endpoint
+        options.ListenAnyIP(8080);
+        
+        // HTTPS endpoint
+        var certificatePath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH") ?? "/certificates";
+        var fullChainPath = Path.Combine(certificatePath, "fullchain.pem");
+        var privateKeyPath = Path.Combine(certificatePath, "privkey.pem");
+        
+        if (File.Exists(fullChainPath) && File.Exists(privateKeyPath))
+        {
+            var tlsCertificateLoader = new TlsCertificateLoader.TlsCertificateLoader(
+                fullChainPath, 
+                privateKeyPath);
+            
+            builder.Services.AddSingleton(tlsCertificateLoader);
+            
+            builder.Services.AddHostedService<CertificateRefreshService>();
+    
+            options.ListenAnyIP(8081, listenOptions =>
+            {
+                listenOptions.SetTlsHandshakeCallbackOptions(tlsCertificateLoader);
+                listenOptions.SetHttpsConnectionAdapterOptions(tlsCertificateLoader);
+                listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+            });
+            
+            
+            var certificateWatcher = new FileSystemWatcher(certificatePath)
+            {
+                NotifyFilter = NotifyFilters.LastWrite,
+                Filter = "*.pem",
+                EnableRaisingEvents = true
+            };
+
+            certificateWatcher.Changed += (sender, e) =>
+            {
+                Console.WriteLine($"Certificate file changed: {e.Name}");
+                try
+                {
+                    tlsCertificateLoader.RefreshDefaultCertificates();
+                    Console.WriteLine("Certificates refreshed successfully");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error refreshing certificates: {ex.Message}");
+                }
+            };
+        }
+        else
+        {
+            Console.WriteLine("HTTPS certificate files not found. Running with HTTP only.");
+        }
+    });
+}
 
 // Configure Serilog with conditional Elasticsearch
 try
@@ -41,7 +102,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 
-
+builder.Services.UseHttpClientMetrics(); 
 
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(@"/home/app/.aspnet/DataProtection-Keys"))
@@ -194,6 +255,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseMetricServer();
 app.UseHttpMetrics(); // Collect HTTP metrics
 app.MapMetrics(); // Expose /metrics endpoint
 
