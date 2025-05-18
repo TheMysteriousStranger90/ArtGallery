@@ -5,7 +5,22 @@ riderModule.iml
 /_ReSharper.Caches/
 
 
-ArtGallery.WebAPI/logs/
+
 ArtGallery.WebAPI/appsettings.json
 ArtGallery.WebAPI/appsettings.Production.json
 .idea/
+certificates/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+ArtGallery.WebAPI/.env
+ArtGallery.WebAPI/.env.production
+
+# Log files
+*.log
+logs/
+ArtGallery.WebAPI/logs/

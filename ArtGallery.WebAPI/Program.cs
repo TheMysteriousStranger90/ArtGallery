@@ -8,6 +8,7 @@ using ArtGallery.Persistence.Context;
 using ArtGallery.Persistence.Extensions;
 using ArtGallery.WebAPI.Extensions;
 using ArtGallery.WebAPI.Services;
+using DotNetEnv;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -19,63 +20,94 @@ using Prometheus;
 using Serilog;
 using TlsCertificateLoader.Extensions;
 
+string envFile = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower() == "production" 
+    ? ".env.production" 
+    : ".env";
+
+if (File.Exists(envFile))
+{
+    Env.Load(envFile);
+    Console.WriteLine($"Loaded environment variables from {envFile}");
+}
+else
+{
+    Console.WriteLine($"No {envFile} file found. Using environment variables and configuration files.");
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure HTTPS with TlsCertificateLoader
+TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader = null;
+
 if (builder.Environment.IsProduction())
 {
+    string effectiveCertificatePath;
+    var certificateEnvVarPath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH");
+
+    if (!string.IsNullOrEmpty(certificateEnvVarPath))
+    {
+        effectiveCertificatePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"..", "..", "..", "..", certificateEnvVarPath));
+    }
+    else
+    {
+        effectiveCertificatePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "certificates"));
+    }
+
+    var fullChainPath = Path.Combine(effectiveCertificatePath, "fullchain.pem");
+    var privateKeyPath = Path.Combine(effectiveCertificatePath, "privkey.pem");
+    
+    Console.WriteLine($"Effective certificate path: {effectiveCertificatePath}");
+    Console.WriteLine($"Checking for certificate files:");
+    Console.WriteLine($"  - fullchain.pem: {(File.Exists(fullChainPath) ? "FOUND" : "NOT FOUND")} at {fullChainPath}");
+    Console.WriteLine($"  - privkey.pem: {(File.Exists(privateKeyPath) ? "FOUND" : "NOT FOUND")} at {privateKeyPath}");
+
+    if (File.Exists(fullChainPath) && File.Exists(privateKeyPath))
+    {
+        Console.WriteLine("Both certificate files found. Configuring HTTPS...");
+        tlsCertificateLoader = new TlsCertificateLoader.TlsCertificateLoader(
+            fullChainPath,
+            privateKeyPath);
+
+        builder.Services.AddSingleton(tlsCertificateLoader);
+        builder.Services.AddHostedService<CertificateRefreshService>();
+
+        var certificateWatcher = new FileSystemWatcher(effectiveCertificatePath)
+        {
+            NotifyFilter = NotifyFilters.LastWrite,
+            Filter = "*.pem",
+            EnableRaisingEvents = true
+        };
+
+        certificateWatcher.Changed += (sender, e) =>
+        {
+            Console.WriteLine($"Certificate file changed: {e.Name}");
+            try
+            {
+                tlsCertificateLoader.RefreshDefaultCertificates();
+                Console.WriteLine("Certificates refreshed successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error refreshing certificates: {ex.Message}");
+            }
+        };
+    }
+    else
+    {
+        Console.WriteLine("HTTPS certificate files not found. Running with HTTP only.");
+    }
+    
     builder.WebHost.ConfigureKestrel(options =>
     {
-        // HTTP endpoint
         options.ListenAnyIP(8080);
         
-        // HTTPS endpoint
-        var certificatePath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH") ?? "/certificates";
-        var fullChainPath = Path.Combine(certificatePath, "fullchain.pem");
-        var privateKeyPath = Path.Combine(certificatePath, "privkey.pem");
-        
-        if (File.Exists(fullChainPath) && File.Exists(privateKeyPath))
+        if (tlsCertificateLoader != null)
         {
-            var tlsCertificateLoader = new TlsCertificateLoader.TlsCertificateLoader(
-                fullChainPath, 
-                privateKeyPath);
-            
-            builder.Services.AddSingleton(tlsCertificateLoader);
-            
-            builder.Services.AddHostedService<CertificateRefreshService>();
-    
             options.ListenAnyIP(8081, listenOptions =>
             {
                 listenOptions.SetTlsHandshakeCallbackOptions(tlsCertificateLoader);
                 listenOptions.SetHttpsConnectionAdapterOptions(tlsCertificateLoader);
                 listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
             });
-            
-            
-            var certificateWatcher = new FileSystemWatcher(certificatePath)
-            {
-                NotifyFilter = NotifyFilters.LastWrite,
-                Filter = "*.pem",
-                EnableRaisingEvents = true
-            };
-
-            certificateWatcher.Changed += (sender, e) =>
-            {
-                Console.WriteLine($"Certificate file changed: {e.Name}");
-                try
-                {
-                    tlsCertificateLoader.RefreshDefaultCertificates();
-                    Console.WriteLine("Certificates refreshed successfully");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error refreshing certificates: {ex.Message}");
-                }
-            };
-        }
-        else
-        {
-            Console.WriteLine("HTTPS certificate files not found. Running with HTTP only.");
         }
     });
 }

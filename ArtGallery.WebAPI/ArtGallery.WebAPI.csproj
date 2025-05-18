@@ -10,6 +10,7 @@
     <ItemGroup>
         <!-- Notice how these don't specify versions -->
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+        <PackageReference Include="DotNetEnv" />
         <PackageReference Include="Elastic.Clients.Elasticsearch" />
         <PackageReference Include="Elastic.Serilog.Sinks" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" />

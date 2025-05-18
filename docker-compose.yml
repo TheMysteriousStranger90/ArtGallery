@@ -11,15 +11,9 @@ services:
       - "8081:8081"
     environment:
       - CERTIFICATE_PATH=/certificates
-      - JwtSettings__Key=your_secure_jwt_key_that_is_at_least_32_characters_long
-      - JwtSettings__Issuer=ArtGalleryAPI
-      - JwtSettings__Audience=ArtGalleryUsers
-      - JwtSettings__DurationInMinutes=60
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__ArtGalleryDbConnection=Server=sqlserver;Database=ArtGalleryDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;Encrypt=False;
-      - ConnectionStrings__ArtGalleryIdentityDbConnection=Server=sqlserver;Database=ArtGalleryIdentityDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;Encrypt=False;
-      - ElasticsearchSettings__Uri=http://elasticsearch:9200
-      - OpenTelemetry__OtlpEndpoint=http://otel-collector:4317
+    env_file:
+      - .env.production
     depends_on:
       sqlserver:
         condition: service_started
