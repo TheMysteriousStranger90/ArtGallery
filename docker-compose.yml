@@ -12,8 +12,13 @@ services:
     environment:
       - CERTIFICATE_PATH=/certificates
       - ASPNETCORE_ENVIRONMENT=Production
-    env_file:
-      - .env.production
+      - ConnectionStrings__ArtGalleryDbConnection=Server=sqlserver;Database=ArtGalleryDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;Encrypt=False;
+      - ConnectionStrings__ArtGalleryIdentityDbConnection=Server=sqlserver;Database=ArtGalleryIdentityDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;Encrypt=False;
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - ELASTICSEARCH_URI=http://elasticsearch:9200
+      - OTEL_ENDPOINT=http://otel-collector:4317
     depends_on:
       sqlserver:
         condition: service_started

@@ -27,6 +27,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5CDD563D-3599-45A1-A457-27F770942278}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
+		.env.production = .env.production
+		.env = .env
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.WebAPI.Tests", "ArtGallery.WebAPI.Tests\ArtGallery.WebAPI.Tests.csproj", "{8763266E-65A0-4BA9-93A7-538BD142BA95}"
