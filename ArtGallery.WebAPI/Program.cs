@@ -138,7 +138,6 @@ if (builder.Environment.IsProduction())
     });
 }
 
-// Configure Serilog with conditional Elasticsearch
 try
 {
     builder.Services.ConfigureSerilog(builder.Configuration);
@@ -147,8 +146,7 @@ try
 catch (Exception ex)
 {
     Console.WriteLine($"Error configuring Serilog: {ex.Message}");
-
-    // Fallback to basic logging
+    
     builder.Host.UseSerilog((context, services, configuration) => configuration
         .WriteTo.Console()
         .WriteTo.File("logs/error-.txt", rollingInterval: RollingInterval.Day));
@@ -162,9 +160,42 @@ builder.Services.AddIdentityServices(builder.Configuration);
 
 builder.Services.UseHttpClientMetrics(); 
 
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(@"/home/app/.aspnet/DataProtection-Keys"))
-    .SetApplicationName("ArtGalleryAPI");
+try
+{
+    string dataProtectionPath = "/root/.aspnet/DataProtection-Keys";
+    var directory = new DirectoryInfo(dataProtectionPath);
+    
+    if (!directory.Exists)
+    {
+        directory.Create();
+    }
+    
+    var testFile = Path.Combine(dataProtectionPath, "permission-test.tmp");
+    try
+    {
+        File.WriteAllText(testFile, "test");
+        File.Delete(testFile);
+        
+        builder.Services.AddDataProtection()
+            .PersistKeysToFileSystem(directory)
+            .SetApplicationName("ArtGalleryAPI");
+        
+        Console.WriteLine($"DataProtection configured to use: {dataProtectionPath}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Warning: Cannot write to {dataProtectionPath}: {ex.Message}");
+        throw; // Rethrow to be caught by outer try/catch
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Warning: DataProtection key persistence failed: {ex.Message}");
+    Console.WriteLine("Using ephemeral keys - keys will not persist across app restarts!");
+    
+    builder.Services.AddDataProtection()
+        .SetApplicationName("ArtGalleryAPI");
+}
 
 
 
@@ -176,23 +207,19 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 
-// Replace the existing Swagger config with our enhanced version
 builder.Services.AddSwaggerDocumentation();
 
-// Configure rate limiting
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-    // Registration rate limit: 3 requests per minute
+    
     options.AddFixedWindowLimiter("registration", opt =>
     {
         opt.Window = TimeSpan.FromMinutes(1);
         opt.PermitLimit = 3;
         opt.QueueLimit = 0;
     });
-
-    // Authentication rate limit: 5 requests per minute
+    
     options.AddFixedWindowLimiter("authentication", opt =>
     {
         opt.Window = TimeSpan.FromMinutes(1);
@@ -206,8 +233,7 @@ try
 {
     var serviceName = "ArtGalleryAPI";
     var serviceVersion = "1.0.0";
-
-    // Define ActivitySource for manual instrumentation
+    
     builder.Services.AddSingleton(new ActivitySource(serviceName));
 
     builder.Services.AddOpenTelemetry()
@@ -244,8 +270,7 @@ try
                 .AddMeter(serviceName)
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation();
-
-            // Add OTLP exporter with retry logic and timeout
+            
             try
             {
                 var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ??
@@ -269,7 +294,6 @@ catch (Exception ex)
 }
 
 
-// Add health checks conditionally
 builder.Services.AddHealthChecks().ForwardToPrometheus();
 
 builder.Services.AddCors(options =>

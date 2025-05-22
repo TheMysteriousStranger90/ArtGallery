@@ -27,7 +27,7 @@ services:
       otel-collector:
         condition: service_started
     volumes:
-      - dataprotection-keys:/home/app/.aspnet/DataProtection-Keys
+      - data_protection_keys:/root/.aspnet/DataProtection-Keys
       - ./certificates:/certificates
     networks:
       - art-gallery-network
@@ -120,7 +120,7 @@ volumes:
   prometheus-data:
   grafana-data:
   sqlserver-data:
-  dataprotection-keys:
+  data_protection_keys:
 
 networks:
   art-gallery-network:

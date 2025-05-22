@@ -3,13 +3,14 @@
 RUN mkdir -p /home/app/.aspnet/DataProtection-Keys \
     && mkdir -p /tmp/serilog-buffer \
     && mkdir -p /certificates \
+    && mkdir -p /root/.aspnet/DataProtection-Keys \
+    && chmod 777 /root/.aspnet/DataProtection-Keys \
     && chown -R 1000:1000 /home/app/.aspnet \
     && chown -R 1000:1000 /certificates \
     && chmod -R 755 /home/app/.aspnet \
     && chmod -R 755 /certificates \
     && chmod -R 755 /tmp/serilog-buffer
 
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
