@@ -1,0 +1,120 @@
+﻿version: '3.8'
+
+services:
+  artgallery.webapi:
+    image: ${DOCKERHUB_USERNAME}/artgallery.webapi:${GITHUB_SHA}
+    build:
+      context: .
+      dockerfile: ArtGallery.WebAPI/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - CERTIFICATE_PATH=/certificates
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__ArtGalleryDbConnection=Server=sqlserver;Database=ArtGalleryDB;User=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;Encrypt=False;
+      - ConnectionStrings__ArtGalleryIdentityDbConnection=Server=sqlserver;Database=ArtGalleryIdentityDB;User=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;Encrypt=False;
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - ELASTICSEARCH_URI=http://elasticsearch:9200
+      - OTEL_ENDPOINT=http://otel-collector:4317
+    depends_on:
+      - sqlserver
+      - elasticsearch
+      - otel-collector
+    volumes:
+      - data_protection_keys:/root/.aspnet/DataProtection-Keys
+      - ./certificates:/certificates
+    networks:
+      - art-gallery-network
+    restart: unless-stopped
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Password
+      - MSSQL_PID=Express
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - art-gallery-network
+    restart: unless-stopped
+  
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - cluster.routing.allocation.disk.threshold_enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - art-gallery-network
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.4
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - art-gallery-network
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./ArtGallery.WebAPI/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - art-gallery-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./ArtGallery.WebAPI/grafana/provisioning:/etc/grafana/provisioning
+      - ./ArtGallery.WebAPI/grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - art-gallery-network
+    restart: unless-stopped
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.91.0
+    volumes:
+      - ./ArtGallery.WebAPI/otelcol-contrib/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    ports:
+      - "4317:4317"
+    networks:
+      - art-gallery-network
+    restart: unless-stopped
+
+volumes:
+  elasticsearch-data:
+  prometheus-data:
+  grafana-data:
+  sqlserver-data:
+  data_protection_keys:
+
+networks:
+  art-gallery-network:
+    driver: bridge
