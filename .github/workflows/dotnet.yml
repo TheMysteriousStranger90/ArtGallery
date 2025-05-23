@@ -37,16 +37,13 @@ jobs:
 
       - name: Build and push Docker images
         env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_KEY: ${{ secrets.JWT_KEY }}
           JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
           JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
         run: |
-          # Create certificates directory if needed
-          mkdir -p certificates
-          
-          # Build and push images using docker-compose
-          docker-compose -f docker-compose.yml build
-          docker-compose -f docker-compose.yml push
+          docker-compose -f docker-compose.github.yml build
+          docker-compose -f docker-compose.github.yml push
           
       - name: Deploy with docker-compose
         env:
