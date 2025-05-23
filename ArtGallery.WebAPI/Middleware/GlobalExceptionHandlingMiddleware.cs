@@ -54,7 +54,7 @@ public class GlobalExceptionHandlingMiddleware
                 ? new ErrorResponse
                 {
                     Errors = new List<string> { ex.Message },
-                    StackTrace = ex.StackTrace // Optional: Include stack trace in dev environment
+                    StackTrace = ex.StackTrace
                 }
                 : new ErrorResponse
                 {
