@@ -1,0 +1,36 @@
+name: Deploy with Docker Compose
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup environment variables
+      run: |
+        echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env.production
+        echo "JWT_ISSUER=${{ secrets.JWT_ISSUER }}" >> .env.production
+        echo "JWT_AUDIENCE=${{ secrets.JWT_AUDIENCE }}" >> .env.production
+
+    - name: Deploy with Docker Compose
+      run: |
+        # Update image to latest
+        export IMAGE_TAG=latest
+        docker-compose -f docker-compose.yml down
+        docker-compose -f docker-compose.yml pull
+        docker-compose -f docker-compose.yml up -d
+
+    - name: Health Check
+      run: |
+        timeout 300 bash -c 'until curl -f http://localhost:8080/health; do sleep 5; done'
+        echo "Application is healthy!"
