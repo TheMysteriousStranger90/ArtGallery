@@ -10,12 +10,14 @@ using ArtGallery.WebAPI.Middleware;
 using ArtGallery.WebAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure environment variables first
 builder.ConfigureEnvironmentVariables();
 
-// Configure enhanced logging first
+// Configure enhanced logging (combines both approaches)
 builder.ConfigureEnhancedLogging();
 
 // Configure TLS certificates BEFORE any other Kestrel configuration
@@ -48,7 +50,7 @@ builder.ConfigureRateLimiting();
 // Configure OpenTelemetry
 builder.ConfigureOpenTelemetry();
 
-// Configure health checks - now with more detailed checks
+// Configure health checks
 builder.Services.AddHealthChecks()
     .ForwardToPrometheus();
 
@@ -91,12 +93,11 @@ app.MapHealthChecks("/health");
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-    var logger = loggerFactory.CreateLogger<Program>();
+    var logger = Log.ForContext<Program>();
 
     try
     {
-        logger.LogInformation("Starting database initialization...");
+        logger.Information("Starting database initialization...");
 
         // Get DbContext instances
         var artGalleryContext = services.GetRequiredService<ArtGalleryDbContext>();
@@ -108,21 +109,34 @@ using (var scope = app.Services.CreateScope())
         await identityContext.Database.EnsureCreatedAsync();
         */
         
-        // Then run migrations
+        // Run migrations
         await artGalleryContext.Database.MigrateAsync();
         await identityContext.Database.MigrateAsync();
 
-        logger.LogInformation("Database initialization completed.");
+        logger.Information("Database initialization completed");
 
-        // Now seed data
-        logger.LogInformation("Starting application seeding...");
+        // Seed data
+        logger.Information("Starting application seeding...");
         await ArtGallery.Identity.SeedData.SeedDataUserInitializer.Initialize(services);
-        logger.LogInformation("Application seeding completed.");
+        logger.Information("Application seeding completed");
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "An error occurred during database initialization or application seeding.");
+        logger.Fatal(ex, "An error occurred during database initialization or application seeding");
+        throw;
     }
 }
 
-app.Run();
+try
+{
+    Log.Information("Starting ArtGallery WebAPI");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
