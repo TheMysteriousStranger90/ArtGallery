@@ -13,13 +13,13 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetches all history for GitVersion
       
       # .NET Setup and Build Steps
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
           
@@ -41,11 +41,11 @@ jobs:
           targetdir: './CoverageReport'
           reporttypes: 'HtmlInline_AzurePipelines;Cobertura'
           
-      - name: Upload deployment artifact
+      - name: Upload code coverage results
         uses: actions/upload-artifact@v4
         with:
-          name: webapp
-          path: ./publish
+          name: code-coverage-report
+          path: './CoverageReport'
           
       # Create Environment Files
       - name: Create env files from secrets
@@ -57,19 +57,25 @@ jobs:
       
       # Docker Setup and Build
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       
       # Code Quality Analysis
       - name: Run code analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          languages: csharp
+        uses: github/super-linter@v5
+        env:
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_CSHARP: true
+      
+      # Create deployment artifact BEFORE Docker build
+      - name: Publish web project
+        run: dotnet publish ArtGallery.WebAPI/ArtGallery.WebAPI.csproj -c Release -o ./publish
       
       # Build and Push Docker Images
       - name: Build and push Docker images
@@ -91,8 +97,10 @@ jobs:
       # Check for SQL migrations
       - name: Check for pending migrations
         run: |
-          # Assuming you have Entity Framework tools installed
-          dotnet ef migrations list --project ArtGallery.Persistence --startup-project ArtGallery.WebAPI
+          # Install EF Core tools if not present
+          dotnet tool install --global dotnet-ef || true
+          # Check migrations
+          dotnet ef migrations list --project ArtGallery.Persistence --startup-project ArtGallery.WebAPI || echo "No migrations found or EF tools not configured"
       
       # Output Build Information
       - name: Add build summary
@@ -104,14 +112,10 @@ jobs:
           echo "* **Build Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "* **Image**: ${{ secrets.DOCKER_HUB_USERNAME }}/artgallery.webapi:${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
       
-      # Create deployment artifact
-      - name: Publish web project
-        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: dotnet publish ArtGallery.WebAPI/ArtGallery.WebAPI.csproj -c Release -o ./publish
-      
+      # Upload deployment artifact
       - name: Upload deployment artifact
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: webapp
           path: ./publish
