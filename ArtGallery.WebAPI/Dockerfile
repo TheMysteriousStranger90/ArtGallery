@@ -38,6 +38,3 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 COPY ../.env.production /app/.env.production
 ENTRYPOINT ["dotnet", "ArtGallery.WebAPI.dll"]
-
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD curl --fail http://localhost:8080/health || exit 1
