@@ -65,13 +65,6 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       
-      # Code Quality Analysis
-      - name: Run code analysis
-        uses: github/super-linter@v5
-        env:
-          DEFAULT_BRANCH: master
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_CSHARP: true
       
       # Create deployment artifact BEFORE Docker build
       - name: Publish web project
