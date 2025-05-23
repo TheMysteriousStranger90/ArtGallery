@@ -2,10 +2,10 @@ name: Docker Build and Deploy
 
 on:
   push:
-    branches: [ master ]  # Using master branch as specified
+    branches: [ master ]
   pull_request:
     branches: [ master ]
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
 
 jobs:
   build_and_deploy:
@@ -17,14 +17,13 @@ jobs:
 
       - name: Create env files from secrets
         run: |
-          # Create .env.production file from secrets
           echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
-          
-          # Create .env file for development if needed
           echo "${{ secrets.ENV_DEVELOPMENT }}" > .env
-          
-          # Verify files were created (don't show content in logs)
+          # Verify files were created
           ls -la .env*
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -32,24 +31,18 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
       - name: Build and push Docker images
         env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_KEY: ${{ secrets.JWT_KEY }}
           JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
           JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
-          docker-compose -f docker-compose.github.yml build
-          docker-compose -f docker-compose.github.yml push
+          # Create certificates directory if needed
+          mkdir -p certificates
           
-      - name: Deploy with docker-compose
-        env:
-          JWT_KEY: ${{ secrets.JWT_KEY }}
-          JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
-          JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
-        run: |
-          # Deploy using docker-compose
-          docker-compose -f docker-compose.yml up -d
+          # Use 'docker compose' instead of 'docker-compose'
+          docker compose -f docker-compose.github.yml build
+          docker compose -f docker-compose.github.yml push
