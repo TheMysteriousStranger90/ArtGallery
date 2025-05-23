@@ -1,4 +1,4 @@
-name: Docker Build and Deploy
+name: ASP.NET Build, Test and Deploy
 
 on:
   push:
@@ -8,29 +8,70 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_deploy:
+  build_test_deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
+        with:
+          fetch-depth: 0  # Fetches all history for GitVersion
+      
+      # .NET Setup and Build Steps
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+          
+      - name: Restore dependencies
+        run: dotnet restore
+        
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+      
+      # Run Tests
+      - name: Run unit tests
+        run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults
+      
+      # Code Coverage Report
+      - name: Generate code coverage report
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
+        with:
+          reports: './TestResults/**/coverage.cobertura.xml'
+          targetdir: './CoverageReport'
+          reporttypes: 'HtmlInline_AzurePipelines;Cobertura'
+          
+      - name: Upload code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: './CoverageReport'
+          
+      # Create Environment Files
       - name: Create env files from secrets
         run: |
           echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
           echo "${{ secrets.ENV_DEVELOPMENT }}" > .env
           # Verify files were created
           ls -la .env*
-
+      
+      # Docker Setup and Build
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
+      
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
+      
+      # Code Quality Analysis
+      - name: Run code analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          languages: csharp
+      
+      # Build and Push Docker Images
       - name: Build and push Docker images
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -46,3 +87,42 @@ jobs:
           # Use 'docker compose' instead of 'docker-compose'
           docker compose -f docker-compose.github.yml build
           docker compose -f docker-compose.github.yml push
+      
+      # Check for SQL migrations
+      - name: Check for pending migrations
+        run: |
+          # Assuming you have Entity Framework tools installed
+          dotnet ef migrations list --project ArtGallery.Persistence --startup-project ArtGallery.WebAPI
+      
+      # Output Build Information
+      - name: Add build summary
+        if: success()
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "* **Project**: ArtGallery ASP.NET Application" >> $GITHUB_STEP_SUMMARY
+          echo "* **Version**: $(grep -m 1 '<Version>' ArtGallery.WebAPI/*.csproj | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/' || echo 'Unknown')" >> $GITHUB_STEP_SUMMARY
+          echo "* **Build Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "* **Image**: ${{ secrets.DOCKER_HUB_USERNAME }}/artgallery.webapi:${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+      
+      # Create deployment artifact
+      - name: Publish web project
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: dotnet publish ArtGallery.WebAPI/ArtGallery.WebAPI.csproj -c Release -o ./publish
+      
+      - name: Upload deployment artifact
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v3
+        with:
+          name: webapp
+          path: ./publish
+          
+      # Notification on completion
+      - name: Notify on completion
+        if: always()
+        run: |
+          status="${{ job.status }}"
+          if [ "$status" == "success" ]; then
+            echo "## ✅ Workflow completed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Workflow failed" >> $GITHUB_STEP_SUMMARY
+          fi
