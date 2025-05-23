@@ -1,6 +1,4 @@
-@ArtGallery.WebAPI_HostAddress = http://localhost:5062
+@ArtGallery.WebAPI_HostAddress = http://localhost:8080
 
 GET {{ArtGallery.WebAPI_HostAddress}}/docs/index.html
 Accept: application/json
-
-###

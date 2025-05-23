@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Extensions;
 using ArtGallery.Identity.Context;
@@ -8,136 +7,19 @@ using ArtGallery.Persistence.Context;
 using ArtGallery.Persistence.Extensions;
 using ArtGallery.WebAPI.Extensions;
 using ArtGallery.WebAPI.Services;
-using DotNetEnv;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Prometheus;
 using Serilog;
-using TlsCertificateLoader.Extensions;
-
-string environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
-string envFileName = environmentName == "production" ? ".env.production" : ".env";
-
-List<string> possiblePaths = new List<string>();
-
-if (environmentName == "production")
-{
-    possiblePaths.Add(Path.Combine(AppContext.BaseDirectory, envFileName));
-    possiblePaths.Add(envFileName);
-    possiblePaths.Add(Path.Combine("/", envFileName));
-    Console.WriteLine($"Running in Production. Will check multiple locations for {envFileName}");
-}
-else
-{
-    string solutionLevelPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
-    possiblePaths.Add(Path.Combine(solutionLevelPath, envFileName));
-    possiblePaths.Add(Path.Combine(AppContext.BaseDirectory, envFileName));
-    possiblePaths.Add(envFileName);
-    Console.WriteLine($"Running in {environmentName ?? "Unknown (assuming Development)"}. Will check multiple locations for {envFileName}");
-}
-
-bool fileLoaded = false;
-foreach (string path in possiblePaths)
-{
-    Console.WriteLine($"Checking for env file at: {path}");
-    
-    if (File.Exists(path))
-    {
-        Env.Load(path);
-        Console.WriteLine($"✅ Successfully loaded environment variables from {path}");
-        fileLoaded = true;
-        break;
-    }
-}
-
-if (!fileLoaded)
-{
-    Console.WriteLine($"❌ No {envFileName} file found in any of the search locations.");
-}
 
 var builder = WebApplication.CreateBuilder(args);
 
-TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader = null;
+// Configure environment variables and settings
+builder.ConfigureEnvironmentVariables();
 
-if (builder.Environment.IsProduction())
-{
-    string effectiveCertificatePath;
-    var certificateEnvVarPath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH");
+// Configure TLS certificates for HTTPS
+builder.ConfigureTlsCertificates();
 
-    if (!string.IsNullOrEmpty(certificateEnvVarPath))
-    {
-        effectiveCertificatePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"..", "..", "..", "..", certificateEnvVarPath));
-    }
-    else
-    {
-        effectiveCertificatePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "certificates"));
-    }
-
-    var fullChainPath = Path.Combine(effectiveCertificatePath, "fullchain.pem");
-    var privateKeyPath = Path.Combine(effectiveCertificatePath, "privkey.pem");
-    
-    Console.WriteLine($"Effective certificate path: {effectiveCertificatePath}");
-    Console.WriteLine($"Checking for certificate files:");
-    Console.WriteLine($"  - fullchain.pem: {(File.Exists(fullChainPath) ? "FOUND" : "NOT FOUND")} at {fullChainPath}");
-    Console.WriteLine($"  - privkey.pem: {(File.Exists(privateKeyPath) ? "FOUND" : "NOT FOUND")} at {privateKeyPath}");
-
-    if (File.Exists(fullChainPath) && File.Exists(privateKeyPath))
-    {
-        Console.WriteLine("Both certificate files found. Configuring HTTPS...");
-        tlsCertificateLoader = new TlsCertificateLoader.TlsCertificateLoader(
-            fullChainPath,
-            privateKeyPath);
-
-        builder.Services.AddSingleton(tlsCertificateLoader);
-        builder.Services.AddHostedService<CertificateRefreshService>();
-
-        var certificateWatcher = new FileSystemWatcher(effectiveCertificatePath)
-        {
-            NotifyFilter = NotifyFilters.LastWrite,
-            Filter = "*.pem",
-            EnableRaisingEvents = true
-        };
-
-        certificateWatcher.Changed += (sender, e) =>
-        {
-            Console.WriteLine($"Certificate file changed: {e.Name}");
-            try
-            {
-                tlsCertificateLoader.RefreshDefaultCertificates();
-                Console.WriteLine("Certificates refreshed successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error refreshing certificates: {ex.Message}");
-            }
-        };
-    }
-    else
-    {
-        Console.WriteLine("HTTPS certificate files not found. Running with HTTP only.");
-    }
-    
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.ListenAnyIP(8080);
-        
-        if (tlsCertificateLoader != null)
-        {
-            options.ListenAnyIP(8081, listenOptions =>
-            {
-                listenOptions.SetTlsHandshakeCallbackOptions(tlsCertificateLoader);
-                listenOptions.SetHttpsConnectionAdapterOptions(tlsCertificateLoader);
-                listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
-            });
-        }
-    });
-}
-
+// Configure Serilog logging
 try
 {
     builder.Services.ConfigureSerilog(builder.Configuration);
@@ -152,162 +34,40 @@ catch (Exception ex)
         .WriteTo.File("logs/error-.txt", rollingInterval: RollingInterval.Day));
 }
 
-// Add services to the container.
+// Configure core services
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.UseHttpClientMetrics();
 
-builder.Services.UseHttpClientMetrics(); 
+// Configure DataProtection
+builder.ConfigureDataProtection();
 
-try
-{
-    string dataProtectionPath = "/root/.aspnet/DataProtection-Keys";
-    var directory = new DirectoryInfo(dataProtectionPath);
-    
-    if (!directory.Exists)
-    {
-        directory.Create();
-    }
-    
-    var testFile = Path.Combine(dataProtectionPath, "permission-test.tmp");
-    try
-    {
-        File.WriteAllText(testFile, "test");
-        File.Delete(testFile);
-        
-        builder.Services.AddDataProtection()
-            .PersistKeysToFileSystem(directory)
-            .SetApplicationName("ArtGalleryAPI");
-        
-        Console.WriteLine($"DataProtection configured to use: {dataProtectionPath}");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Warning: Cannot write to {dataProtectionPath}: {ex.Message}");
-        throw; // Rethrow to be caught by outer try/catch
-    }
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Warning: DataProtection key persistence failed: {ex.Message}");
-    Console.WriteLine("Using ephemeral keys - keys will not persist across app restarts!");
-    
-    builder.Services.AddDataProtection()
-        .SetApplicationName("ArtGalleryAPI");
-}
-
-
-
+// Configure additional services
 builder.Services.AddMemoryCache();
-
 builder.Services.AddScoped<ILoggedInUserService, LoggedInUserService>();
-
 builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddControllers();
-
 builder.Services.AddSwaggerDocumentation();
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    
-    options.AddFixedWindowLimiter("registration", opt =>
-    {
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.PermitLimit = 3;
-        opt.QueueLimit = 0;
-    });
-    
-    options.AddFixedWindowLimiter("authentication", opt =>
-    {
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.PermitLimit = 5;
-        opt.QueueLimit = 0;
-    });
-});
+// Configure rate limiting
+builder.ConfigureRateLimiting();
 
+// Configure OpenTelemetry
+builder.ConfigureOpenTelemetry();
 
-try
-{
-    var serviceName = "ArtGalleryAPI";
-    var serviceVersion = "1.0.0";
-    
-    builder.Services.AddSingleton(new ActivitySource(serviceName));
-
-    builder.Services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource
-            .AddService(serviceName: serviceName, serviceVersion: serviceVersion)
-            .AddTelemetrySdk()
-            .AddEnvironmentVariableDetector())
-        .WithTracing(tracing =>
-        {
-            tracing
-                .AddSource(serviceName)
-                .AddAspNetCoreInstrumentation(options => { options.RecordException = true; })
-                .AddHttpClientInstrumentation();
-
-            try
-            {
-                var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ??
-                                   "http://localhost:4317";
-                tracing.AddOtlpExporter(opts =>
-                {
-                    opts.Endpoint = new Uri(otlpEndpoint);
-                    opts.TimeoutMilliseconds = 5000;
-                });
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex,
-                    "Failed to configure OpenTelemetry OTLP exporter for tracing. Using console exporter as fallback.");
-            }
-        })
-        .WithMetrics(metrics =>
-        {
-            metrics
-                .AddMeter(serviceName)
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation();
-            
-            try
-            {
-                var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ??
-                                   "http://localhost:4317";
-                metrics.AddOtlpExporter(opts =>
-                {
-                    opts.Endpoint = new Uri(otlpEndpoint);
-                    opts.TimeoutMilliseconds = 5000;
-                });
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex,
-                    "Failed to configure OpenTelemetry OTLP exporter for metrics. Using console exporter as fallback.");
-            }
-        });
-}
-catch (Exception ex)
-{
-    Log.Error(ex, "Failed to initialize OpenTelemetry");
-}
-
-
+// Configure health checks
 builder.Services.AddHealthChecks().ForwardToPrometheus();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-});
-
+// Configure CORS
+builder.ConfigureCors();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    // Replace the standard Swagger middleware with our enhanced version
     app.UseSwaggerDocumentation();
 
     app.Use(async (context, next) =>
@@ -322,27 +82,20 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Enable rate limiting middleware
 app.UseRateLimiter();
-
 app.UseRequestLogging();
 app.UseGlobalExceptionHandling();
-
 app.UseHttpsRedirection();
-
 app.UseCors("Open");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.UseMetricServer();
-app.UseHttpMetrics(); // Collect HTTP metrics
-app.MapMetrics(); // Expose /metrics endpoint
-
+app.UseHttpMetrics();
+app.MapMetrics();
 app.MapHealthChecks("/health");
 
+// Initialize databases and seed data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
