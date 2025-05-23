@@ -2,12 +2,12 @@
 
 public class CertificateRefreshService : BackgroundService
 {
-    private readonly TlsCertificateLoader.TlsCertificateLoader _tlsCertificateLoader;
+    private readonly TlsCertificateLoader.TlsCertificateLoader? _tlsCertificateLoader;
     private readonly ILogger<CertificateRefreshService> _logger;
     private readonly TimeSpan _refreshInterval = TimeSpan.FromHours(12);
 
     public CertificateRefreshService(
-        TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader,
+        TlsCertificateLoader.TlsCertificateLoader? tlsCertificateLoader,
         ILogger<CertificateRefreshService> logger)
     {
         _tlsCertificateLoader = tlsCertificateLoader;
@@ -16,6 +16,12 @@ public class CertificateRefreshService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        if (_tlsCertificateLoader == null)
+        {
+            _logger.LogInformation("No TLS certificate loader available - service will not refresh certificates");
+            return;
+        }
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try

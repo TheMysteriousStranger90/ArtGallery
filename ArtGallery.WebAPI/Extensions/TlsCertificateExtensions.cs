@@ -1,35 +1,50 @@
-﻿using ArtGallery.WebAPI.Services;
+﻿using System.Security.Cryptography.X509Certificates;
+using ArtGallery.WebAPI.Services;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using TlsCertificateLoader.Extensions;
 
 namespace ArtGallery.WebAPI.Extensions;
-
+/*
 public static class TlsCertificateExtensions
 {
-    public static TlsCertificateLoader.TlsCertificateLoader ConfigureTlsCertificates(this WebApplicationBuilder builder)
+    public static void ConfigureTlsCertificates(this WebApplicationBuilder builder)
     {
-        if (!builder.Environment.IsProduction())
+        TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader = null;
+        
+        if (builder.Environment.IsProduction())
         {
-            return null;
+            string effectiveCertificatePath = ResolveCertificatePath();
+            tlsCertificateLoader = LoadCertificates(effectiveCertificatePath, builder);
+            
+            if (tlsCertificateLoader != null)
+            {
+                builder.Services.AddSingleton(tlsCertificateLoader);
+                builder.Services.AddHostedService<CertificateRefreshService>();
+                ConfigureCertificateWatcher(effectiveCertificatePath, tlsCertificateLoader);
+            }
         }
 
-        TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader = null;
-        string effectiveCertificatePath;
-        var certificateEnvVarPath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH");
+        ConfigureKestrelConsistently(builder, tlsCertificateLoader);
+    }
 
+    private static string ResolveCertificatePath()
+    {
+        var certificateEnvVarPath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH");
+        
         if (!string.IsNullOrEmpty(certificateEnvVarPath))
         {
-            effectiveCertificatePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", certificateEnvVarPath));
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", certificateEnvVarPath));
         }
-        else
-        {
-            effectiveCertificatePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "certificates"));
-        }
-
-        var fullChainPath = Path.Combine(effectiveCertificatePath, "fullchain.pem");
-        var privateKeyPath = Path.Combine(effectiveCertificatePath, "privkey.pem");
         
-        Console.WriteLine($"Effective certificate path: {effectiveCertificatePath}");
+        return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "certificates"));
+    }
+
+    private static TlsCertificateLoader.TlsCertificateLoader LoadCertificates(string certificatePath, WebApplicationBuilder builder)
+    {
+        var fullChainPath = Path.Combine(certificatePath, "fullchain.pem");
+        var privateKeyPath = Path.Combine(certificatePath, "privkey.pem");
+        
+        Console.WriteLine($"Effective certificate path: {certificatePath}");
         Console.WriteLine($"Checking for certificate files:");
         Console.WriteLine($"  - fullchain.pem: {(File.Exists(fullChainPath) ? "FOUND" : "NOT FOUND")} at {fullChainPath}");
         Console.WriteLine($"  - privkey.pem: {(File.Exists(privateKeyPath) ? "FOUND" : "NOT FOUND")} at {privateKeyPath}");
@@ -37,23 +52,11 @@ public static class TlsCertificateExtensions
         if (File.Exists(fullChainPath) && File.Exists(privateKeyPath))
         {
             Console.WriteLine("Both certificate files found. Configuring HTTPS...");
-            tlsCertificateLoader = new TlsCertificateLoader.TlsCertificateLoader(
-                fullChainPath,
-                privateKeyPath);
-
-            builder.Services.AddSingleton(tlsCertificateLoader);
-            builder.Services.AddHostedService<CertificateRefreshService>();
-
-            ConfigureCertificateWatcher(effectiveCertificatePath, tlsCertificateLoader);
-            ConfigureKestrel(builder, tlsCertificateLoader);
+            return new TlsCertificateLoader.TlsCertificateLoader(fullChainPath, privateKeyPath);
         }
-        else
-        {
-            Console.WriteLine("HTTPS certificate files not found. Running with HTTP only.");
-            ConfigureKestrel(builder, null);
-        }
-
-        return tlsCertificateLoader;
+        
+        Console.WriteLine("HTTPS certificate files not found. Running with HTTP only.");
+        return null;
     }
 
     private static void ConfigureCertificateWatcher(string certificatePath, TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader)
@@ -80,21 +83,210 @@ public static class TlsCertificateExtensions
         };
     }
 
-    private static void ConfigureKestrel(WebApplicationBuilder builder, TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader)
+    private static void ConfigureKestrelConsistently(WebApplicationBuilder builder, TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader)
     {
-        builder.WebHost.ConfigureKestrel(options =>
+        if (builder.Configuration.GetSection("Kestrel").Exists())
         {
-            options.ListenAnyIP(8080);
+            Console.WriteLine("Configuring Kestrel from configuration sources");
             
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                if (tlsCertificateLoader != null)
+                {
+                    var httpsPort = int.Parse(builder.Configuration["Kestrel:Endpoints:Https:Port"] ?? "8081");
+                    options.ListenAnyIP(httpsPort, listenOptions =>
+                    {
+                        listenOptions.SetTlsHandshakeCallbackOptions(tlsCertificateLoader);
+                        listenOptions.SetHttpsConnectionAdapterOptions(tlsCertificateLoader);
+                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+                    });
+                }
+            });
+        }
+        else
+        {
+            Console.WriteLine("No Kestrel configuration found. Using explicit configuration.");
+            
+            var httpPort = int.Parse(Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS") ?? "8080");
+            
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(httpPort);
+                
+                if (tlsCertificateLoader != null)
+                {
+                    var httpsPort = int.Parse(Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORTS") ?? "8081");
+                    options.ListenAnyIP(httpsPort, listenOptions =>
+                    {
+                        listenOptions.SetTlsHandshakeCallbackOptions(tlsCertificateLoader);
+                        listenOptions.SetHttpsConnectionAdapterOptions(tlsCertificateLoader);
+                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+                    });
+                }
+            });
+        }
+    }
+}
+*/
+
+public static class TlsCertificateExtensions
+{
+    public static void ConfigureTlsCertificates(this WebApplicationBuilder builder)
+    {
+        TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader = null;
+        
+        string effectiveCertificatePath = ResolveCertificatePath();
+        tlsCertificateLoader = LoadCertificates(effectiveCertificatePath, builder);
+        
+        if (tlsCertificateLoader != null)
+        {
+            builder.Services.AddSingleton(tlsCertificateLoader);
+            builder.Services.AddHostedService<CertificateRefreshService>();
+            ConfigureCertificateWatcher(effectiveCertificatePath, tlsCertificateLoader);
+        }
+
+        ConfigureKestrelWithDiagnostics(builder, tlsCertificateLoader);
+    }
+
+    private static string ResolveCertificatePath()
+    {
+        var certificateEnvVarPath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH");
+        
+        if (!string.IsNullOrEmpty(certificateEnvVarPath))
+        {
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", certificateEnvVarPath));
+        }
+        
+        return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "certificates"));
+    }
+
+    private static TlsCertificateLoader.TlsCertificateLoader LoadCertificates(string certificatePath, WebApplicationBuilder builder)
+    {
+        var fullChainPath = Path.Combine(certificatePath, "fullchain.pem");
+        var privateKeyPath = Path.Combine(certificatePath, "privkey.pem");
+        
+        Console.WriteLine($"Effective certificate path: {certificatePath}");
+        Console.WriteLine($"Checking for certificate files:");
+        Console.WriteLine($"  - fullchain.pem: {(File.Exists(fullChainPath) ? "FOUND" : "NOT FOUND")} at {fullChainPath}");
+        Console.WriteLine($"  - privkey.pem: {(File.Exists(privateKeyPath) ? "FOUND" : "NOT FOUND")} at {privateKeyPath}");
+
+        if (File.Exists(fullChainPath) && File.Exists(privateKeyPath))
+        {
+            Console.WriteLine("Both certificate files found. Configuring HTTPS...");
+            try
+            {
+                // Проверяем сертификат перед созданием загрузчика
+                var cert = X509Certificate2.CreateFromPemFile(fullChainPath, privateKeyPath);
+                Console.WriteLine($"✅ Certificate loaded successfully:");
+                Console.WriteLine($"   Subject: {cert.Subject}");
+                Console.WriteLine($"   Issuer: {cert.Issuer}");
+                Console.WriteLine($"   Valid from: {cert.NotBefore}");
+                Console.WriteLine($"   Valid to: {cert.NotAfter}");
+                Console.WriteLine($"   Has private key: {cert.HasPrivateKey}");
+                
+                var loader = new TlsCertificateLoader.TlsCertificateLoader(fullChainPath, privateKeyPath);
+                Console.WriteLine("✅ TLS certificate loader created successfully");
+                return loader;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error creating certificate loader: {ex.Message}");
+                Console.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+                return null;
+            }
+        }
+        
+        Console.WriteLine("HTTPS certificate files not found. Running with HTTP only.");
+        return null;
+    }
+
+    private static void ConfigureKestrelWithDiagnostics(WebApplicationBuilder builder, TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader)
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            Console.WriteLine("🔧 Using development configuration with dev certificates");
+            return;
+        }
+        
+        builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+        {
+            serverOptions.ConfigurationLoader = null;
+            
+            var httpPort = int.Parse(Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS") ?? "8080");
+            var httpsPort = int.Parse(Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORTS") ?? "8081");
+            
+            // HTTP endpoint
+            serverOptions.ListenAnyIP(httpPort, listenOptions =>
+            {
+                listenOptions.Protocols = HttpProtocols.Http1;
+            });
+            
+            Console.WriteLine($"✅ HTTP endpoint configured: http://localhost:{httpPort}");
+            Console.WriteLine($"✅ Try accessing: http://localhost:{httpPort}/docs/index.html");
+            
+            // HTTPS endpoint
             if (tlsCertificateLoader != null)
             {
-                options.ListenAnyIP(8081, listenOptions =>
+                try
                 {
-                    listenOptions.SetTlsHandshakeCallbackOptions(tlsCertificateLoader);
-                    listenOptions.SetHttpsConnectionAdapterOptions(tlsCertificateLoader);
-                    listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
-                });
+                    serverOptions.ListenAnyIP(httpsPort, listenOptions =>
+                    {
+                        listenOptions.SetTlsHandshakeCallbackOptions(tlsCertificateLoader);
+                        listenOptions.SetHttpsConnectionAdapterOptions(tlsCertificateLoader);
+                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+                    });
+                    
+                    Console.WriteLine($"✅ HTTPS endpoint configured: https://localhost:{httpsPort}");
+                    Console.WriteLine($"✅ Try accessing: https://localhost:{httpsPort}/docs/index.html");
+                    Console.WriteLine($"⚠️  If browser shows security warning, click 'Advanced' -> 'Proceed to localhost (unsafe)'");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ Error configuring HTTPS endpoint: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("⚠️ No TLS certificates available - HTTPS not configured");
+                Console.WriteLine($"🔗 Use HTTP instead: http://localhost:{httpPort}/docs/index.html");
             }
         });
+    }
+
+    private static void ConfigureCertificateWatcher(string certificatePath, TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader)
+    {
+        try
+        {
+            if (!Directory.Exists(certificatePath))
+            {
+                Console.WriteLine($"Certificate directory does not exist: {certificatePath}");
+                return;
+            }
+
+            var certificateWatcher = new FileSystemWatcher(certificatePath)
+            {
+                NotifyFilter = NotifyFilters.LastWrite,
+                Filter = "*.pem",
+                EnableRaisingEvents = true
+            };
+
+            certificateWatcher.Changed += (sender, e) =>
+            {
+                Console.WriteLine($"Certificate file changed: {e.Name}");
+                try
+                {
+                    tlsCertificateLoader.RefreshDefaultCertificates();
+                    Console.WriteLine("Certificates refreshed successfully");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error refreshing certificates: {ex.Message}");
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Could not set up certificate watcher: {ex.Message}");
+        }
     }
 }

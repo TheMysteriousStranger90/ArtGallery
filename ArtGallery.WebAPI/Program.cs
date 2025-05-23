@@ -6,33 +6,24 @@ using ArtGallery.Infrastructure.Extensions;
 using ArtGallery.Persistence.Context;
 using ArtGallery.Persistence.Extensions;
 using ArtGallery.WebAPI.Extensions;
+using ArtGallery.WebAPI.Middleware;
 using ArtGallery.WebAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure environment variables and settings
 builder.ConfigureEnvironmentVariables();
 
-// Configure TLS certificates for HTTPS
+// Configure enhanced logging first
+builder.ConfigureEnhancedLogging();
+
+// Configure TLS certificates BEFORE any other Kestrel configuration
 builder.ConfigureTlsCertificates();
 
-// Configure Serilog logging
-try
-{
-    builder.Services.ConfigureSerilog(builder.Configuration);
-    builder.Host.UseSerilog();
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Error configuring Serilog: {ex.Message}");
-    
-    builder.Host.UseSerilog((context, services, configuration) => configuration
-        .WriteTo.Console()
-        .WriteTo.File("logs/error-.txt", rollingInterval: RollingInterval.Day));
-}
+// Configure error alerts and monitoring
+builder.ConfigureErrorAlerts();
+builder.ConfigureMonitoring(); 
 
 // Configure core services
 builder.Services.AddApplicationServices(builder.Configuration);
@@ -57,8 +48,9 @@ builder.ConfigureRateLimiting();
 // Configure OpenTelemetry
 builder.ConfigureOpenTelemetry();
 
-// Configure health checks
-builder.Services.AddHealthChecks().ForwardToPrometheus();
+// Configure health checks - now with more detailed checks
+builder.Services.AddHealthChecks()
+    .ForwardToPrometheus();
 
 // Configure CORS
 builder.ConfigureCors();
@@ -69,7 +61,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerDocumentation();
-
+    
     app.Use(async (context, next) =>
     {
         if (context.Request.Path.StartsWithSegments("/swagger"))
@@ -77,14 +69,14 @@ if (app.Environment.IsDevelopment())
             context.Response.Redirect("/docs");
             return;
         }
-
         await next();
     });
 }
 
-app.UseRateLimiter();
 app.UseRequestLogging();
+app.UseMiddleware<ErrorAlertMiddleware>();
 app.UseGlobalExceptionHandling();
+app.UseRateLimiter();
 app.UseHttpsRedirection();
 app.UseCors("Open");
 app.UseAuthentication();
