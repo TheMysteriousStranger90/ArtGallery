@@ -2,7 +2,7 @@
 
 public interface IAuthService
 {
-    Task<RegistrationResponse> Register(RegistrationRequest request);
-    Task<bool> Login(AuthenticationRequest request);
+    Task<RegistrationResponse> Register(RegisterCommand request);
+    Task<bool> Login(AuthenticateCommand request);
     Task Logout();
 }

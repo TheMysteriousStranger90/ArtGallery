@@ -28,9 +28,9 @@ namespace ArtGallery.BlazorApp.Services
         /// </summary>
         /// <param name="api_version">The requested API version</param>
         /// <param name="body">User registration details</param>
-        /// <returns>Returns the newly registered user ID</returns>
+        /// <returns>Returns the newly registered user data with token</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RegistrationResponse> RegisterAsync(string api_version, RegistrationRequest body);
+        System.Threading.Tasks.Task<RegistrationResponse> RegisterAsync(string api_version, RegisterCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -38,9 +38,9 @@ namespace ArtGallery.BlazorApp.Services
         /// </summary>
         /// <param name="api_version">The requested API version</param>
         /// <param name="body">User registration details</param>
-        /// <returns>Returns the newly registered user ID</returns>
+        /// <returns>Returns the newly registered user data with token</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RegistrationResponse> RegisterAsync(string api_version, RegistrationRequest body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RegistrationResponse> RegisterAsync(string api_version, RegisterCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Authenticates a user and returns a JWT token
@@ -49,7 +49,7 @@ namespace ArtGallery.BlazorApp.Services
         /// <param name="body">User credentials</param>
         /// <returns>Returns the user data with access token</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AuthenticationResponse> AuthenticateAsync(string api_version, AuthenticationRequest body);
+        System.Threading.Tasks.Task<AuthenticationResponse> AuthenticateAsync(string api_version, AuthenticateCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -59,7 +59,7 @@ namespace ArtGallery.BlazorApp.Services
         /// <param name="body">User credentials</param>
         /// <returns>Returns the user data with access token</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AuthenticationResponse> AuthenticateAsync(string api_version, AuthenticationRequest body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<AuthenticationResponse> AuthenticateAsync(string api_version, AuthenticateCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Delete an artist
@@ -649,9 +649,9 @@ namespace ArtGallery.BlazorApp.Services
         /// </summary>
         /// <param name="api_version">The requested API version</param>
         /// <param name="body">User registration details</param>
-        /// <returns>Returns the newly registered user ID</returns>
+        /// <returns>Returns the newly registered user data with token</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<RegistrationResponse> RegisterAsync(string api_version, RegistrationRequest body)
+        public virtual System.Threading.Tasks.Task<RegistrationResponse> RegisterAsync(string api_version, RegisterCommand body)
         {
             return RegisterAsync(api_version, body, System.Threading.CancellationToken.None);
         }
@@ -662,9 +662,9 @@ namespace ArtGallery.BlazorApp.Services
         /// </summary>
         /// <param name="api_version">The requested API version</param>
         /// <param name="body">User registration details</param>
-        /// <returns>Returns the newly registered user ID</returns>
+        /// <returns>Returns the newly registered user data with token</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<RegistrationResponse> RegisterAsync(string api_version, RegistrationRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RegistrationResponse> RegisterAsync(string api_version, RegisterCommand body, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -769,7 +769,7 @@ namespace ArtGallery.BlazorApp.Services
         /// <param name="body">User credentials</param>
         /// <returns>Returns the user data with access token</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<AuthenticationResponse> AuthenticateAsync(string api_version, AuthenticationRequest body)
+        public virtual System.Threading.Tasks.Task<AuthenticationResponse> AuthenticateAsync(string api_version, AuthenticateCommand body)
         {
             return AuthenticateAsync(api_version, body, System.Threading.CancellationToken.None);
         }
@@ -782,7 +782,7 @@ namespace ArtGallery.BlazorApp.Services
         /// <param name="body">User credentials</param>
         /// <returns>Returns the user data with access token</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AuthenticationResponse> AuthenticateAsync(string api_version, AuthenticationRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<AuthenticationResponse> AuthenticateAsync(string api_version, AuthenticateCommand body, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -5288,6 +5288,39 @@ namespace ArtGallery.BlazorApp.Services
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.3.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AuthenticateCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("email")]
+        public string Email { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("password")]
+        public string Password { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.3.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RegisterCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("firstName")]
+        public string FirstName { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastName")]
+        public string LastName { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("email")]
+        public string Email { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("password")]
+        public string Password { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("confirmPassword")]
+        public string ConfirmPassword { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.3.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CreateExhibitionCommand
     {
 
@@ -5402,18 +5435,6 @@ namespace ArtGallery.BlazorApp.Services
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.3.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class AuthenticationRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("email")]
-        public string Email { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("password")]
-        public string Password { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.3.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class AuthenticationResponse
     {
 
@@ -5428,29 +5449,6 @@ namespace ArtGallery.BlazorApp.Services
 
         [System.Text.Json.Serialization.JsonPropertyName("token")]
         public string Token { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.3.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class RegistrationRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("firstName")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public string FirstName { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("lastName")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public string LastName { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("email")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public string Email { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("password")]
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(int.MaxValue, MinimumLength = 6)]
-        public string Password { get; set; }
 
     }
 

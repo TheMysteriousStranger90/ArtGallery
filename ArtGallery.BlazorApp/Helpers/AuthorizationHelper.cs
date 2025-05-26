@@ -1,32 +1,37 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Components.Authorization;
 
-namespace ArtGallery.BlazorApp.Helpers;
-
-public static class AuthorizationHelper
+namespace ArtGallery.BlazorApp.Helpers
 {
-    public static bool IsInRole(this AuthenticationState authState, string role)
+    public static class AuthorizationHelper
     {
-        return authState?.User?.IsInRole(role) ?? false;
-    }
-    
-    public static bool IsAdmin(this AuthenticationState authState)
-    {
-        return authState?.User?.IsInRole("Administrator") ?? false;
-    }
-    
-    public static string GetUserId(this AuthenticationState authState)
-    {
-        return authState?.User?.FindFirstValue("uid");
-    }
-    
-    public static string GetUserName(this AuthenticationState authState)
-    {
-        return authState?.User?.FindFirstValue(ClaimTypes.Name);
-    }
-    
-    public static string GetUserEmail(this AuthenticationState authState)
-    {
-        return authState?.User?.FindFirstValue(ClaimTypes.Email);
+        public static string GetUserId(ClaimsPrincipal user)
+        {
+            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        }
+
+        public static string GetUserName(ClaimsPrincipal user)
+        {
+            return user.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
+        }
+
+        public static string GetUserEmail(ClaimsPrincipal user)
+        {
+            return user.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
+        }
+
+        public static string GetUserRole(ClaimsPrincipal user)
+        {
+            return user.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;
+        }
+
+        public static bool IsInRole(ClaimsPrincipal user, string role)
+        {
+            return user.IsInRole(role);
+        }
+
+        public static bool HasClaim(ClaimsPrincipal user, string claimType, string claimValue)
+        {
+            return user.HasClaim(claimType, claimValue);
+        }
     }
 }

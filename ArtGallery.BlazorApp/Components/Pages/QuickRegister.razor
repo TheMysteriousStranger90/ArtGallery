@@ -1,0 +1,173 @@
+﻿@* filepath: ArtGallery.BlazorApp/Components/Auth/QuickRegister.razor *@
+@using ArtGallery.BlazorApp.ViewModels
+@using ArtGallery.BlazorApp.Services
+@using ArtGallery.BlazorApp.Services.Interfaces
+@inject IAuthService AuthService
+@inject ILogger<QuickRegister> Logger
+
+<div class="quick-auth-form">
+    <EditForm Model="@_viewModel" OnValidSubmit="@HandleRegister" novalidate>
+        <DataAnnotationsValidator />
+
+        @if (!string.IsNullOrEmpty(_viewModel.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-sm" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                @_viewModel.ErrorMessage
+            </div>
+        }
+
+        <div class="row mb-3">
+            <div class="col-6">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <InputText class="form-control" 
+                             @bind-Value="_viewModel.FirstName" 
+                             placeholder="First Name"
+                             disabled="@_viewModel.IsLoading" />
+                </div>
+                <ValidationMessage For="@(() => _viewModel.FirstName)" class="text-danger small" />
+            </div>
+            <div class="col-6">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <InputText class="form-control" 
+                             @bind-Value="_viewModel.LastName" 
+                             placeholder="Last Name"
+                             disabled="@_viewModel.IsLoading" />
+                </div>
+                <ValidationMessage For="@(() => _viewModel.LastName)" class="text-danger small" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-envelope"></i>
+                </span>
+                <InputText class="form-control" 
+                         @bind-Value="_viewModel.Email" 
+                         placeholder="Email"
+                         disabled="@_viewModel.IsLoading" />
+            </div>
+            <ValidationMessage For="@(() => _viewModel.Email)" class="text-danger small" />
+        </div>
+
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-lock"></i>
+                </span>
+                <InputText type="@(_viewModel.ShowPassword ? "text" : "password")"
+                         class="form-control" 
+                         @bind-Value="_viewModel.Password" 
+                         @oninput="OnPasswordChanged"
+                         placeholder="Password"
+                         disabled="@_viewModel.IsLoading" />
+                <button class="btn btn-outline-secondary" 
+                        type="button" 
+                        @onclick="@(() => _viewModel.ShowPassword = !_viewModel.ShowPassword)"
+                        disabled="@_viewModel.IsLoading">
+                    <i class="fas @(_viewModel.ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                </button>
+            </div>
+            
+            @if (!string.IsNullOrEmpty(_viewModel.Password))
+            {
+                <div class="mt-1">
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-@_viewModel.GetPasswordStrengthClass()" 
+                             style="width: @(_viewModel.PasswordStrength)%"></div>
+                    </div>
+                    <small class="text-@_viewModel.GetPasswordStrengthClass()">@_viewModel.GetPasswordStrengthText()</small>
+                </div>
+            }
+            
+            <ValidationMessage For="@(() => _viewModel.Password)" class="text-danger small" />
+        </div>
+
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-shield-alt"></i>
+                </span>
+                <InputText type="password"
+                         class="form-control" 
+                         @bind-Value="_viewModel.ConfirmPassword" 
+                         placeholder="Confirm Password"
+                         disabled="@_viewModel.IsLoading" />
+            </div>
+            <ValidationMessage For="@(() => _viewModel.ConfirmPassword)" class="text-danger small" />
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check">
+                <InputCheckbox class="form-check-input" 
+                             @bind-Value="_viewModel.AcceptTerms"
+                             disabled="@_viewModel.IsLoading" />
+                <label class="form-check-label small">
+                    I agree to <a href="/terms" target="_blank">Terms</a> & <a href="/privacy" target="_blank">Privacy</a>
+                </label>
+            </div>
+            <ValidationMessage For="@(() => _viewModel.AcceptTerms)" class="text-danger small" />
+        </div>
+
+        <button type="submit" 
+                class="btn btn-primary w-100"
+                disabled="@_viewModel.IsLoading">
+            @if (_viewModel.IsLoading)
+            {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            <i class="fas fa-user-plus me-2"></i>Create Account
+        </button>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnRegisterSuccess { get; set; }
+    
+    private RegisterViewModel _viewModel = new();
+
+    private async Task OnPasswordChanged(ChangeEventArgs e)
+    {
+        _viewModel.Password = e.Value?.ToString() ?? string.Empty;
+        _viewModel.UpdatePasswordStrength();
+        StateHasChanged();
+    }
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            _viewModel.SetLoading(true);
+            StateHasChanged();
+
+            var command = _viewModel.ToCommand();
+            var response = await AuthService.Register(command);
+
+            if (response != null && !string.IsNullOrEmpty(response.Token))
+            {
+                Logger.LogInformation("Quick registration successful for: {Email}", _viewModel.Email);
+                await OnRegisterSuccess.InvokeAsync();
+            }
+            else
+            {
+                _viewModel.SetError("Registration failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Quick registration error for: {Email}", _viewModel.Email);
+            _viewModel.SetError(ex.Message);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+}

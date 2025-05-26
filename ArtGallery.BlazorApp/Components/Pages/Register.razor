@@ -1,0 +1,334 @@
+﻿@page "/register"
+@using ArtGallery.BlazorApp.ViewModels
+@using ArtGallery.BlazorApp.Services
+@using ArtGallery.BlazorApp.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject ILogger<Register> Logger
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Create Account - Art Gallery</PageTitle>
+
+<div class="auth-container">
+<div class="container">
+<div class="row justify-content-center min-vh-100 align-items-center py-5">
+<div class="col-md-8 col-lg-6">
+<div class="auth-card fade-in-up">
+    <div class="card-body p-5">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="mb-3">
+                <i class="fas fa-user-plus fa-3x text-primary pulse-animation"></i>
+            </div>
+            <h2 class="fw-bold text-primary">Join Our Community</h2>
+            <p class="text-muted">Create your Art Gallery account</p>
+        </div>
+
+        <!-- Registration Form -->
+        <EditForm Model="@_viewModel" OnValidSubmit="@HandleRegister" novalidate>
+            <DataAnnotationsValidator/>
+
+            <!-- Error Alert -->
+            @if (!string.IsNullOrEmpty(_viewModel.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @_viewModel.ErrorMessage
+                    <button type="button" class="btn-close" @onclick="@(() => _viewModel.ErrorMessage = string.Empty)"></button>
+                </div>
+            }
+
+            <!-- Success Alert -->
+            @if (!string.IsNullOrEmpty(_viewModel.SuccessMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @_viewModel.SuccessMessage
+                    <button type="button" class="btn-close" @onclick="@(() => _viewModel.SuccessMessage = string.Empty)"></button>
+                </div>
+            }
+
+            <!-- Name Fields -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText id="firstName"
+                                   class="form-control"
+                                   @bind-Value="_viewModel.FirstName"
+                                   placeholder="First Name"
+                                   autocomplete="given-name"
+                                   disabled="@_viewModel.IsLoading"/>
+                        <label for="firstName">
+                            <i class="fas fa-user me-2"></i>First Name
+                        </label>
+                    </div>
+                    <ValidationMessage For="@(() => _viewModel.FirstName)" class="text-danger small mt-1"/>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText id="lastName"
+                                   class="form-control"
+                                   @bind-Value="_viewModel.LastName"
+                                   placeholder="Last Name"
+                                   autocomplete="family-name"
+                                   disabled="@_viewModel.IsLoading"/>
+                        <label for="lastName">
+                            <i class="fas fa-user me-2"></i>Last Name
+                        </label>
+                    </div>
+                    <ValidationMessage For="@(() => _viewModel.LastName)" class="text-danger small mt-1"/>
+                </div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="mb-3">
+                <div class="form-floating">
+                    <InputText id="email"
+                               class="form-control"
+                               @bind-Value="_viewModel.Email"
+                               placeholder="Email Address"
+                               autocomplete="email"
+                               disabled="@_viewModel.IsLoading"/>
+                    <label for="email">
+                        <i class="fas fa-envelope me-2"></i>Email Address
+                    </label>
+                </div>
+                <ValidationMessage For="@(() => _viewModel.Email)" class="text-danger small mt-1"/>
+            </div>
+
+            <!-- Password Field with Strength Indicator -->
+            <div class="mb-3">
+                <div class="form-floating">
+                    <div class="input-group">
+                        <InputText id="password"
+                                   type="@(_viewModel.ShowPassword ? "text" : "password")"
+                                   class="form-control"
+                                   @bind-Value="_viewModel.Password"
+                                   @oninput="OnPasswordChanged"
+                                   placeholder="Password"
+                                   autocomplete="new-password"
+                                   disabled="@_viewModel.IsLoading"/>
+                        <button class="btn btn-outline-secondary"
+                                type="button"
+                                @onclick="@(() => _viewModel.ShowPassword = !_viewModel.ShowPassword)"
+                                disabled="@_viewModel.IsLoading"
+                                title="@(_viewModel.ShowPassword ? "Hide Password" : "Show Password")">
+                            <i class="fas @(_viewModel.ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                        </button>
+                    </div>
+                    <label for="password">
+                        <i class="fas fa-lock me-2"></i>Password
+                    </label>
+                </div>
+
+                <!-- Password Strength Visualization -->
+                @if (!string.IsNullOrEmpty(_viewModel.Password))
+                {
+                    <div class="password-strength">
+                        <div class="password-strength-meter">
+                            <div class="password-strength-bar @GetPasswordStrengthClass()"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="password-strength-text @_viewModel.GetPasswordStrengthClass()">
+                                @_viewModel.GetPasswordStrength()
+                            </small>
+                            <small class="text-muted">
+                                @GetPasswordRequirements()
+                            </small>
+                        </div>
+                    </div>
+                }
+
+                <ValidationMessage For="@(() => _viewModel.Password)" class="text-danger small mt-1"/>
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="mb-3">
+                <div class="form-floating">
+                    <div class="input-group">
+                        <InputText id="confirmPassword"
+                                   type="@(_viewModel.ShowConfirmPassword ? "text" : "password")"
+                                   class="form-control"
+                                   @bind-Value="_viewModel.ConfirmPassword"
+                                   placeholder="Confirm Password"
+                                   autocomplete="new-password"
+                                   disabled="@_viewModel.IsLoading"/>
+                        <button class="btn btn-outline-secondary"
+                                type="button"
+                                @onclick="@(() => _viewModel.ShowConfirmPassword = !_viewModel.ShowConfirmPassword)"
+                                disabled="@_viewModel.IsLoading"
+                                title="@(_viewModel.ShowConfirmPassword ? "Hide Password" : "Show Password")">
+                            <i class="fas @(_viewModel.ShowConfirmPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                        </button>
+                    </div>
+                    <label for="confirmPassword">
+                        <i class="fas fa-lock me-2"></i>Confirm Password
+                    </label>
+                </div>
+                <ValidationMessage For="@(() => _viewModel.ConfirmPassword)" class="text-danger small mt-1"/>
+            </div>
+
+            <!-- Terms and Conditions with Enhanced UI -->
+            <div class="mb-4">
+                <div class="card border-0 bg-light p-3">
+                    <div class="form-check">
+                        <InputCheckbox id="acceptTerms"
+                                       class="form-check-input"
+                                       @bind-Value="_viewModel.AcceptTerms"
+                                       disabled="@_viewModel.IsLoading"/>
+                        <label class="form-check-label" for="acceptTerms">
+                            <i class="fas fa-file-contract me-2 text-primary"></i>
+                            I agree to the
+                            <a href="/terms" target="_blank" class="terms-link">
+                                <i class="fas fa-external-link-alt me-1"></i>Terms of Service
+                            </a>
+                            and
+                            <a href="/privacy" target="_blank" class="terms-link">
+                                <i class="fas fa-shield-alt me-1"></i>Privacy Policy
+                            </a>
+                        </label>
+                    </div>
+                </div>
+                <ValidationMessage For="@(() => _viewModel.AcceptTerms)" class="text-danger small mt-1"/>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mb-3">
+                <button type="submit"
+                        class="btn btn-primary btn-lg w-100 fw-medium"
+                        disabled="@_viewModel.IsLoading">
+                    @if (_viewModel.IsLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        <span>Creating Account...</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-user-plus me-2"></i>
+                        <span>Create Account</span>
+                    }
+                </button>
+            </div>
+
+            <!-- Divider -->
+            <div class="text-center mb-3">
+                <hr class="my-4">
+                <small class="text-muted bg-white px-3">or</small>
+            </div>
+
+            <!-- Login Link -->
+            <div class="text-center">
+                <p class="mb-0">
+                    Already have an account?
+                    <a href="/login" class="text-primary text-decoration-none fw-medium">
+                        Sign in here
+                    </a>
+                </p>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+<!-- Back to Gallery -->
+<div class="text-center mt-4">
+    <a href="/" class="text-white text-decoration-none">
+        <i class="fas fa-arrow-left me-1"></i>
+        Back to Gallery
+    </a>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+@code {
+    private RegisterViewModel _viewModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            Navigation.NavigateTo("/dashboard", replace: true);
+            return;
+        }
+
+        Logger.LogInformation("Register page initialized");
+    }
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            _viewModel.SetLoading(true);
+            StateHasChanged();
+
+            Logger.LogInformation("Registration attempt for user: {Email}", _viewModel.Email);
+
+            var command = _viewModel.ToCommand();
+            var response = await AuthService.Register(command);
+
+            if (response != null && !string.IsNullOrEmpty(response.Token))
+            {
+                Logger.LogInformation("Registration successful for user: {Email}", _viewModel.Email);
+
+                _viewModel.SetSuccess($"Welcome, {response.UserName}! Your account has been created successfully.");
+
+                await Task.Delay(2000);
+                Navigation.NavigateTo("/dashboard", replace: true);
+            }
+            else
+            {
+                Logger.LogWarning("Registration failed for user: {Email}", _viewModel.Email);
+                _viewModel.SetError("Registration failed. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Registration error for user: {Email}", _viewModel.Email);
+            _viewModel.SetError(ex.Message);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnPasswordChanged(ChangeEventArgs e)
+    {
+        _viewModel.Password = e.Value?.ToString() ?? string.Empty;
+        StateHasChanged();
+    }
+
+    private string GetPasswordStrengthClass()
+    {
+        return _viewModel.GetPasswordStrength().ToLower().Replace(" ", "-");
+    }
+
+    private string GetPasswordRequirements()
+    {
+        if (string.IsNullOrEmpty(_viewModel.Password))
+            return "8+ chars, A-Z, a-z, 0-9";
+
+        var requirements = new List<string>();
+        if (_viewModel.Password.Length < 6) requirements.Add("6+ chars");
+        if (!_viewModel.Password.Any(char.IsUpper)) requirements.Add("A-Z");
+        if (!_viewModel.Password.Any(char.IsLower)) requirements.Add("a-z");
+        if (!_viewModel.Password.Any(char.IsDigit)) requirements.Add("0-9");
+
+        return requirements.Any() ? string.Join(", ", requirements) : "All requirements met!";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                document.getElementById('firstName')?.focus();
+            ");
+        }
+    }
+
+}

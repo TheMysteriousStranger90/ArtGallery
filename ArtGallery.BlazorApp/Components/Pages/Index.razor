@@ -1,0 +1,517 @@
+﻿@page "/"
+@using ArtGallery.BlazorApp.ViewModels
+@using ArtGallery.BlazorApp.Services
+@using ArtGallery.BlazorApp.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject ILogger<Index> Logger
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Welcome - Art Gallery</PageTitle>
+
+<div class="hero-section">
+<div class="container">
+<div class="row align-items-center min-vh-100">
+<!-- Hero Content -->
+<div class="col-lg-6">
+    <div class="hero-content fade-in-up">
+        <h1 class="hero-title">
+            Discover <span class="text-warning">Amazing</span> Art
+        </h1>
+        <p class="hero-subtitle">
+            Explore thousands of masterpieces from renowned artists around the world.
+            Join our community of art enthusiasts and collectors.
+        </p>
+
+        <ul class="hero-features mb-4">
+            <li><i class="fas fa-palette"></i>Curated Art Collections</li>
+            <li><i class="fas fa-users"></i>Artist Profiles & Stories</li>
+            <li><i class="fas fa-heart"></i>Personal Favorites</li>
+            <li><i class="fas fa-calendar-alt"></i>Virtual Exhibitions</li>
+            <li><i class="fas fa-mobile-alt"></i>Mobile Experience</li>
+        </ul>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="/gallery" class="btn btn-light btn-lg">
+                        <i class="fas fa-images me-2"></i>Browse Gallery
+                    </a>
+                    <a href="/dashboard" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="d-flex gap-3 flex-wrap">
+                    <button type="button" class="quick-auth-btn" @onclick="@(() => ShowQuickAuth("login"))">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                    </button>
+                    <button type="button" class="quick-auth-btn" @onclick="@(() => ShowQuickAuth("register"))">
+                        <i class="fas fa-user-plus me-2"></i>Get Started
+                    </button>
+                    <a href="/gallery" class="quick-auth-btn">
+                        <i class="fas fa-eye me-2"></i>Browse as Guest
+                    </a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</div>
+
+<!-- Quick Auth Panel -->
+<div class="col-lg-6">
+<AuthorizeView>
+<NotAuthorized Context="notAuthContext">
+<div class="auth-panel @(_showQuickAuth ? "show" : "")">
+<!-- Quick Auth Tabs -->
+<div class="auth-tabs">
+    <button type="button" class="auth-tab @(_activeTab == "login" ? "active" : "")"
+            @onclick="@(() => SetActiveTab("login"))">
+        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+    </button>
+    <button type="button" class="auth-tab @(_activeTab == "register" ? "active" : "")"
+            @onclick="@(() => SetActiveTab("register"))">
+        <i class="fas fa-user-plus me-2"></i>Sign Up
+    </button>
+    <button type="button" class="auth-tab-close" @onclick="@HideQuickAuth">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+
+<!-- Login Panel -->
+@if (_activeTab == "login")
+{
+    <div class="auth-form">
+        <EditForm Model="@_loginViewModel" OnValidSubmit="@HandleQuickLogin">
+            <DataAnnotationsValidator/>
+
+            @if (!string.IsNullOrEmpty(_loginViewModel.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @_loginViewModel.ErrorMessage
+                    <button type="button" class="btn-close"
+                            @onclick="@(() => _loginViewModel.ErrorMessage = string.Empty)"
+                            aria-label="Close">
+                    </button>
+                </div>
+            }
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                    <InputText id="quickLoginEmail"
+                               class="form-control"
+                               @bind-Value="_loginViewModel.Email"
+                               placeholder="Email"
+                               disabled="@_loginViewModel.IsLoading"
+                               autocomplete="email"/>
+                </div>
+                <ValidationMessage For="@(() => _loginViewModel.Email)" class="text-danger small mt-1"/>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <InputText id="quickLoginPassword"
+                               type="@(_loginViewModel.ShowPassword ? "text" : "password")"
+                               class="form-control"
+                               @bind-Value="_loginViewModel.Password"
+                               placeholder="Password"
+                               disabled="@_loginViewModel.IsLoading"
+                               autocomplete="current-password"/>
+                    <button type="button" class="btn btn-outline-secondary"
+                            @onclick="@(() => _loginViewModel.ShowPassword = !_loginViewModel.ShowPassword)"
+                            disabled="@_loginViewModel.IsLoading"
+                            title="@(_loginViewModel.ShowPassword ? "Hide password" : "Show password")">
+                        <i class="fas @(_loginViewModel.ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                    </button>
+                </div>
+                <ValidationMessage For="@(() => _loginViewModel.Password)" class="text-danger small mt-1"/>
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <InputCheckbox id="quickRememberMe"
+                                   class="form-check-input"
+                                   @bind-Value="_loginViewModel.RememberMe"
+                                   disabled="@_loginViewModel.IsLoading"/>
+                    <label class="form-check-label" for="quickRememberMe">
+                        Remember me
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary w-100 mb-3"
+                    disabled="@_loginViewModel.IsLoading">
+                @if (_loginViewModel.IsLoading)
+                {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span>Signing In...</span>
+                }
+                else
+                {
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    <span>Sign In</span>
+                }
+            </button>
+
+            <div class="text-center">
+                <a href="/forgot-password" class="text-decoration-none small">
+                    Forgot your password?
+                </a>
+            </div>
+        </EditForm>
+    </div>
+}
+
+<!-- Register Panel -->
+@if (_activeTab == "register")
+{
+    <div class="auth-form">
+        <EditForm Model="@_registerViewModel" OnValidSubmit="@HandleQuickRegister">
+            <DataAnnotationsValidator/>
+
+            @if (!string.IsNullOrEmpty(_registerViewModel.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @_registerViewModel.ErrorMessage
+                    <button type="button" class="btn-close"
+                            @onclick="@(() => _registerViewModel.ErrorMessage = string.Empty)"
+                            aria-label="Close">
+                    </button>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(_registerViewModel.SuccessMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @_registerViewModel.SuccessMessage
+                    <button type="button" class="btn-close"
+                            @onclick="@(() => _registerViewModel.SuccessMessage = string.Empty)"
+                            aria-label="Close">
+                    </button>
+                </div>
+            }
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <InputText id="quickFirstName"
+                                   class="form-control"
+                                   @bind-Value="_registerViewModel.FirstName"
+                                   placeholder="First Name"
+                                   disabled="@_registerViewModel.IsLoading"
+                                   autocomplete="given-name"/>
+                    </div>
+                    <ValidationMessage For="@(() => _registerViewModel.FirstName)" class="text-danger small mt-1"/>
+                </div>
+                <div class="col-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <InputText id="quickLastName"
+                                   class="form-control"
+                                   @bind-Value="_registerViewModel.LastName"
+                                   placeholder="Last Name"
+                                   disabled="@_registerViewModel.IsLoading"
+                                   autocomplete="family-name"/>
+                    </div>
+                    <ValidationMessage For="@(() => _registerViewModel.LastName)" class="text-danger small mt-1"/>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                    <InputText id="quickRegisterEmail"
+                               class="form-control"
+                               @bind-Value="_registerViewModel.Email"
+                               placeholder="Email"
+                               disabled="@_registerViewModel.IsLoading"
+                               autocomplete="email"/>
+                </div>
+                <ValidationMessage For="@(() => _registerViewModel.Email)" class="text-danger small mt-1"/>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <InputText id="quickRegisterPassword"
+                               type="@(_registerViewModel.ShowPassword ? "text" : "password")"
+                               class="form-control"
+                               @bind-Value="_registerViewModel.Password"
+                               @oninput="@OnQuickPasswordChanged"
+                               placeholder="Password"
+                               disabled="@_registerViewModel.IsLoading"
+                               autocomplete="new-password"/>
+                    <button type="button" class="btn btn-outline-secondary"
+                            @onclick="@(() => _registerViewModel.ShowPassword = !_registerViewModel.ShowPassword)"
+                            disabled="@_registerViewModel.IsLoading"
+                            title="@(_registerViewModel.ShowPassword ? "Hide password" : "Show password")">
+                        <i class="fas @(_registerViewModel.ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrEmpty(_registerViewModel.Password))
+                {
+                    <div class="password-strength mt-2">
+                        <div class="password-strength-meter">
+                            <div class="password-strength-bar @_registerViewModel.GetPasswordStrengthCssClass()"
+                                 style="width: @(_registerViewModel.GetPasswordStrengthPercentage())%">
+                            </div>
+                        </div>
+                        <small class="password-strength-text @_registerViewModel.GetPasswordStrengthClass()">
+                            @_registerViewModel.GetPasswordStrength()
+                        </small>
+                    </div>
+                }
+                <ValidationMessage For="@(() => _registerViewModel.Password)" class="text-danger small mt-1"/>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <InputText id="quickConfirmPassword"
+                               type="password"
+                               class="form-control"
+                               @bind-Value="_registerViewModel.ConfirmPassword"
+                               placeholder="Confirm Password"
+                               disabled="@_registerViewModel.IsLoading"
+                               autocomplete="new-password"/>
+                </div>
+                <ValidationMessage For="@(() => _registerViewModel.ConfirmPassword)" class="text-danger small mt-1"/>
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <InputCheckbox id="quickAcceptTerms"
+                                   class="form-check-input"
+                                   @bind-Value="_registerViewModel.AcceptTerms"
+                                   disabled="@_registerViewModel.IsLoading"/>
+                    <label class="form-check-label small" for="quickAcceptTerms">
+                        I agree to the
+                        <a href="/terms" target="_blank" class="terms-link">Terms</a>
+                        and
+                        <a href="/privacy" target="_blank" class="terms-link">Privacy Policy</a>
+                    </label>
+                </div>
+                <ValidationMessage For="@(() => _registerViewModel.AcceptTerms)" class="text-danger small mt-1"/>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary w-100 mb-3"
+                    disabled="@_registerViewModel.IsLoading">
+                @if (_registerViewModel.IsLoading)
+                {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span>Creating Account...</span>
+                }
+                else
+                {
+                    <i class="fas fa-user-plus me-2"></i>
+                    <span>Create Account</span>
+                }
+            </button>
+
+            <div class="text-center">
+                <small class="text-muted">
+                    Already have an account?
+                    <button type="button" class="btn btn-link btn-sm p-0"
+                            @onclick="@(() => SetActiveTab("login"))">
+                        Sign in here
+                    </button>
+                </small>
+            </div>
+        </EditForm>
+    </div>
+}
+</div>
+</NotAuthorized>
+<Authorized>
+    <div class="text-center">
+        <div class="card border-0 bg-white bg-opacity-90 p-4 rounded-4">
+            <h3 class="text-primary mb-3">
+                <i class="fas fa-user-circle me-2"></i>
+                Welcome back, @context.User.Identity?.Name!
+            </h3>
+            <p class="text-muted mb-4">Ready to explore more amazing artworks?</p>
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="/gallery" class="btn btn-primary">
+                    <i class="fas fa-images me-2"></i>Browse Gallery
+                </a>
+                <a href="/dashboard" class="btn btn-outline-primary">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</Authorized>
+</AuthorizeView>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="fw-bold mb-3">Why Choose Our Art Gallery?</h2>
+                <p class="text-muted lead">Discover what makes our platform special</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-palette fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Curated Collections</h5>
+                    <p class="text-muted">Handpicked artworks from renowned artists and emerging talents worldwide.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-users fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Artist Community</h5>
+                    <p class="text-muted">Connect with artists, read their stories, and follow your favorites.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-mobile-alt fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Mobile Experience</h5>
+                    <p class="text-muted">Enjoy seamless browsing on any device, anywhere, anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private bool _showQuickAuth = false;
+    private string _activeTab = "login";
+    private readonly LoginViewModel _loginViewModel = new();
+    private readonly RegisterViewModel _registerViewModel = new();
+
+    private void ShowQuickAuth(string tab)
+    {
+        _activeTab = tab;
+        _showQuickAuth = true;
+        StateHasChanged();
+    }
+
+    private void HideQuickAuth()
+    {
+        _showQuickAuth = false;
+        _loginViewModel.Reset();
+        _registerViewModel.Reset();
+        StateHasChanged();
+    }
+
+    private void SetActiveTab(string tab)
+    {
+        _activeTab = tab;
+        StateHasChanged();
+    }
+
+    private async Task HandleQuickLogin()
+    {
+        try
+        {
+            _loginViewModel.SetLoading(true);
+            StateHasChanged();
+
+            var command = _loginViewModel.ToCommand();
+            var success = await AuthService.Login(command);
+
+            if (success)
+            {
+                Logger.LogInformation("Quick login successful for user: {Email}", _loginViewModel.Email);
+                Navigation.NavigateTo("/dashboard", replace: true);
+            }
+            else
+            {
+                _loginViewModel.SetError("Invalid email or password.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Quick login error for user: {Email}", _loginViewModel.Email);
+            _loginViewModel.SetError(ex.Message);
+        }
+    }
+
+    private async Task HandleQuickRegister()
+    {
+        try
+        {
+            _registerViewModel.SetLoading(true);
+            StateHasChanged();
+
+            var command = _registerViewModel.ToCommand();
+            var response = await AuthService.Register(command);
+
+            if (response != null && !string.IsNullOrEmpty(response.Token))
+            {
+                Logger.LogInformation("Quick registration successful for user: {Email}", _registerViewModel.Email);
+                _registerViewModel.SetSuccess($"Welcome, {response.UserName}!");
+
+                await Task.Delay(1500);
+                Navigation.NavigateTo("/dashboard", replace: true);
+            }
+            else
+            {
+                _registerViewModel.SetError("Registration failed. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Quick registration error for user: {Email}", _registerViewModel.Email);
+            _registerViewModel.SetError(ex.Message);
+        }
+    }
+
+    private void OnQuickPasswordChanged(ChangeEventArgs e)
+    {
+        _registerViewModel.Password = e.Value?.ToString() ?? string.Empty;
+        _registerViewModel.UpdatePasswordStrength();
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("console.log", "Index page loaded");
+        }
+    }
+
+}

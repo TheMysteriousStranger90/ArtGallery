@@ -21,14 +21,14 @@ public class AuthService : IAuthService
         _authStateProvider = authStateProvider;
     }
     
-    public async Task<RegistrationResponse> Register(RegistrationRequest request)
+    public async Task<RegistrationResponse> Register(RegisterCommand request)
     {
         return await ApiExceptionHandler.HandleApiOperationAsync(
             async () => await _client.RegisterAsync("1.0", request),
             "Registration failed");
     }
     
-    public async Task<bool> Login(AuthenticationRequest request)
+    public async Task<bool> Login(AuthenticateCommand request)
     {
         try
         {
