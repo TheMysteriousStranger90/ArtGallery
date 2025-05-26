@@ -14,6 +14,8 @@
     --link-color: var(--brand-secondary);
     --link-hover-color: #D7CCC8; /* Lighter shade for hover */
 
+    --navbar-bg: #212121;
+
     /* Bootstrap variable overrides */
     --bs-primary: var(--brand-primary);
     --bs-secondary: var(--brand-secondary);
@@ -41,8 +43,9 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-.top-row a, .top-row .btn-link {
-    color: var(--text-light);
+.top-row {
+    background-color: var(--navbar-bg);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .auth-container {

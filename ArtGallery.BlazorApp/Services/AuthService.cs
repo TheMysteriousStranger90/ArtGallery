@@ -13,8 +13,8 @@ public class AuthService : IAuthService
     private readonly ILocalStorageService _localStorage;
     private readonly AuthenticationStateProvider _authStateProvider;
     private readonly ILogger<AuthService> _logger;
-    
-    public AuthService(IClient client, 
+
+    public AuthService(IClient client,
         ILocalStorageService localStorage,
         AuthenticationStateProvider authStateProvider,
         ILogger<AuthService> logger)
@@ -56,14 +56,13 @@ public class AuthService : IAuthService
         }
     }
     
-    public async Task<AuthResult> Login(AuthenticateCommand request)
+  public async Task<AuthResult> Login(AuthenticateCommand request)
     {
         try
         {
             _logger.LogInformation("Starting login attempt for user: {Email}", request.Email);
-            
-            // Call the API and log the raw response
-            var authResult = await ApiExceptionHandler.HandleApiOperationAsync(
+
+            var apiResponse = await ApiExceptionHandler.HandleApiOperationAsync(
                 async () => {
                     var result = await _client.AuthenticateAsync("1.0", request);
                     _logger.LogInformation("Raw API response received. Type: {Type}", result?.GetType().Name);
@@ -71,94 +70,55 @@ public class AuthService : IAuthService
                 },
                 "Login failed",
                 _logger);
-        
-            _logger.LogInformation("Login API call completed. AuthResult is null: {IsNull}", authResult == null);
-            
-            if (authResult != null)
+
+            _logger.LogInformation("Login API call completed. ApiResponse is null: {IsNull}", apiResponse == null);
+
+            if (apiResponse != null && !string.IsNullOrEmpty(apiResponse.Token))
             {
-                // Log all properties of the auth result for debugging
-                _logger.LogInformation("AuthResult properties - Token present: {HasToken}, Token length: {TokenLength}", 
-                    !string.IsNullOrEmpty(authResult.Token), 
-                    authResult.Token?.Length ?? 0);
-                
-                if (!string.IsNullOrEmpty(authResult.Token))
+                _logger.LogInformation("API authentication successful for user: {Email}. Token received.", request.Email);
+                _logger.LogInformation("ApiResponse properties - Token present: {HasToken}, Token length: {TokenLength}",
+                    !string.IsNullOrEmpty(apiResponse.Token),
+                    apiResponse.Token?.Length ?? 0);
+
+                return new AuthResult
                 {
-                    try
-                    {
-                        _logger.LogInformation("Saving token to localStorage for user: {Email}", request.Email);
-                        await _localStorage.SetItemAsync("authToken", authResult.Token);
-                        
-                        _logger.LogInformation("Notifying authentication state provider for user: {Email}", request.Email);
-                        
-                        // Check if the auth state provider is of the expected type
-                        if (_authStateProvider is CustomAuthStateProvider customProvider)
-                        {
-                            customProvider.NotifyUserAuthentication(authResult.Token);
-                            _logger.LogInformation("Successfully notified CustomAuthStateProvider");
-                        }
-                        else
-                        {
-                            _logger.LogWarning("AuthStateProvider is not CustomAuthStateProvider. Type: {Type}", 
-                                _authStateProvider.GetType().Name);
-                        }
-                        
-                        _logger.LogInformation("Login successful for user: {Email}", request.Email);
-                        return new AuthResult 
-                        { 
-                            IsSuccess = true,
-                            Token = authResult.Token
-                        };
-                    }
-                    catch (Exception storageEx)
-                    {
-                        _logger.LogError(storageEx, "Error saving token or notifying auth provider for user: {Email}", 
-                            request.Email);
-                        return new AuthResult 
-                        { 
-                            IsSuccess = false, 
-                            ErrorMessage = $"Authentication successful but failed to save session: {storageEx.Message}"
-                        };
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("Token is null or empty for user: {Email}. AuthResult type: {Type}", 
-                        request.Email, authResult.GetType().Name);
-                    
-                    // Log all properties of authResult for debugging
-                    var properties = authResult.GetType().GetProperties();
-                    foreach (var prop in properties)
-                    {
-                        try
-                        {
-                            var value = prop.GetValue(authResult);
-                            _logger.LogInformation("AuthResult.{PropertyName}: {Value}", prop.Name, value ?? "null");
-                        }
-                        catch (Exception propEx)
-                        {
-                            _logger.LogWarning(propEx, "Could not read property {PropertyName}", prop.Name);
-                        }
-                    }
-                }
+                    IsSuccess = true,
+                    Token = apiResponse.Token
+                };
             }
             else
             {
-                _logger.LogWarning("AuthResult is null for user: {Email}", request.Email);
+                _logger.LogWarning("API authentication failed or token was empty for user: {Email}. ApiResponse type: {Type}",
+                    request.Email, apiResponse?.GetType().Name);
+                if (apiResponse != null) {
+                     var properties = apiResponse.GetType().GetProperties();
+                        foreach (var prop in properties)
+                        {
+                            try
+                            {
+                                var value = prop.GetValue(apiResponse);
+                                _logger.LogInformation("ApiResponse.{PropertyName}: {Value}", prop.Name, value ?? "null");
+                            }
+                            catch (Exception propEx)
+                            {
+                                _logger.LogWarning(propEx, "Could not read property {PropertyName}", prop.Name);
+                            }
+                        }
+                }
+                return new AuthResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "Invalid credentials or authentication failed"
+                };
             }
-        
-            return new AuthResult 
-            { 
-                IsSuccess = false, 
-                ErrorMessage = "Invalid credentials or authentication failed" 
-            };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Login exception for user: {Email}. Exception type: {ExceptionType}, Stack trace: {StackTrace}", 
+            _logger.LogError(ex, "Login exception for user: {Email}. Exception type: {ExceptionType}, Stack trace: {StackTrace}",
                 request.Email, ex.GetType().Name, ex.StackTrace);
-            return new AuthResult 
-            { 
-                IsSuccess = false, 
+            return new AuthResult
+            {
+                IsSuccess = false,
                 ErrorMessage = $"Login error: {ex.Message}"
             };
         }

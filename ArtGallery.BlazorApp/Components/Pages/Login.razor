@@ -1,9 +1,13 @@
 ﻿@page "/login"
 @using ArtGallery.BlazorApp.ViewModels
-@using ArtGallery.BlazorApp.Services
 @using ArtGallery.BlazorApp.Services.Interfaces
+@using ArtGallery.BlazorApp.Auth
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
+@inject ILocalStorageService localStorage
+@inject AuthenticationStateProvider authStateProvider
 @inject IJSRuntime JS
 
 <PageTitle>Sign In - Art Gallery</PageTitle>
@@ -73,23 +77,21 @@
                             </div>
 
                             <!-- Password Field -->
-                            <div class="form-floating mb-3">
-                                <div class="input-group">
-                                    <InputText @bind-Value="loginViewModel.Password"
-                                               type="@(loginViewModel.ShowPassword ? "text" : "password")"
-                                               class="@GetPasswordCssClass()"
-                                               id="password"
-                                               placeholder="Password"
-                                               disabled="@loginViewModel.IsLoading"/>
-                                    <button class="btn btn-outline-secondary" type="button"
-                                            @onclick="() => loginViewModel.ShowPassword = !loginViewModel.ShowPassword"
-                                            disabled="@loginViewModel.IsLoading">
-                                        <i class="fas @(loginViewModel.ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
-                                    </button>
-                                </div>
+                            <div class="form-floating mb-3 position-relative">
+                                <InputText @bind-Value="loginViewModel.Password"
+                                           type="@(loginViewModel.ShowPassword ? "text" : "password")"
+                                           class="@GetPasswordCssClass()"
+                                           id="password"
+                                           placeholder="Password"
+                                           disabled="@loginViewModel.IsLoading"/>
                                 <label for="password">
                                     <i class="fas fa-lock me-2"></i>Password
                                 </label>
+                                <button class="btn btn-outline-secondary password-toggle" type="button"
+                                        @onclick="() => loginViewModel.ShowPassword = !loginViewModel.ShowPassword"
+                                        disabled="@loginViewModel.IsLoading">
+                                    <i class="fas @(loginViewModel.ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                                </button>
                                 <ValidationMessage For="() => loginViewModel.Password" class="invalid-feedback"/>
                             </div>
 
@@ -178,70 +180,390 @@
     </div>
 </div>
 
+<style>
+    /* Custom styles for login form */
+    .auth-container {
+        background: linear-gradient(135deg, var(--bg-dark) 0%, #2c1e1a 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+
+    .auth-card {
+        background-color: var(--bg-dark-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        color: var(--text-light);
+    }
+
+    /* Password toggle button positioning */
+    .form-floating.position-relative .password-toggle {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: none;
+        z-index: 4;
+        padding: 0 0.75rem;
+        background-color: transparent;
+        border-color: var(--input-border);
+        color: var(--text-light);
+    }
+
+    .form-floating.position-relative .password-toggle:hover {
+        background-color: var(--brand-accent);
+        border-color: var(--brand-accent);
+        color: var(--text-light);
+    }
+
+    .form-floating.position-relative .password-toggle:focus {
+        box-shadow: none;
+        background-color: var(--brand-accent);
+        border-color: var(--brand-accent);
+    }
+
+    /* Adjust input padding to accommodate the button */
+    .form-floating.position-relative .form-control {
+        padding-right: 3rem;
+    }
+
+    /* Ensure form-floating labels work correctly */
+    .form-floating > label {
+        color: #B0BEC5;
+        z-index: 2;
+    }
+
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: var(--brand-secondary);
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+
+    /* Form controls styling */
+    .form-control {
+        background-color: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--input-text);
+        border-radius: 0.375rem;
+        height: calc(3.5rem + 2px);
+    }
+
+    .form-control:focus {
+        background-color: var(--input-bg);
+        border-color: var(--brand-secondary);
+        color: var(--input-text);
+        box-shadow: 0 0 0 0.25rem rgba(161, 136, 127, 0.25);
+    }
+
+    .form-control::placeholder {
+        color: #90A4AE;
+    }
+
+    /* Validation styling */
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Button styling */
+    .btn-primary {
+        background-color: var(--brand-primary);
+        border-color: var(--brand-primary);
+        color: var(--text-light);
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+        background-color: #4E342E;
+        border-color: #4E342E;
+        color: var(--text-light);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary:disabled {
+        background-color: var(--brand-primary);
+        border-color: var(--brand-primary);
+        opacity: 0.6;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Social buttons */
+    .btn-outline-light {
+        border-color: var(--border-color);
+        color: var(--text-light);
+        background-color: transparent;
+    }
+
+    .btn-outline-light:hover {
+        background-color: var(--brand-accent);
+        border-color: var(--brand-accent);
+        color: var(--text-light);
+    }
+
+    /* Links */
+    .btn-link {
+        color: var(--link-color);
+        text-decoration: none;
+    }
+
+    .btn-link:hover {
+        color: var(--link-hover-color);
+        text-decoration: underline;
+    }
+
+    /* Alerts */
+    .alert-danger {
+        background-color: #B71C1C;
+        color: var(--text-light);
+        border-color: #880E4F;
+    }
+
+    .alert-success {
+        background-color: #1B5E20;
+        color: var(--text-light);
+        border-color: #003300;
+    }
+
+    .alert-warning {
+        background-color: #E65100;
+        color: var(--text-light);
+        border-color: #BF360C;
+    }
+
+    /* Divider styling */
+    hr {
+        border-top: 1px solid var(--border-color);
+        margin: 1rem 0;
+    }
+
+    .bg-white {
+        background-color: var(--bg-dark-card) !important;
+        color: var(--text-light);
+    }
+
+    /* Animation improvements */
+    .animate__fadeInUp {
+        animation-duration: 0.6s;
+    }
+</style>
+
+
 @code {
     [SupplyParameterFromForm] private LoginViewModel loginViewModel { get; set; } = new();
 
     private bool _isInteractive = false;
+    private string? _tokenToSave;
+    private bool _shouldSaveTokenAndNotify = false;
+    private EditContext? _editContext;
+    private bool _navigationAttempted = false;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override void OnInitialized()
     {
+        _editContext = new EditContext(loginViewModel);
+        Console.WriteLine("Login.OnInitialized: EditContext created.");
+
+        var uri = new Uri(Navigation.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        if (query.TryGetValue("returnUrl", out var returnUrlValue) && !string.IsNullOrEmpty(returnUrlValue))
+        {
+            loginViewModel.ReturnUrl = returnUrlValue!;
+            Console.WriteLine($"Login.OnInitialized: ReturnUrl set to {loginViewModel.ReturnUrl}");
+        }
+        else
+        {
+            Console.WriteLine("Login.OnInitialized: No ReturnUrl found in query.");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine($"Login.OnAfterRenderAsync: ENTERED - firstRender: {firstRender}, _isInteractive: {_isInteractive}, _shouldSaveTokenAndNotify: {_shouldSaveTokenAndNotify}, _tokenToSave null: {string.IsNullOrEmpty(_tokenToSave)}, _navigationAttempted: {_navigationAttempted}");
+
         if (firstRender)
         {
             _isInteractive = true;
+            Console.WriteLine("Login.OnAfterRenderAsync: _isInteractive set to true.");
+        }
+
+        if (_shouldSaveTokenAndNotify && !string.IsNullOrEmpty(_tokenToSave) && _isInteractive && !_navigationAttempted)
+        {
+            _navigationAttempted = true; // Prevent multiple attempts
+            Console.WriteLine($"Login.OnAfterRenderAsync: Processing token for {loginViewModel.Email}");
+
+            _shouldSaveTokenAndNotify = false;
+            string tokenForProcessing = _tokenToSave;
+            _tokenToSave = null;
+
+            try
+            {
+                Console.WriteLine($"Login.OnAfterRenderAsync: Saving token to localStorage for {loginViewModel.Email}.");
+                await localStorage.SetItemAsync("authToken", tokenForProcessing);
+                Console.WriteLine($"Login.OnAfterRenderAsync: Token saved successfully for {loginViewModel.Email}.");
+
+                if (authStateProvider is CustomAuthStateProvider customProvider)
+                {
+                    Console.WriteLine($"Login.OnAfterRenderAsync: Notifying CustomAuthStateProvider for {loginViewModel.Email}.");
+                    customProvider.NotifyUserAuthentication(tokenForProcessing);
+                    Console.WriteLine($"Login.OnAfterRenderAsync: CustomAuthStateProvider notified for {loginViewModel.Email}.");
+                }
+
+                loginViewModel.SetSuccess("Login successful! Redirecting...");
+                StateHasChanged();
+
+                Console.WriteLine($"Login.OnAfterRenderAsync: Starting navigation process for {loginViewModel.Email}.");
+                await Task.Delay(500); // Shorter delay
+
+                var returnUrl = !string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? loginViewModel.ReturnUrl : "/";
+                Console.WriteLine($"Login.OnAfterRenderAsync: Attempting navigation to {returnUrl} for {loginViewModel.Email}.");
+
+                // Try multiple navigation methods
+                bool navigationSuccessful = false;
+
+                // Method 1: JavaScript navigation
+                try
+                {
+                    await JS.InvokeVoidAsync("window.location.replace", returnUrl);
+                    Console.WriteLine($"Login.OnAfterRenderAsync: JavaScript navigation (replace) initiated to {returnUrl}");
+                    navigationSuccessful = true;
+                }
+                catch (Exception jsEx)
+                {
+                    Console.WriteLine($"Login.OnAfterRenderAsync: JavaScript navigation failed: {jsEx.Message}");
+                }
+
+                // Method 2: Blazor navigation if JS failed
+                if (!navigationSuccessful)
+                {
+                    try
+                    {
+                        Navigation.NavigateTo(returnUrl, forceLoad: true, replace: true);
+                        Console.WriteLine($"Login.OnAfterRenderAsync: Blazor navigation initiated to {returnUrl}");
+                        navigationSuccessful = true;
+                    }
+                    catch (Exception navEx)
+                    {
+                        Console.WriteLine($"Login.OnAfterRenderAsync: Blazor navigation failed: {navEx.Message}");
+                    }
+                }
+
+                // Method 3: Force page reload if navigation failed
+                if (!navigationSuccessful)
+                {
+                    try
+                    {
+                        await JS.InvokeVoidAsync("window.location.href", returnUrl);
+                        Console.WriteLine($"Login.OnAfterRenderAsync: Force reload navigation to {returnUrl}");
+                    }
+                    catch (Exception reloadEx)
+                    {
+                        Console.WriteLine($"Login.OnAfterRenderAsync: Force reload failed: {reloadEx.Message}");
+                        loginViewModel.SetError("Login successful but navigation failed. Please manually navigate to the home page.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Login.OnAfterRenderAsync: Error during token processing: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                loginViewModel.SetError($"Authentication successful, but session setup failed: {ex.Message}");
+                _navigationAttempted = false; // Allow retry
+            }
+            finally
+            {
+                loginViewModel.SetLoading(false);
+                StateHasChanged();
+                Console.WriteLine($"Login.OnAfterRenderAsync: Process completed for {loginViewModel.Email}.");
+            }
         }
     }
 
     private string GetEmailCssClass()
     {
-        return HasValidationError("Email") ? "form-control is-invalid" : "form-control";
+        return HasValidationError(() => loginViewModel.Email) ? "form-control is-invalid" : "form-control";
     }
 
     private string GetPasswordCssClass()
     {
-        return HasValidationError("Password") ? "form-control is-invalid" : "form-control";
+        return HasValidationError(() => loginViewModel.Password) ? "form-control is-invalid" : "form-control";
     }
 
-    private bool HasValidationError(string fieldName)
+    private bool HasValidationError(System.Linq.Expressions.Expression<Func<object?>> accessor)
     {
-        return false;
+        if (_editContext == null) return false;
+        return _editContext.GetValidationMessages(accessor).Any();
     }
 
     private async Task HandleLogin()
     {
+        Console.WriteLine($"Login.HandleLogin: Started for user: {loginViewModel.Email}. CanAttemptLogin: {loginViewModel.CanAttemptLogin()}");
         if (!loginViewModel.CanAttemptLogin())
         {
             return;
         }
 
+        _navigationAttempted = false; // Reset navigation flag
         loginViewModel.SetLoading(true);
-        StateHasChanged();
+        _tokenToSave = null;
+        _shouldSaveTokenAndNotify = false;
+        loginViewModel.ErrorMessage = string.Empty;
+        loginViewModel.SuccessMessage = string.Empty;
+
+        if (_editContext == null) _editContext = new EditContext(loginViewModel);
+        bool isValid = _editContext.Validate();
+        Console.WriteLine($"Login.HandleLogin: Form validation result for {loginViewModel.Email}: IsValid = {isValid}");
+
+        if (!isValid)
+        {
+            loginViewModel.SetLoading(false);
+            loginViewModel.SetError("Please correct the validation errors.");
+            StateHasChanged();
+            Console.WriteLine($"Login.HandleLogin: Invalid form, returning. User: {loginViewModel.Email}");
+            return;
+        }
 
         try
         {
             var command = loginViewModel.ToCommand();
-            Console.WriteLine($"Login attempt for: {command.Email}");
+            Console.WriteLine($"Login.HandleLogin: Attempting AuthService.Login for {command.Email}");
 
             var result = await AuthService.Login(command);
 
-            Console.WriteLine($"Login result - IsSuccess: {result.IsSuccess}, ErrorMessage: {result.ErrorMessage}");
+            Console.WriteLine($"Login.HandleLogin: AuthService.Login result for {command.Email} - IsSuccess: {result.IsSuccess}, ErrorMessage: {result.ErrorMessage}, TokenPresent: {!string.IsNullOrEmpty(result.Token)}");
 
-            if (result.IsSuccess)
+            if (result.IsSuccess && !string.IsNullOrEmpty(result.Token))
             {
-                loginViewModel.SetSuccess("Login successful! Redirecting...");
+                _tokenToSave = result.Token;
+                _shouldSaveTokenAndNotify = true;
+                Console.WriteLine($"Login.HandleLogin: API login successful for {command.Email}. Token will be processed in OnAfterRenderAsync.");
+
+                // Force multiple state changes to ensure OnAfterRenderAsync is called
+                StateHasChanged();
+                await Task.Delay(100);
                 StateHasChanged();
 
-                await Task.Delay(1000);
-
-                var returnUrl = !string.IsNullOrEmpty(loginViewModel.ReturnUrl)
-                    ? loginViewModel.ReturnUrl
-                    : "/";
-                Navigation.NavigateTo(returnUrl);
+                Console.WriteLine($"Login.HandleLogin: Multiple StateHasChanged calls made for {command.Email}");
             }
             else
             {
                 var errorMsg = result.ErrorMessage ?? "Login failed. Please try again.";
-                Console.WriteLine($"Login failed: {errorMsg}");
+                Console.WriteLine($"Login.HandleLogin: API login failed for {command.Email}: {errorMsg}");
                 loginViewModel.SetError(errorMsg);
+                loginViewModel.SetLoading(false);
 
                 if (_isInteractive)
                 {
@@ -251,31 +573,20 @@
                     }
                     catch (Exception jsEx)
                     {
-                        Console.WriteLine($"Vibration failed: {jsEx.Message}");
+                        Console.WriteLine($"Login.HandleLogin: Vibration failed for {command.Email}: {jsEx.Message}");
                     }
                 }
+
+                StateHasChanged();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Login exception: {ex.Message}");
+            Console.WriteLine($"Login.HandleLogin: Exception for {loginViewModel.Email}: {ex.Message}");
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
             loginViewModel.SetError($"Login error: {ex.Message}");
-        }
-        finally
-        {
             loginViewModel.SetLoading(false);
             StateHasChanged();
-        }
-    }
-
-    protected override void OnInitialized()
-    {
-        var uri = new Uri(Navigation.Uri);
-        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
-        if (query.TryGetValue("returnUrl", out var returnUrl))
-        {
-            loginViewModel.ReturnUrl = returnUrl!;
         }
     }
 
