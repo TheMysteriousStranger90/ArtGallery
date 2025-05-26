@@ -1,36 +1,44 @@
 ﻿using ArtGallery.BlazorApp.Services;
+using Microsoft.Extensions.Logging;
 
 namespace ArtGallery.BlazorApp.Exceptions;
 
-public class ApiExceptionHandler
+public static class ApiExceptionHandler
 {
-    public static async Task<T> HandleApiOperationAsync<T>(Func<Task<T>> apiCall, string genericErrorMessage = "An error occurred")
+    public static async Task<T> HandleApiOperationAsync<T>(
+        Func<Task<T>> operation,
+        string errorMessage,
+        ILogger? logger = null)
     {
         try
         {
-            return await apiCall();
+            logger?.LogDebug("Executing API operation");
+            var result = await operation();
+            logger?.LogDebug("API operation completed successfully. Result is null: {IsNull}, Result type: {Type}",
+                result == null, result?.GetType().Name ?? "null");
+            return result;
         }
-        catch (ApiException ex)
+        catch (ApiException apiEx)
         {
-            switch (ex.StatusCode)
-            {
-                case 400:
-                    throw new Exception($"Bad request: {ex.Response}");
-                case 401:
-                    throw new Exception("Your session has expired. Please log in again.");
-                case 403:
-                    throw new Exception("You don't have permission to perform this action.");
-                case 404:
-                    throw new Exception("The requested resource was not found.");
-                case 429:
-                    throw new Exception("Too many requests. Please try again later.");
-                default:
-                    throw new Exception($"{genericErrorMessage}: {ex.Message}");
-            }
+            logger?.LogError(apiEx, "API Exception occurred: Status={StatusCode}, Response={Response}",
+                apiEx.StatusCode, apiEx.Response);
+            throw new ApplicationException($"{errorMessage}: Status {apiEx.StatusCode} ");
+        }
+        catch (HttpRequestException httpEx)
+        {
+            logger?.LogError(httpEx, "HTTP Request Exception occurred");
+            throw new ApplicationException($"{errorMessage}: Network error - {httpEx.Message}");
+        }
+        catch (TaskCanceledException tcEx)
+        {
+            logger?.LogError(tcEx, "Request timeout occurred");
+            throw new ApplicationException($"{errorMessage}: Request timeout");
         }
         catch (Exception ex)
         {
-            throw new Exception($"{genericErrorMessage}: {ex.Message}");
+            logger?.LogError(ex, "General exception occurred during API operation. Exception type: {ExceptionType}",
+                ex.GetType().Name);
+            throw new ApplicationException($"{errorMessage}: {ex.Message}");
         }
     }
 }

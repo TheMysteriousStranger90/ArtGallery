@@ -1,502 +1,245 @@
-/* =================================
-   Authentication Styles
-   ================================= */
+:root {
+    --brand-primary: #5D4037; /* Dark Brown */
+    --brand-secondary: #A1887F; /* Lighter Brown */
+    --brand-accent: #795548; /* Medium Brown */
+    --text-light: #F5F5F5;
+    --text-dark: #212121;
+    --bg-dark: #212121; /* Very Dark Gray/Charcoal */
+    --bg-dark-card: #3E2723; /* Darker Brown for cards */
+    --bg-light: #ECEFF1;
+    --border-color: #4E342E; /* Dark brown border */
+    --input-bg: #424242; /* Dark input background */
+    --input-border: #5D4037;
+    --input-text: var(--text-light);
+    --link-color: var(--brand-secondary);
+    --link-hover-color: #D7CCC8; /* Lighter shade for hover */
 
-/* Auth Container */
-.auth-container {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    position: relative;
+    /* Bootstrap variable overrides */
+    --bs-primary: var(--brand-primary);
+    --bs-secondary: var(--brand-secondary);
+    --bs-body-color: var(--text-light);
+    --bs-body-bg: var(--bg-dark);
+    --bs-link-color: var(--link-color);
+    --bs-link-hover-color: var(--link-hover-color);
+    --bs-border-color: var(--border-color);
 }
 
-.auth-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('/images/art-pattern.png') repeat;
-    opacity: 0.1;
-    z-index: 1;
-}
-
-/* Auth Card */
-.auth-card {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 2;
-    overflow: hidden;
-}
-
-.auth-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    z-index: 1;
-}
-
-/* Form Controls */
-.form-control {
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
-}
-
-.form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    background: #fff;
-    transform: translateY(-2px);
-}
-
-.form-control:hover {
-    border-color: #667eea;
-}
-
-/* Input Groups */
-.input-group .form-control {
-    border-right: none;
-}
-
-.input-group .btn-outline-secondary {
-    border: 2px solid #e9ecef;
-    border-left: none;
-    border-radius: 0 10px 10px 0;
-    background: rgba(248, 249, 250, 0.9);
-    transition: all 0.3s ease;
-}
-
-.input-group .btn-outline-secondary:hover {
-    background: #667eea;
-    border-color: #667eea;
-    color: white;
-}
-
-/* Buttons */
-.btn-primary {
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    border: none;
-    border-radius: 12px;
-    padding: 12px 24px;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-}
-
-.btn-primary:hover::before {
-    left: 100%;
-}
-
-.btn-primary:active {
-    transform: translateY(-1px);
-}
-
-/* Password Strength Meter */
-.password-strength {
-    margin-top: 8px;
-}
-
-.password-strength-meter {
-    height: 6px;
-    border-radius: 3px;
-    background: #e9ecef;
-    overflow: hidden;
-    margin-bottom: 5px;
-}
-
-.password-strength-bar {
-    height: 100%;
-    transition: all 0.3s ease;
-    border-radius: 3px;
-}
-
-.strength-very-weak .password-strength-bar {
-    background: linear-gradient(45deg, #dc3545, #e74c3c);
-    width: 20%;
-}
-
-.strength-weak .password-strength-bar {
-    background: linear-gradient(45deg, #fd7e14, #f39c12);
-    width: 40%;
-}
-
-.strength-fair .password-strength-bar {
-    background: linear-gradient(45deg, #ffc107, #f1c40f);
-    width: 60%;
-}
-
-.strength-good .password-strength-bar {
-    background: linear-gradient(45deg, #20c997, #1abc9c);
-    width: 80%;
-}
-
-.strength-strong .password-strength-bar {
-    background: linear-gradient(45deg, #28a745, #27ae60);
-    width: 100%;
-}
-
-.password-strength-text {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Quick Auth Panel */
-.auth-panel {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 30px;
-    margin-top: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transform: translateY(20px);
-    opacity: 0;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-.auth-panel.show {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-.auth-tabs {
-    display: flex;
-    margin-bottom: 25px;
-    border-bottom: 2px solid #e9ecef;
-    position: relative;
-}
-
-.auth-tab {
-    flex: 1;
-    background: none;
-    border: none;
-    padding: 15px 20px;
-    font-weight: 600;
-    color: #6c757d;
-    transition: all 0.3s ease;
-    position: relative;
-    cursor: pointer;
-}
-
-.auth-tab:hover {
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
-}
-
-.auth-tab.active {
-    color: #667eea;
-}
-
-.auth-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(45deg, #667eea, #764ba2);
-}
-
-.auth-tab-close {
-    background: none;
-    border: none;
-    color: #6c757d;
-    font-size: 18px;
-    padding: 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-
-.auth-tab-close:hover {
-    color: #dc3545;
-    background: rgba(220, 53, 69, 0.1);
-    border-radius: 50%;
-}
-
-/* Hero Section */
-.hero-section {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)),
-    url('/images/hero-bg.jpg') center/cover;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    position: relative;
-    color: white;
-}
-
-.hero-content {
-    z-index: 2;
-    position: relative;
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.hero-subtitle {
-    font-size: 1.3rem;
-    margin-bottom: 30px;
-    opacity: 0.9;
-}
-
-.hero-features {
-    list-style: none;
+body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
     padding: 0;
 }
 
-.hero-features li {
-    padding: 10px 0;
-    font-size: 1.1rem;
+.page {
+    background-color: var(--bs-body-bg);
 }
 
-.hero-features i {
-    color: #ffc107;
-    margin-right: 10px;
+.top-row {
+    background-color: rgba(0,0,0,0.3); /* Darker shade for top bar */
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* Quick Auth Buttons */
-.quick-auth-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    border-radius: 12px;
-    padding: 12px 30px;
-    margin: 5px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+.top-row a, .top-row .btn-link {
+    color: var(--text-light);
 }
 
-.quick-auth-btn:hover {
-    background: white;
-    color: #667eea;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Terms and Conditions */
-.terms-link {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.terms-link:hover {
-    color: #764ba2;
-    text-decoration: underline;
-}
-
-/* Remember Me Toggle */
-.remember-toggle {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 30px;
-}
-
-.remember-toggle input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.remember-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 30px;
-}
-
-.remember-slider:before {
-    position: absolute;
-    content: "";
-    height: 22px;
-    width: 22px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-}
-
-input:checked + .remember-slider {
-    background: linear-gradient(45deg, #667eea, #764ba2);
-}
-
-input:checked + .remember-slider:before {
-    transform: translateX(30px);
-}
-
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-.pulse-animation {
-    animation: pulse 2s infinite;
-}
-
-/* Alert Enhancements */
-.alert {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-}
-
-.alert-success {
-    background: linear-gradient(45deg, rgba(40, 167, 69, 0.1), rgba(39, 174, 96, 0.1));
-    border-left: 4px solid #28a745;
-}
-
-.alert-danger {
-    background: linear-gradient(45deg, rgba(220, 53, 69, 0.1), rgba(231, 76, 60, 0.1));
-    border-left: 4px solid #dc3545;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.1rem;
-    }
-
-    .auth-panel {
-        margin-top: 15px;
-        padding: 20px;
-    }
-
-    .auth-tabs {
-        flex-direction: column;
-    }
-
-    .auth-tab {
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .auth-tab:last-child {
-        border-bottom: none;
-    }
-}
-
-/* Loading Spinner */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(102, 126, 234, 0.8);
+.auth-container {
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #2c1e1a 100%); /* Subtle gradient */
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
-    backdrop-filter: blur(5px);
 }
 
-.loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+.auth-card {
+    background-color: var(--bg-dark-card);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    color: var(--text-light);
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.auth-card .card-body {
+    padding: 2.5rem !important; /* Ensure padding */
 }
 
-/* Form Enhancement */
-.form-floating {
-    position: relative;
+.auth-card .text-primary {
+    color: var(--brand-secondary) !important; /* Lighter brown for primary text highlights in card */
 }
 
-.form-floating > .form-control {
-    padding: 1rem 0.75rem;
+.auth-card .text-muted {
+    color: #B0BEC5 !important; /* Lighter muted text */
+}
+
+.auth-card h2.fw-bold {
+    color: var(--brand-secondary) !important;
+}
+
+/* Forms */
+.form-control {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--input-text);
+    border-radius: 0.375rem;
+}
+
+.form-control:focus {
+    background-color: var(--input-bg);
+    border-color: var(--brand-secondary);
+    color: var(--input-text);
+    box-shadow: 0 0 0 0.25rem rgba(var(), 0.25); /* Use RGB if var(--brand-secondary) is hex */
+}
+
+.form-control::placeholder {
+    color: #90A4AE;
 }
 
 .form-floating > label {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    padding: 1rem 0.75rem;
-    pointer-events: none;
-    border: 1px solid transparent;
-    transform-origin: 0 0;
-    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    color: #B0BEC5; /* Lighter label color */
 }
 
 .form-floating > .form-control:focus ~ label,
 .form-floating > .form-control:not(:placeholder-shown) ~ label {
-    opacity: 0.65;
-    transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    color: var(--brand-secondary);
+}
+
+
+.input-group .btn {
+    border-color: var(--input-border);
+}
+.input-group .btn:hover {
+    background-color: var(--brand-accent);
+}
+
+.btn-primary {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #4E342E; /* Darker shade of primary */
+    border-color: #4E342E;
+    color: var(--text-light);
+}
+
+.btn-link {
+    color: var(--link-color);
+    text-decoration: none;
+}
+.btn-link:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+.alert-danger {
+    background-color: #B71C1C; /* Darker red */
+    color: var(--text-light);
+    border-color: #880E4F;
+}
+
+.alert-success {
+    background-color: #1B5E20; /* Darker green */
+    color: var(--text-light);
+    border-color: #003300;
+}
+
+.alert .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%); /* Make close button visible on dark alerts */
+}
+
+
+/* Password Strength */
+.password-strength-meter {
+    height: 8px;
+    background-color: #424242; /* Dark background for meter */
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.password-strength-bar {
+    height: 100%;
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.strength-very-weak { background-color: #d9534f; width: 20%; } /* Red */
+.strength-weak { background-color: #f0ad4e; width: 40%; }      /* Orange */
+.strength-fair { background-color: #5bc0de; width: 60%; }      /* Info Blue */
+.strength-good { background-color: #337ab7; width: 80%; }      /* Primary Blue (adjust to theme) */
+.strength-strong { background-color: #5cb85c; width: 100%; }   /* Green */
+
+/* Text color for password strength, can be same as bar or contrasting */
+.password-strength .text-danger { color: #d9534f !important; }
+.password-strength .text-warning { color: #f0ad4e !important; }
+.password-strength .text-info { color: #5bc0de !important; }
+.password-strength .text-primary { color: var(--brand-secondary) !important; } /* Adjusted */
+.password-strength .text-success { color: #5cb85c !important; }
+
+
+/* Remember me toggle (if you have custom styling for it) */
+.remember-toggle {
+    /* Add custom styles if your .remember-slider is custom */
+}
+
+/* Ensure Font Awesome icons are visible */
+.fas {
+    color: inherit; /* Inherit color from parent, or set a specific light color */
+}
+
+.auth-card .fa-3x {
+    color: var(--brand-secondary) !important; /* Ensure icons in header are themed */
+}
+
+/* Index page specific welcome card */
+.container.mt-5 .card {
+    background-color: var(--bg-dark-card);
+    border-color: var(--border-color);
+}
+.container.mt-5 .card-title {
+    color: var(--brand-secondary) !important;
+}
+.container.mt-5 .card-text {
+    color: var(--text-light);
+}
+.container.mt-5 .btn-outline-danger {
+    color: #ff8a80; /* Light red for text */
+    border-color: #ff8a80; /* Light red for border */
+}
+.container.mt-5 .btn-outline-danger:hover {
+    color: var(--text-light);
+    background-color: #c9302c; /* Darker red for hover background */
+    border-color: #c9302c;
+}
+
+/* Ensure links in MainLayout are styled */
+.top-row a, .top-row span {
+    color: var(--text-light) !important; /* Ensure text is light */
+}
+.top-row a:hover {
+    color: var(--link-hover-color) !important;
+}
+
+/* Adjustments for Blazor error UI */
+#blazor-error-ui {
+    background: #420000; /* Dark red background */
+    color: white;
+    border-top: 2px solid #8B0000; /* Darker red border */
+}
+#blazor-error-ui a {
+    color: #FFCCCB; /* Light red links */
+}
+#blazor-error-ui a:hover {
+    color: white;
+}
+
+hr {
+    border-top: 1px solid var(--border-color);
+}
+.bg-white.px-3 { /* For "or" divider text background */
+    background-color: var(--bg-dark-card) !important; /* Match card background */
+    color: var(--text-light);
 }
