@@ -18,12 +18,14 @@
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Http.Features" Version="2.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Server.Kestrel.Core" Version="2.3.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.16" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.14" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Analyzers" Version="8.0.14" />
@@ -36,6 +38,7 @@
     <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="8.0.14" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="Serilog" Version="3.1.1" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <!-- Prometheus Monitoring -->
     <PackageVersion Include="prometheus-net.AspNetCore" Version="8.1.0" />
@@ -66,5 +69,7 @@
     <PackageVersion Include="TlsCertificateLoader" Version="2.3.1" />
     <PackageVersion Include="xunit" Version="2.5.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.14" PrivateAssets="all" />
   </ItemGroup>
 </Project>

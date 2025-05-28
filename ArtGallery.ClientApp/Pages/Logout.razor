@@ -1,0 +1,32 @@
+﻿@page "/logout"
+@using ArtGallery.ClientApp.Services.Interfaces
+@inject IAuthenticationService AuthService
+@inject NavigationManager Navigation
+
+<PageTitle>Logging out...</PageTitle>
+
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="text-center">
+        <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Logging out...</span>
+        </div>
+        <p>Logging you out...</p>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await AuthService.LogoutAsync();
+            await Task.Delay(1000); // Brief delay for UX
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Logout error: {ex.Message}");
+            Navigation.NavigateTo("/");
+        }
+    }
+}

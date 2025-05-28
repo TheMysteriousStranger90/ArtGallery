@@ -1,0 +1,79 @@
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.top-row {
+    background-color: #212121;
+    border-bottom: 1px solid #424242;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    color: #F5F5F5;
+}
+
+.top-row a,
+.top-row span,
+.top-row .btn {
+    color: #F5F5F5 !important;
+}
+
+.top-row a:hover {
+    color: #D7CCC8 !important;
+}
+
+.top-row .btn-outline-secondary {
+    border-color: #F5F5F5;
+    color: #F5F5F5;
+}
+
+.top-row .btn-outline-secondary:hover {
+    background-color: #F5F5F5;
+    color: #212121;
+}
+
+.top-row .btn-primary {
+    background-color: #5D4037;
+    border-color: #5D4037;
+}
+
+.top-row .btn-primary:hover {
+    background-color: #4E342E;
+    border-color: #4E342E;
+}
+
+.content {
+    flex: 1;
+}
+
+#blazor-error-ui {
+    background: #212121;
+    color: #F5F5F5;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+    color: #F5F5F5;
+}
+
+#blazor-error-ui a {
+    color: #D7CCC8;
+}
+
+#blazor-error-ui a:hover {
+    color: #F5F5F5;
+}
