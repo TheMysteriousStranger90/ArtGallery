@@ -1,0 +1,272 @@
+﻿@* filepath: Pages/Login.razor *@
+@page "/login"
+@using ArtGallery.ClientApp.ViewModels
+@using ArtGallery.ClientApp.Services.Interfaces
+@inject IAuthenticationService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Sign In - Art Gallery</PageTitle>
+
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8">
+                <div class="auth-card card shadow-lg border-0 animate__animated animate__fadeInUp">
+                    <div class="card-body p-4">
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-palette fa-3x text-primary"></i>
+                            </div>
+                            <h2 class="fw-bold mb-1">Welcome Back</h2>
+                            <p class="text-muted">Sign in to your Art Gallery account</p>
+                        </div>
+
+                        <!-- Alert Messages -->
+                        @if (!string.IsNullOrEmpty(loginViewModel.ErrorMessage))
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show animate__animated animate__shakeX" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                @loginViewModel.ErrorMessage
+                                <button type="button" class="btn-close" @onclick="() => loginViewModel.ErrorMessage = string.Empty"></button>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(loginViewModel.SuccessMessage))
+                        {
+                            <div class="alert alert-success alert-dismissible fade show animate__animated animate__fadeInDown" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                @loginViewModel.SuccessMessage
+                                <button type="button" class="btn-close" @onclick="() => loginViewModel.SuccessMessage = string.Empty"></button>
+                            </div>
+                        }
+
+                        <!-- Account Locked Warning -->
+                        @if (loginViewModel.IsAccountLocked && !loginViewModel.CanAttemptLogin())
+                        {
+                            <div class="alert alert-warning animate__animated animate__pulse animate__infinite">
+                                <i class="fas fa-lock me-2"></i>
+                                <strong>Account Temporarily Locked</strong><br>
+                                Too many failed attempts. Please wait 15 minutes before trying again.
+                            </div>
+                        }
+
+                        <!-- Login Form -->
+                        <EditForm Model="loginViewModel"
+                                  OnValidSubmit="HandleLogin"
+                                  FormName="LoginForm"
+                                  novalidate>
+                            <DataAnnotationsValidator/>
+
+                            <!-- Email Field -->
+                            <div class="form-floating mb-3">
+                                <InputText @bind-Value="loginViewModel.Email"
+                                           class="@GetEmailCssClass()"
+                                           id="email"
+                                           placeholder="name@example.com"
+                                           disabled="@loginViewModel.IsLoading"/>
+                                <label for="email">
+                                    <i class="fas fa-envelope me-2"></i>Email Address
+                                </label>
+                                <ValidationMessage For="() => loginViewModel.Email" class="invalid-feedback"/>
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-floating mb-3 position-relative">
+                                <InputText @bind-Value="loginViewModel.Password"
+                                           type="@(loginViewModel.ShowPassword ? "text" : "password")"
+                                           class="@GetPasswordCssClass()"
+                                           id="password"
+                                           placeholder="Password"
+                                           disabled="@loginViewModel.IsLoading"/>
+                                <label for="password">
+                                    <i class="fas fa-lock me-2"></i>Password
+                                </label>
+                                <button class="btn btn-outline-secondary password-toggle" type="button"
+                                        @onclick="() => loginViewModel.ShowPassword = !loginViewModel.ShowPassword"
+                                        disabled="@loginViewModel.IsLoading">
+                                    <i class="fas @(loginViewModel.ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                                </button>
+                                <ValidationMessage For="() => loginViewModel.Password" class="invalid-feedback"/>
+                            </div>
+
+                            <!-- Remember Me & Forgot Password -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <InputCheckbox @bind-Value="loginViewModel.RememberMe"
+                                                   class="form-check-input"
+                                                   id="rememberMe"
+                                                   disabled="@loginViewModel.IsLoading"/>
+                                    <label class="form-check-label" for="rememberMe">
+                                        Remember me
+                                    </label>
+                                </div>
+                                <a href="/forgot-password" class="btn btn-link p-0 text-decoration-none">
+                                    Forgot password?
+                                </a>
+                            </div>
+
+                            <!-- Login Button -->
+                            <button type="submit"
+                                    class="btn btn-primary w-100 py-3 mb-3 position-relative"
+                                    disabled="@(!loginViewModel.CanAttemptLogin() || loginViewModel.IsLoading)">
+                                @if (loginViewModel.IsLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>Signing in...</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    <span>Sign In</span>
+                                }
+                            </button>
+
+                            <!-- Social Login Buttons -->
+                            <div class="position-relative text-center mb-3">
+                                <hr class="my-3">
+                                <span class="bg-white px-3 text-muted small">or</span>
+                            </div>
+
+                            <div class="d-grid gap-2 mb-4">
+                                <button type="button" class="btn btn-outline-light" disabled="@loginViewModel.IsLoading">
+                                    <i class="fab fa-google me-2 text-danger"></i>
+                                    Continue with Google
+                                </button>
+                                <button type="button" class="btn btn-outline-light" disabled="@loginViewModel.IsLoading">
+                                    <i class="fab fa-microsoft me-2 text-primary"></i>
+                                    Continue with Microsoft
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <p class="mb-0 text-muted">
+                                    Don't have an account?
+                                    <a href="/register" class="btn btn-link p-0 text-decoration-none fw-semibold">
+                                        Create one here
+                                    </a>
+                                </p>
+                            </div>
+                        </EditForm>
+
+                        <!-- Login Attempts Info -->
+                        @if (loginViewModel.LoginAttempts > 0 && !loginViewModel.IsAccountLocked)
+                        {
+                            <div class="mt-3 text-center">
+                                <small class="text-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    @loginViewModel.LoginAttempts failed attempt@(loginViewModel.LoginAttempts > 1 ? "s" : "")
+                                    (@(5 - loginViewModel.LoginAttempts) remaining)
+                                </small>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Security Notice -->
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Your connection is secure and encrypted
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private LoginViewModel loginViewModel { get; set; } = new();
+
+    private bool hasRendered = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uri = new Uri(Navigation.Uri);
+            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+            if (query.TryGetValue("returnUrl", out var returnUrl))
+            {
+                loginViewModel.ReturnUrl = returnUrl.FirstOrDefault() ?? "/";
+            }
+
+            if (await AuthService.IsAuthenticatedAsync())
+            {
+                Navigation.NavigateTo(string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl);
+            }
+        }
+        catch (Exception ex)
+        {
+            loginViewModel.SetError("Unable to check authentication status.");
+            Console.WriteLine($"Login page initialization error: {ex.Message}");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            hasRendered = true;
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        if (!loginViewModel.CanAttemptLogin())
+        {
+            loginViewModel.SetError("Account is temporarily locked. Please wait 15 minutes before trying again.");
+            return;
+        }
+
+        try
+        {
+            loginViewModel.SetLoading(true);
+            StateHasChanged();
+
+            var success = await AuthService.LoginAsync(loginViewModel);
+
+            if (success)
+            {
+                loginViewModel.SetSuccess("Login successful! Redirecting...");
+                StateHasChanged();
+
+                await Task.Delay(1000); // Show success message
+                
+                var redirectUrl = string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl;
+                Navigation.NavigateTo(redirectUrl);
+            }
+            else
+            {
+                loginViewModel.SetError("Invalid email or password. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            loginViewModel.SetError("An error occurred during login. Please try again.");
+            Console.WriteLine($"Login error: {ex.Message}");
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private string GetEmailCssClass()
+    {
+        var hasValue = !string.IsNullOrEmpty(loginViewModel.Email);
+        var isValid = hasValue && new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(loginViewModel.Email);
+        
+        return hasValue ? (isValid ? "form-control is-valid" : "form-control is-invalid") : "form-control";
+    }
+
+    private string GetPasswordCssClass()
+    {
+        var hasValue = !string.IsNullOrEmpty(loginViewModel.Password);
+        var isValid = hasValue && loginViewModel.Password.Length >= 6;
+        
+        return hasValue ? (isValid ? "form-control is-valid" : "form-control is-invalid") : "form-control";
+    }
+}

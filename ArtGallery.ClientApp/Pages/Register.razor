@@ -1,0 +1,345 @@
+﻿@page "/register"
+@using ArtGallery.ClientApp.ViewModels
+@using ArtGallery.ClientApp.Services.Interfaces
+@inject IAuthenticationService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Create Account - Art Gallery</PageTitle>
+
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-5 col-lg-6 col-md-7 col-sm-9">
+                <div class="auth-card card shadow-lg border-0 animate__animated animate__fadeInUp">
+                    <div class="card-body p-4">
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-user-plus fa-3x text-primary"></i>
+                            </div>
+                            <h2 class="fw-bold mb-1">Create Your Account</h2>
+                            <p class="text-muted">Join our Art Gallery community</p>
+                        </div>
+
+                        <!-- Alert Messages -->
+                        @if (!string.IsNullOrEmpty(registerViewModel.ErrorMessage))
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show animate__animated animate__shakeX" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                @registerViewModel.ErrorMessage
+                                <button type="button" class="btn-close" @onclick="() => registerViewModel.ErrorMessage = string.Empty"></button>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(registerViewModel.SuccessMessage))
+                        {
+                            <div class="alert alert-success alert-dismissible fade show animate__animated animate__fadeInDown" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                @registerViewModel.SuccessMessage
+                                <button type="button" class="btn-close" @onclick="() => registerViewModel.SuccessMessage = string.Empty"></button>
+                            </div>
+                        }
+
+                        <!-- Registration Form -->
+                        <EditForm Model="registerViewModel"
+                                  OnValidSubmit="HandleRegister"
+                                  FormName="RegisterForm"
+                                  novalidate>
+                            <DataAnnotationsValidator/>
+
+                            <!-- Name Fields -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <InputText @bind-Value="registerViewModel.FirstName"
+                                                   class="@GetFirstNameCssClass()"
+                                                   id="firstName"
+                                                   placeholder="First Name"
+                                                   disabled="@registerViewModel.IsLoading"/>
+                                        <label for="firstName">
+                                            <i class="fas fa-user me-2"></i>First Name
+                                        </label>
+                                        <ValidationMessage For="() => registerViewModel.FirstName" class="invalid-feedback"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <InputText @bind-Value="registerViewModel.LastName"
+                                                   class="@GetLastNameCssClass()"
+                                                   id="lastName"
+                                                   placeholder="Last Name"
+                                                   disabled="@registerViewModel.IsLoading"/>
+                                        <label for="lastName">
+                                            <i class="fas fa-user me-2"></i>Last Name
+                                        </label>
+                                        <ValidationMessage For="() => registerViewModel.LastName" class="invalid-feedback"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email Field -->
+                            <div class="form-floating mb-3">
+                                <InputText @bind-Value="registerViewModel.Email"
+                                           class="@GetEmailCssClass()"
+                                           id="email"
+                                           placeholder="name@example.com"
+                                           disabled="@registerViewModel.IsLoading"/>
+                                <label for="email">
+                                    <i class="fas fa-envelope me-2"></i>Email Address
+                                </label>
+                                <ValidationMessage For="() => registerViewModel.Email" class="invalid-feedback"/>
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-floating mb-3 position-relative">
+                                <InputText @bind-Value="registerViewModel.Password"
+                                           @bind-Value:after="OnPasswordChanged"
+                                           type="@(registerViewModel.ShowPassword ? "text" : "password")"
+                                           class="@GetPasswordCssClass()"
+                                           id="password"
+                                           placeholder="Password"
+                                           disabled="@registerViewModel.IsLoading"/>
+                                <label for="password">
+                                    <i class="fas fa-lock me-2"></i>Password
+                                </label>
+                                <button class="btn btn-outline-secondary password-toggle" type="button"
+                                        @onclick="() => registerViewModel.ShowPassword = !registerViewModel.ShowPassword"
+                                        disabled="@registerViewModel.IsLoading">
+                                    <i class="fas @(registerViewModel.ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                                </button>
+                                <ValidationMessage For="() => registerViewModel.Password" class="invalid-feedback"/>
+
+                                <!-- Password Strength Meter -->
+                                @if (!string.IsNullOrEmpty(registerViewModel.Password))
+                                {
+                                    <div class="password-strength mt-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="text-muted">Password Strength:</small>
+                                            <small class="@registerViewModel.GetPasswordStrengthClass() fw-semibold">
+                                                @registerViewModel.GetPasswordStrengthText()
+                                            </small>
+                                        </div>
+                                        <div class="password-strength-meter">
+                                            <div class="password-strength-bar @registerViewModel.GetPasswordStrengthCssClass()"
+                                                 style="width: @(registerViewModel.GetPasswordStrengthPercentage())%; background-color: @registerViewModel.GetPasswordStrengthColor();">
+                                            </div>
+                                        </div>
+                                        @if (registerViewModel.PasswordRequirements.Any())
+                                        {
+                                            <div class="mt-2">
+                                                <small class="text-muted">Requirements:</small>
+                                                <ul class="list-unstyled mt-1 mb-0">
+                                                    @foreach (var requirement in registerViewModel.PasswordRequirements)
+                                                    {
+                                                        <li class="small text-warning">
+                                                            <i class="fas fa-times me-1"></i>@requirement
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Confirm Password Field -->
+                            <div class="form-floating mb-3 position-relative">
+                                <InputText @bind-Value="registerViewModel.ConfirmPassword"
+                                           type="@(registerViewModel.ShowConfirmPassword ? "text" : "password")"
+                                           class="@GetConfirmPasswordCssClass()"
+                                           id="confirmPassword"
+                                           placeholder="Confirm Password"
+                                           disabled="@registerViewModel.IsLoading"/>
+                                <label for="confirmPassword">
+                                    <i class="fas fa-lock me-2"></i>Confirm Password
+                                </label>
+                                <button class="btn btn-outline-secondary password-toggle" type="button"
+                                        @onclick="() => registerViewModel.ShowConfirmPassword = !registerViewModel.ShowConfirmPassword"
+                                        disabled="@registerViewModel.IsLoading">
+                                    <i class="fas @(registerViewModel.ShowConfirmPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                                </button>
+                                <ValidationMessage For="() => registerViewModel.ConfirmPassword" class="invalid-feedback"/>
+                            </div>
+
+                            <!-- Terms and Conditions -->
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <InputCheckbox @bind-Value="registerViewModel.AcceptTerms"
+                                                   class="@GetAcceptTermsCssClass()"
+                                                   id="acceptTerms"
+                                                   disabled="@registerViewModel.IsLoading"/>
+                                    <label class="form-check-label" for="acceptTerms">
+                                        I agree to the <a href="/terms" target="_blank" class="text-decoration-none">Terms of Service</a>
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <ValidationMessage For="() => registerViewModel.AcceptTerms" class="invalid-feedback"/>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <InputCheckbox @bind-Value="registerViewModel.AcceptPrivacyPolicy"
+                                                   class="form-check-input"
+                                                   id="acceptPrivacy"
+                                                   disabled="@registerViewModel.IsLoading"/>
+                                    <label class="form-check-label" for="acceptPrivacy">
+                                        I agree to the <a href="/privacy" target="_blank" class="text-decoration-none">Privacy Policy</a>
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <InputCheckbox @bind-Value="registerViewModel.AcceptMarketing"
+                                                   class="form-check-input"
+                                                   id="acceptMarketing"
+                                                   disabled="@registerViewModel.IsLoading"/>
+                                    <label class="form-check-label" for="acceptMarketing">
+                                        I would like to receive marketing emails and updates
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Register Button -->
+                            <button type="submit"
+                                    class="btn btn-primary w-100 py-3 mb-3"
+                                    disabled="@registerViewModel.IsLoading">
+                                @if (registerViewModel.IsLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>Creating Account...</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    <span>Create Account</span>
+                                }
+                            </button>
+
+                            <div class="text-center">
+                                <p class="mb-0 text-muted">
+                                    Already have an account?
+                                    <a href="/login" class="btn btn-link p-0 text-decoration-none fw-semibold">
+                                        Sign in here
+                                    </a>
+                                </p>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm] private RegisterViewModel registerViewModel { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (await AuthService.IsAuthenticatedAsync())
+            {
+                Navigation.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            registerViewModel.SetError("Unable to check authentication status.");
+            Console.WriteLine($"Register page initialization error: {ex.Message}");
+        }
+    }
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            registerViewModel.SetLoading(true);
+            StateHasChanged();
+
+// Используем правильный метод с RegisterViewModel
+            var success = await AuthService.RegisterAsync(registerViewModel);
+
+            if (success)
+            {
+                registerViewModel.SetSuccess("Registration successful! Redirecting...");
+                StateHasChanged();
+
+                await Task.Delay(1000); // Show success message
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                registerViewModel.SetError("Registration failed. Please check your information and try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            registerViewModel.SetError("An error occurred during registration. Please try again.");
+            Console.WriteLine($"Registration error: {ex.Message}");
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void OnPasswordChanged()
+    {
+        registerViewModel.UpdatePasswordStrength();
+        StateHasChanged();
+    }
+
+    private string GetFirstNameCssClass()
+    {
+        var hasValue = !string.IsNullOrEmpty(registerViewModel.FirstName);
+        if (!hasValue) return "form-control";
+
+        var isValid = System.Text.RegularExpressions.Regex.IsMatch(registerViewModel.FirstName, @"^[a-zA-Z\s]+$")
+                      && registerViewModel.FirstName.Length <= 50;
+        return isValid ? "form-control is-valid" : "form-control is-invalid";
+    }
+
+    private string GetLastNameCssClass()
+    {
+        var hasValue = !string.IsNullOrEmpty(registerViewModel.LastName);
+        if (!hasValue) return "form-control";
+
+        var isValid = System.Text.RegularExpressions.Regex.IsMatch(registerViewModel.LastName, @"^[a-zA-Z\s]+$")
+                      && registerViewModel.LastName.Length <= 50;
+        return isValid ? "form-control is-valid" : "form-control is-invalid";
+    }
+
+    private string GetEmailCssClass()
+    {
+        var hasValue = !string.IsNullOrEmpty(registerViewModel.Email);
+        if (!hasValue) return "form-control";
+
+        var isValid = new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(registerViewModel.Email)
+                      && registerViewModel.Email.Length <= 100;
+        return isValid ? "form-control is-valid" : "form-control is-invalid";
+    }
+
+    private string GetPasswordCssClass()
+    {
+        var hasValue = !string.IsNullOrEmpty(registerViewModel.Password);
+        if (!hasValue) return "form-control";
+
+        var isValid = registerViewModel.Password.Length >= 6
+                      && System.Text.RegularExpressions.Regex.IsMatch(registerViewModel.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)");
+        return isValid ? "form-control is-valid" : "form-control is-invalid";
+    }
+
+    private string GetConfirmPasswordCssClass()
+    {
+        var hasValue = !string.IsNullOrEmpty(registerViewModel.ConfirmPassword);
+        if (!hasValue) return "form-control";
+
+        var isValid = registerViewModel.ConfirmPassword == registerViewModel.Password;
+        return isValid ? "form-control is-valid" : "form-control is-invalid";
+    }
+
+    private string GetAcceptTermsCssClass()
+    {
+        return registerViewModel.AcceptTerms ? "form-check-input is-valid" : "form-check-input is-invalid";
+    }
+
+}

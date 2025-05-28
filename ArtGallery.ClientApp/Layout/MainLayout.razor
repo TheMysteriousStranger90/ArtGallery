@@ -1,0 +1,69 @@
+﻿@* filepath: Shared/MainLayout.razor *@
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<div class="page">
+    <main>
+        <div class="top-row px-4">
+            <AuthorizeView>
+                <Authorized>
+                    <span>Hello, @(context.User.Identity?.Name ?? "User")!</span>
+                    <a href="javascript:void(0)" @onclick="Logout" class="btn btn-outline-secondary btn-sm ms-2">Logout</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="/login" class="btn btn-primary btn-sm">Login</a>
+                </NotAuthorized>
+                <Authorizing>
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    <span>Loading...</span>
+                </Authorizing>
+            </AuthorizeView>
+        </div>
+
+        <article class="content px-4">
+            <ErrorBoundary>
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent Context="exception">
+                    <div class="alert alert-danger m-4">
+                        <h4>Page Error</h4>
+                        <p>An error occurred while rendering this page.</p>
+                        <details>
+                            <summary>Error Details</summary>
+                            <pre class="mt-2">@exception.ToString()</pre>
+                        </details>
+                        <button class="btn btn-primary mt-2" @onclick="ReloadPage">
+                            <i class="fas fa-refresh me-2"></i>
+                            Reload Page
+                        </button>
+                    </div>
+                </ErrorContent>
+            </ErrorBoundary>
+        </article>
+    </main>
+</div>
+
+@code {
+
+    private async Task Logout()
+    {
+        try
+        {
+// Clear token and redirect
+            Navigation.NavigateTo("/logout", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Logout error: {ex.Message}");
+            Navigation.NavigateTo("/", forceLoad: true);
+        }
+    }
+
+    private void ReloadPage()
+    {
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+
+}

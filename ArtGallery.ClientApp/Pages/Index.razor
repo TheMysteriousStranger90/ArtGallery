@@ -1,0 +1,569 @@
+﻿@page "/"
+@using ArtGallery.ClientApp.Services.Interfaces
+@inject IAuthenticationService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>Art Gallery - Discover Amazing Artworks</PageTitle>
+
+@if (IsLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (HasError)
+{
+    <div class="alert alert-danger m-4">
+        <h4>Unable to load page</h4>
+        <p>@ErrorMessage</p>
+        <button class="btn btn-primary" @onclick="RetryLoad">
+            <i class="fas fa-redo me-2"></i>
+            Retry
+        </button>
+    </div>
+}
+else
+{
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-background"></div>
+        <div class="hero-overlay"></div>
+        <div class="container position-relative">
+            <div class="row min-vh-100 align-items-center">
+                <div class="col-lg-8 mx-auto text-center">
+                    <div class="hero-content animate__animated animate__fadeInUp">
+                        <h1 class="display-3 fw-bold text-white mb-4">
+                            Discover the World's
+                            <span class="text-gradient">Finest Art</span>
+                        </h1>
+                        <p class="lead text-white-50 mb-5 fs-4">
+                            Explore curated collections from renowned artists, emerging talents,
+                            and timeless masterpieces that inspire and captivate.
+                        </p>
+
+                        @if (IsAuthenticated)
+                        {
+                            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                                <a href="/gallery" class="btn btn-primary btn-lg px-5 py-3">
+                                    <i class="fas fa-images me-2"></i>
+                                    Explore Gallery
+                                </a>
+                                <a href="/profile" class="btn btn-outline-light btn-lg px-5 py-3">
+                                    <i class="fas fa-user me-2"></i>
+                                    My Profile
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                                <a href="/register" class="btn btn-primary btn-lg px-5 py-3">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Get Started
+                                </a>
+                                <a href="/login" class="btn btn-outline-light btn-lg px-5 py-3">
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    Sign In
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                <div class="scroll-arrow animate__animated animate__bounce animate__infinite">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section py-5">
+        <div class="container py-5">
+            <div class="row text-center mb-5">
+                <div class="col-lg-8 mx-auto">
+                    <h2 class="display-5 fw-bold mb-4">Why Choose Our Gallery?</h2>
+                    <p class="lead text-muted">
+                        Experience art like never before with our curated collections and immersive features
+                    </p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card text-center p-4 h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-palette fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Curated Collections</h4>
+                        <p class="text-muted">
+                            Handpicked artworks from established and emerging artists,
+                            carefully selected for quality and artistic merit.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card text-center p-4 h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-search-plus fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">High-Resolution Viewing</h4>
+                        <p class="text-muted">
+                            Explore every detail with our advanced zoom technology
+                            and high-quality image rendering.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card text-center p-4 h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-heart fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Personal Collections</h4>
+                        <p class="text-muted">
+                            Create and manage your own art collections,
+                            save favorites, and track your artistic journey.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card text-center p-4 h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-users fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Artist Community</h4>
+                        <p class="text-muted">
+                            Connect with artists and art enthusiasts from around the world,
+                            share insights and discover new perspectives.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card text-center p-4 h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Art Education</h4>
+                        <p class="text-muted">
+                            Learn about art history, techniques, and styles through
+                            our comprehensive educational resources.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card text-center p-4 h-100">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-mobile-alt fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Mobile Experience</h4>
+                        <p class="text-muted">
+                            Enjoy seamless art exploration on any device with
+                            our responsive and intuitive interface.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="stats-section py-5">
+        <div class="container py-5">
+            <div class="row text-center g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="15000">0</div>
+                        <div class="stat-label">Artworks</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="1200">0</div>
+                        <div class="stat-label">Artists</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="50000">0</div>
+                        <div class="stat-label">Users</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="98">0</div>
+                        <div class="stat-label">Satisfaction %</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    @if (!IsAuthenticated)
+    {
+        <section class="cta-section py-5">
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <div class="cta-content p-5 rounded-4">
+                            <h2 class="display-6 fw-bold mb-4">Ready to Start Your Art Journey?</h2>
+                            <p class="lead mb-4">
+                                Join thousands of art enthusiasts and discover your next favorite masterpiece.
+                            </p>
+                            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                                <a href="/register" class="btn btn-primary btn-lg px-5 py-3">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Create Free Account
+                                </a>
+                                <a href="/gallery" class="btn btn-outline-primary btn-lg px-5 py-3">
+                                    <i class="fas fa-eye me-2"></i>
+                                    Browse Gallery
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+}
+
+<style>
+
+    :root {
+        --brand-primary: #5D4037;
+        --brand-secondary: #D7CCC8;
+        --brand-accent: #8D6E63;
+        --bg-light: #FAFAFA;
+        --text-dark: #212529;
+        --text-muted: #6c757d;
+    }
+
+    @@keyframes gradientShift {
+         0% { background-position: 0% 50%; }
+         50% { background-position: 100% 50%; }
+         100% { background-position: 0% 50%; }
+     }
+     
+    .hero-section {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, var(--brand-primary), var(--brand-accent));
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .text-gradient {
+        background: linear-gradient(45deg, var(--brand-secondary), #D7CCC8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: var(--brand-secondary);
+    }
+
+    .scroll-indicator {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255, 255, 255, 0.7);
+        z-index: 2;
+    }
+
+    .scroll-arrow {
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .scroll-arrow:hover {
+        color: rgba(255, 255, 255, 1);
+    }
+    
+    .features-section {
+        background-color: var(--bg-light);
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(93, 64, 55, 0.1);
+        height: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(45deg, var(--brand-primary), var(--brand-accent));
+        border-radius: 50%;
+        color: white !important;
+    }
+
+    .feature-icon i {
+        color: white !important;
+    }
+
+    .stats-section {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+        color: white;
+    }
+
+    .stat-item {
+        padding: 2rem 1rem;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--brand-secondary);
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+    }
+
+    .cta-section {
+        background-color: var(--bg-light);
+    }
+
+    .cta-content {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+        color: white;
+    }
+
+    @@media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .feature-card {
+            margin-bottom: 2rem;
+        }
+
+        .hero-content .btn {
+            margin-bottom: 1rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+
+        .hero-section .lead {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<script>
+    window.initializeIndexPage = function() {
+        console.log('Initializing Index page client-side features');
+
+        // Counter animation for statistics
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.stat-number');
+                    counters.forEach(counter => {
+                        const target = parseInt(counter.getAttribute('data-target'));
+                        if (target && !counter.hasAttribute('data-animated')) {
+                            counter.setAttribute('data-animated', 'true');
+                            animateCounter(counter, target);
+                        }
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
+
+        // Smooth scroll for scroll indicator
+        const scrollIndicator = document.querySelector('.scroll-indicator');
+        if (scrollIndicator) {
+            scrollIndicator.addEventListener('click', () => {
+                const featuresSection = document.querySelector('.features-section');
+                if (featuresSection) {
+                    featuresSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        }
+
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = Math.ceil(target / 100);
+            const duration = 2000; // 2 seconds
+            const stepTime = duration / (target / increment);
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current).toLocaleString();
+            }, stepTime);
+        }
+
+        console.log('Index page client-side features initialized successfully');
+    };
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.initializeIndexPage === 'function') {
+            window.initializeIndexPage();
+        }
+    });
+</script>
+
+@code {
+    private bool IsAuthenticated = false;
+    private bool IsLoading = true;
+    private bool HasError = false;
+    private string ErrorMessage = string.Empty;
+    private int RetryCount = 0;
+    private const int MaxRetries = 3;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPageData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !HasError && !IsLoading)
+        {
+            try
+            {
+                await InitializeClientSideFeatures();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to initialize client-side features: {ex.Message}");
+                // Don't show error to user for non-critical client-side features
+            }
+        }
+    }
+
+    private async Task LoadPageData()
+    {
+        try
+        {
+            IsLoading = true;
+            HasError = false;
+            ErrorMessage = string.Empty;
+            StateHasChanged();
+
+            IsAuthenticated = await AuthService.IsAuthenticatedAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Index page error: {ex.Message}");
+            HandleLoadError($"An error occurred: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleLoadError(string message)
+    {
+        HasError = true;
+        ErrorMessage = message;
+        IsAuthenticated = false;
+    }
+
+    private async Task RetryLoad()
+    {
+        if (RetryCount >= MaxRetries)
+        {
+            return;
+        }
+
+        RetryCount++;
+        await LoadPageData();
+    }
+
+    private async Task InitializeClientSideFeatures()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("initializeIndexPage");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to initialize client-side features: {ex.Message}");
+            throw;
+        }
+    }
+}
