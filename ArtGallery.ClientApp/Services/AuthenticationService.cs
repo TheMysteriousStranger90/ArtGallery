@@ -30,6 +30,8 @@ namespace ArtGallery.ClientApp.Services
         {
             try
             {
+                _logger.LogInformation("Attempting login for email: {Email}", loginViewModel.Email);
+
                 var command = new AuthenticateCommand
                 {
                     Email = loginViewModel.Email,
@@ -46,6 +48,7 @@ namespace ArtGallery.ClientApp.Services
                     return true;
                 }
 
+                _logger.LogWarning("Login failed - no token received for email: {Email}", loginViewModel.Email);
                 return false;
             }
             catch (ApiException ex) when (ex.StatusCode == 401)
@@ -64,6 +67,8 @@ namespace ArtGallery.ClientApp.Services
         {
             try
             {
+                _logger.LogInformation("Attempting registration for email: {Email}", registerViewModel.Email);
+
                 var command = new RegisterCommand
                 {
                     FirstName = registerViewModel.FirstName,
@@ -77,31 +82,48 @@ namespace ArtGallery.ClientApp.Services
                 
                 if (response != null && !string.IsNullOrEmpty(response.Token))
                 {
+                    _logger.LogInformation("Registration successful for email: {Email}", registerViewModel.Email);
+                    
                     await _authStateProvider.SetUserAuthenticatedAsync(response.Token);
                     AuthenticationStateChanged?.Invoke(true);
-                    _logger.LogInformation("Registration successful for email: {Email}", registerViewModel.Email);
+                    
                     return true;
                 }
 
+                _logger.LogWarning("Registration failed - no token received for email: {Email}", registerViewModel.Email);
                 return false;
             }
             catch (ApiException ex) when (ex.StatusCode == 400)
             {
-                _logger.LogWarning("Invalid registration data for email: {Email}", registerViewModel.Email);
-                return false;
+                _logger.LogWarning("Invalid registration data for email: {Email} - {Error}", 
+                    registerViewModel.Email, ex.Message);
+                throw;
+            }
+            catch (ApiException ex) when (ex.StatusCode == 409)
+            {
+                _logger.LogWarning("Email already exists: {Email}", registerViewModel.Email);
+                throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during registration for email: {Email}", registerViewModel.Email);
-                return false;
+                throw;
             }
         }
 
         public async Task LogoutAsync()
         {
-            await _authStateProvider.SetUserLoggedOutAsync();
-            AuthenticationStateChanged?.Invoke(false);
-            _logger.LogInformation("User logged out");
+            try
+            {
+                await _authStateProvider.SetUserLoggedOutAsync();
+                AuthenticationStateChanged?.Invoke(false);
+                _logger.LogInformation("User logged out successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during logout");
+                throw;
+            }
         }
 
         public async Task<bool> IsAuthenticatedAsync()
@@ -119,17 +141,41 @@ namespace ArtGallery.ClientApp.Services
 
         public async Task<string> GetTokenAsync()
         {
-            return await _tokenService.GetTokenAsync();
+            try
+            {
+                return await _tokenService.GetTokenAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting token");
+                return string.Empty;
+            }
         }
 
         public async Task<string> GetUserNameAsync()
         {
-            return await _tokenService.GetClaimValueAsync("unique_name");
+            try
+            {
+                return await _tokenService.GetClaimValueAsync("unique_name");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user name");
+                return string.Empty;
+            }
         }
 
         public async Task<string> GetUserEmailAsync()
         {
-            return await _tokenService.GetClaimValueAsync("email");
+            try
+            {
+                return await _tokenService.GetClaimValueAsync("email");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user email");
+                return string.Empty;
+            }
         }
     }
 }

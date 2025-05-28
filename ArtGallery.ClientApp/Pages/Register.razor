@@ -1,4 +1,6 @@
-﻿@page "/register"
+﻿@* filepath: Pages/Register.razor *@
+@page "/register"
+@using ArtGallery.ClientApp.Exceptions
 @using ArtGallery.ClientApp.ViewModels
 @using ArtGallery.ClientApp.Services.Interfaces
 @inject IAuthenticationService AuthService
@@ -22,6 +24,27 @@
                             <p class="text-muted">Join our Art Gallery community</p>
                         </div>
 
+                        <!-- Debug Info (remove in production) -->
+                        @if (showDebugInfo)
+                        {
+                            <div class="alert alert-info">
+                                <h6>Debug Info:</h6>
+                                <small>
+                                    Form Valid: @IsFormValid()<br/>
+                                    First Name: @(!string.IsNullOrWhiteSpace(registerViewModel.FirstName))<br/>
+                                    Last Name: @(!string.IsNullOrWhiteSpace(registerViewModel.LastName))<br/>
+                                    Email: @(!string.IsNullOrWhiteSpace(registerViewModel.Email))<br/>
+                                    Email Valid: @(new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(registerViewModel.Email))<br/>
+                                    Password: @(!string.IsNullOrWhiteSpace(registerViewModel.Password))<br/>
+                                    Password Length: @(registerViewModel.Password?.Length ?? 0)<br/>
+                                    Passwords Match: @(registerViewModel.Password == registerViewModel.ConfirmPassword)<br/>
+                                    Terms: @registerViewModel.AcceptTerms<br/>
+                                    Loading: @registerViewModel.IsLoading
+                                </small>
+                                <button class="btn btn-sm btn-secondary mt-2" @onclick="() => showDebugInfo = false">Hide Debug</button>
+                            </div>
+                        }
+
                         <!-- Alert Messages -->
                         @if (!string.IsNullOrEmpty(registerViewModel.ErrorMessage))
                         {
@@ -44,6 +67,7 @@
                         <!-- Registration Form -->
                         <EditForm Model="registerViewModel"
                                   OnValidSubmit="HandleRegister"
+                                  OnInvalidSubmit="HandleInvalidSubmit"
                                   FormName="RegisterForm"
                                   novalidate>
                             <DataAnnotationsValidator/>
@@ -53,6 +77,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating">
                                         <InputText @bind-Value="registerViewModel.FirstName"
+                                                   @bind-Value:after="OnFormChanged"
                                                    class="@GetFirstNameCssClass()"
                                                    id="firstName"
                                                    placeholder="First Name"
@@ -66,6 +91,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating">
                                         <InputText @bind-Value="registerViewModel.LastName"
+                                                   @bind-Value:after="OnFormChanged"
                                                    class="@GetLastNameCssClass()"
                                                    id="lastName"
                                                    placeholder="Last Name"
@@ -81,6 +107,7 @@
                             <!-- Email Field -->
                             <div class="form-floating mb-3">
                                 <InputText @bind-Value="registerViewModel.Email"
+                                           @bind-Value:after="OnFormChanged"
                                            class="@GetEmailCssClass()"
                                            id="email"
                                            placeholder="name@example.com"
@@ -103,7 +130,7 @@
                                 <label for="password">
                                     <i class="fas fa-lock me-2"></i>Password
                                 </label>
-                                <button class="btn btn-outline-secondary password-toggle" type="button"
+                                <button class="password-toggle" type="button"
                                         @onclick="() => registerViewModel.ShowPassword = !registerViewModel.ShowPassword"
                                         disabled="@registerViewModel.IsLoading">
                                     <i class="fas @(registerViewModel.ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
@@ -146,6 +173,7 @@
                             <!-- Confirm Password Field -->
                             <div class="form-floating mb-3 position-relative">
                                 <InputText @bind-Value="registerViewModel.ConfirmPassword"
+                                           @bind-Value:after="OnFormChanged"
                                            type="@(registerViewModel.ShowConfirmPassword ? "text" : "password")"
                                            class="@GetConfirmPasswordCssClass()"
                                            id="confirmPassword"
@@ -154,7 +182,7 @@
                                 <label for="confirmPassword">
                                     <i class="fas fa-lock me-2"></i>Confirm Password
                                 </label>
-                                <button class="btn btn-outline-secondary password-toggle" type="button"
+                                <button class="password-toggle" type="button"
                                         @onclick="() => registerViewModel.ShowConfirmPassword = !registerViewModel.ShowConfirmPassword"
                                         disabled="@registerViewModel.IsLoading">
                                     <i class="fas @(registerViewModel.ShowConfirmPassword ? "fa-eye-slash" : "fa-eye")"></i>
@@ -166,6 +194,7 @@
                             <div class="mb-3">
                                 <div class="form-check mb-2">
                                     <InputCheckbox @bind-Value="registerViewModel.AcceptTerms"
+                                                   @bind-Value:after="OnFormChanged"
                                                    class="@GetAcceptTermsCssClass()"
                                                    id="acceptTerms"
                                                    disabled="@registerViewModel.IsLoading"/>
@@ -212,7 +241,7 @@
                                     <span>Create Account</span>
                                 }
                             </button>
-
+                            
                             <div class="text-center">
                                 <p class="mb-0 text-muted">
                                     Already have an account?
@@ -224,68 +253,142 @@
                         </EditForm>
                     </div>
                 </div>
+
+                <!-- Security Notice -->
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Your information is secure and encrypted
+                    </small>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 @code {
-    [SupplyParameterFromForm] private RegisterViewModel registerViewModel { get; set; } = new();
+    [SupplyParameterFromForm] 
+    private RegisterViewModel registerViewModel { get; set; } = new();
+    
+    private bool showDebugInfo = false;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            Console.WriteLine("Register page initialized");
+            
             if (await AuthService.IsAuthenticatedAsync())
             {
-                Navigation.NavigateTo("/");
+                Console.WriteLine("User already authenticated, redirecting to home");
+                Navigation.NavigateTo("/", forceLoad: true);
+                return;
             }
         }
         catch (Exception ex)
         {
-            registerViewModel.SetError("Unable to check authentication status.");
             Console.WriteLine($"Register page initialization error: {ex.Message}");
+            registerViewModel.SetError("Unable to check authentication status.");
         }
     }
 
     private async Task HandleRegister()
     {
+        Console.WriteLine("HandleRegister called");
+        
         try
         {
+            Console.WriteLine("Starting registration process...");
+            Console.WriteLine($"Form valid: {IsFormValid()}");
+            
             registerViewModel.SetLoading(true);
             StateHasChanged();
 
-// Используем правильный метод с RegisterViewModel
             var success = await AuthService.RegisterAsync(registerViewModel);
 
             if (success)
             {
-                registerViewModel.SetSuccess("Registration successful! Redirecting...");
+                Console.WriteLine("Registration successful!");
+                registerViewModel.SetSuccess("Registration successful! Welcome to Art Gallery!");
                 StateHasChanged();
-
-                await Task.Delay(1000); // Show success message
-                Navigation.NavigateTo("/");
+                
+                await Task.Delay(2000);
+                
+                Console.WriteLine("Redirecting to home page...");
+                Navigation.NavigateTo("/", forceLoad: true);
             }
             else
             {
+                Console.WriteLine("Registration failed - invalid data or server error");
                 registerViewModel.SetError("Registration failed. Please check your information and try again.");
             }
         }
+        catch (ApiException apiEx)
+        {
+            Console.WriteLine($"API Registration error: {apiEx.StatusCode} - {apiEx.Message}");
+
+            var errorMessage = apiEx.StatusCode switch
+            {
+                400 => "Invalid registration data. Please check your information.",
+                409 => "An account with this email already exists.",
+                _ => "Registration failed. Please try again later."
+            };
+
+            registerViewModel.SetError(errorMessage);
+        }
         catch (Exception ex)
         {
-            registerViewModel.SetError("An error occurred during registration. Please try again.");
-            Console.WriteLine($"Registration error: {ex.Message}");
+            Console.WriteLine($"Registration error: {ex}");
+            registerViewModel.SetError("An unexpected error occurred during registration. Please try again.");
         }
         finally
         {
+            registerViewModel.SetLoading(false);
             StateHasChanged();
         }
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        Console.WriteLine("HandleInvalidSubmit called - form validation failed");
+        registerViewModel.SetError("Please correct the validation errors and try again.");
+    }
+
+    private async Task ForceSubmit()
+    {
+        Console.WriteLine("Force submit called");
+        await HandleRegister();
     }
 
     private void OnPasswordChanged()
     {
         registerViewModel.UpdatePasswordStrength();
+        OnFormChanged();
+    }
+
+    private void OnFormChanged()
+    {
+        Console.WriteLine($"Form changed - Valid: {IsFormValid()}");
         StateHasChanged();
+    }
+
+    private bool IsFormValid()
+    {
+        var firstNameValid = !string.IsNullOrWhiteSpace(registerViewModel.FirstName);
+        var lastNameValid = !string.IsNullOrWhiteSpace(registerViewModel.LastName);
+        var emailValid = !string.IsNullOrWhiteSpace(registerViewModel.Email) && 
+                        new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(registerViewModel.Email);
+        var passwordValid = !string.IsNullOrWhiteSpace(registerViewModel.Password) && 
+                           registerViewModel.Password.Length >= 6;
+        var confirmPasswordValid = !string.IsNullOrWhiteSpace(registerViewModel.ConfirmPassword) &&
+                                  registerViewModel.Password == registerViewModel.ConfirmPassword;
+        var termsValid = registerViewModel.AcceptTerms;
+
+        var result = firstNameValid && lastNameValid && emailValid && passwordValid && confirmPasswordValid && termsValid;
+        
+        Console.WriteLine($"Form validation: FirstName={firstNameValid}, LastName={lastNameValid}, Email={emailValid}, Password={passwordValid}, ConfirmPassword={confirmPasswordValid}, Terms={termsValid}, Result={result}");
+        
+        return result;
     }
 
     private string GetFirstNameCssClass()
@@ -293,7 +396,7 @@
         var hasValue = !string.IsNullOrEmpty(registerViewModel.FirstName);
         if (!hasValue) return "form-control";
 
-        var isValid = System.Text.RegularExpressions.Regex.IsMatch(registerViewModel.FirstName, @"^[a-zA-Z\s]+$")
+        var isValid = System.Text.RegularExpressions.Regex.IsMatch(registerViewModel.FirstName, @"^[a-zA-ZÀ-ÿ\s]+$")
                       && registerViewModel.FirstName.Length <= 50;
         return isValid ? "form-control is-valid" : "form-control is-invalid";
     }
@@ -303,7 +406,7 @@
         var hasValue = !string.IsNullOrEmpty(registerViewModel.LastName);
         if (!hasValue) return "form-control";
 
-        var isValid = System.Text.RegularExpressions.Regex.IsMatch(registerViewModel.LastName, @"^[a-zA-Z\s]+$")
+        var isValid = System.Text.RegularExpressions.Regex.IsMatch(registerViewModel.LastName, @"^[a-zA-ZÀ-ÿ\s]+$")
                       && registerViewModel.LastName.Length <= 50;
         return isValid ? "form-control is-valid" : "form-control is-invalid";
     }
@@ -323,8 +426,7 @@
         var hasValue = !string.IsNullOrEmpty(registerViewModel.Password);
         if (!hasValue) return "form-control";
 
-        var isValid = registerViewModel.Password.Length >= 6
-                      && System.Text.RegularExpressions.Regex.IsMatch(registerViewModel.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)");
+        var isValid = registerViewModel.Password.Length >= 6;
         return isValid ? "form-control is-valid" : "form-control is-invalid";
     }
 
@@ -341,5 +443,4 @@
     {
         return registerViewModel.AcceptTerms ? "form-check-input is-valid" : "form-check-input is-invalid";
     }
-
 }
