@@ -894,3 +894,41 @@ a:hover {
 }
 
 
+/* Improved Filter Panel Styles */
+.filter-panel {
+    background-color: var(--bg-dark-card);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    height: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 1rem;
+}
+
+.filter-heading {
+    color: var(--brand-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.filter-group {
+    margin-bottom: 1.25rem;
+}
+
+/* Make select elements smaller for better fit */
+.filter-group .form-select-sm {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .filter-panel {
+        position: static;
+        margin-bottom: 1.5rem;
+    }
+}

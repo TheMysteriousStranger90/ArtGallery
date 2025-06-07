@@ -5,17 +5,18 @@
 @inject IPaintingService PaintingService
 @inject NavigationManager NavigationManager
 @inject ILogger<Gallery> Logger
+@inject IClient ApiClient
 
 <PageTitle>Painting Gallery</PageTitle>
 
 <div class="gallery-container">
     <h1 class="gallery-page-title">Painting Gallery</h1>
 
-    <div class="gallery-controls">
+    <div class="gallery-controls mb-4">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-9">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Search by title..." 
+                    <input type="text" class="form-control" placeholder="Search by title..."
                            @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp"/>
                     <button class="btn btn-primary" type="button" @onclick="ApplySearch">
                         <i class="bi bi-search me-1"></i> Search
@@ -27,9 +28,6 @@
                         </button>
                     }
                 </div>
-            </div>
-            <div class="col-md-3">
-                <!-- Reserved for future filters -->
             </div>
             <div class="col-md-3 text-md-end">
                 <label for="sortOrder" class="form-label-sm">Sort by:</label>
@@ -45,126 +43,233 @@
         </div>
     </div>
 
-    @if (isLoading)
-    {
-        <div class="loading-container">
-            <div class="spinner-border loading-spinner" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="loading-text">Loading masterpieces...</p>
-        </div>
-    }
-    else if (pagedPaintings?.Data != null && pagedPaintings.Data.Any())
-    {
-        <div class="painting-grid">
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
-                @foreach (var painting in pagedPaintings.Data)
-                {
-                    <div class="col">
-                        <div class="painting-card">
-                            <PaintingCard Painting="painting"/>
+    <!-- Main Content with Filters on Left and Paintings on Right -->
+    <div class="row">
+        <!-- Filter Panel (Left Sidebar) -->
+        <div class="col-md-3 mb-4">
+            <div class="filter-panel">
+                <h5 class="filter-heading">Filter By</h5>
+
+                <!-- Artist Filter -->
+                <div class="filter-group">
+                    <label for="artistFilter" class="form-label-sm">Artist</label>
+                    <select id="artistFilter" class="form-select form-select-sm"
+                            @bind="ArtistId" @bind:after="ApplyFilters">
+                        <option value="">All Artists</option>
+                        @if (artists != null)
+                        {
+                            @foreach (var artist in artists)
+                            {
+                                <option value="@artist.Id">@artist.FullName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Genre Filter -->
+                <div class="filter-group">
+                    <label for="genreFilter" class="form-label-sm">Genre</label>
+                    <select id="genreFilter" class="form-select form-select-sm"
+                            @bind="GenreId" @bind:after="ApplyFilters">
+                        <option value="">All Genres</option>
+                        @if (genres != null)
+                        {
+                            @foreach (var genre in genres)
+                            {
+                                <option value="@genre.Id">@genre.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Museum Filter -->
+                <div class="filter-group">
+                    <label for="museumFilter" class="form-label-sm">Museum</label>
+                    <select id="museumFilter" class="form-select form-select-sm"
+                            @bind="MuseumId" @bind:after="ApplyFilters">
+                        <option value="">All Museums</option>
+                        @if (museums != null)
+                        {
+                            @foreach (var museum in museums)
+                            {
+                                <option value="@museum.Id">@museum.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Paint Type Filter -->
+                <div class="filter-group">
+                    <label for="paintTypeFilter" class="form-label-sm">Paint Type</label>
+                    <select id="paintTypeFilter" class="form-select form-select-sm"
+                            @bind="PaintTypeString" @bind:after="ApplyFilters">
+                        <option value="">All Types</option>
+                        <option value="Oil">Oil</option>
+                        <option value="Acrylic">Acrylic</option>
+                        <option value="Watercolor">Watercolor</option>
+                        <option value="Gouache">Gouache</option>
+                        <option value="Tempera">Tempera</option>
+                        <option value="Fresco">Fresco</option>
+                        <option value="Encaustic">Encaustic</option>
+                        <option value="Pastel">Pastel</option>
+                        <option value="Digital">Digital</option>
+                        <option value="MixedMedia">Mixed Media</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Year Range Filters -->
+                <div class="filter-group">
+                    <label class="form-label-sm">Creation Year</label>
+                    <div class="d-flex gap-2">
+                        <div class="flex-grow-1">
+                            <input type="number" class="form-control form-control-sm"
+                                   placeholder="From" @bind="FromYear"/>
                         </div>
+                        <div class="flex-grow-1">
+                            <input type="number" class="form-control form-control-sm"
+                                   placeholder="To" @bind="ToYear"/>
+                        </div>
+                        <button class="btn btn-sm btn-primary" @onclick="ApplyYearFilter">
+                            <i class="bi bi-funnel"></i>
+                        </button>
+                    </div>
+                </div>
+
+                @if (HasActiveFilters)
+                {
+                    <div class="filter-actions mt-3">
+                        <button class="btn btn-sm btn-outline-secondary w-100" @onclick="ClearAllFilters">
+                            <i class="bi bi-x-circle me-1"></i> Clear All Filters
+                        </button>
                     </div>
                 }
             </div>
         </div>
 
-        <div class="pagination-container">
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
-                        <button class="page-link" @onclick="() => ChangePage(CurrentPage - 1)" disabled="@(CurrentPage == 1)">
-                            <i class="bi bi-chevron-left"></i> Previous
-                        </button>
-                    </li>
-
-                    @if (TotalPages <= 7)
-                    {
-                        for (int i = 1; i <= TotalPages; i++)
+        <!-- Paintings Content (Right Side) -->
+        <div class="col-md-9">
+            @if (isLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border loading-spinner" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="loading-text">Loading masterpieces...</p>
+                </div>
+            }
+            else if (pagedPaintings?.Data != null && pagedPaintings.Data.Any())
+            {
+                <div class="painting-grid">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
+                        @foreach (var painting in pagedPaintings.Data)
                         {
-                            var pageNum = i;
-                            <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
-                                <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
-                            </li>
+                            <div class="col">
+                                <div class="painting-card">
+                                    <PaintingCard Painting="painting"/>
+                                </div>
+                            </div>
                         }
-                    }
-                    else
-                    {
-                        <li class="page-item @(1 == CurrentPage ? "active" : "")">
-                            <button class="page-link" @onclick="() => ChangePage(1)">1</button>
-                        </li>
+                    </div>
+                </div>
 
-                        @if (CurrentPage > 3)
-                        {
-                            <li class="page-item disabled">
-                                <span class="page-link">...</span>
+                <div class="pagination-container">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                                <button class="page-link" @onclick="() => ChangePage(CurrentPage - 1)" disabled="@(CurrentPage == 1)">
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </button>
                             </li>
-                        }
 
-                        int startPage = Math.Max(2, CurrentPage - 1);
-                        int endPage = Math.Min(TotalPages - 1, CurrentPage + 1);
+                            @if (TotalPages <= 7)
+                            {
+                                for (int i = 1; i <= TotalPages; i++)
+                                {
+                                    var pageNum = i;
+                                    <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="page-item @(1 == CurrentPage ? "active" : "")">
+                                    <button class="page-link" @onclick="() => ChangePage(1)">1</button>
+                                </li>
 
-                        if (CurrentPage <= 2 && startPage > 1) startPage = Math.Max(1, CurrentPage - 1);
-                        if (CurrentPage >= TotalPages - 1 && endPage < TotalPages) endPage = Math.Min(TotalPages, CurrentPage + 1);
+                                @if (CurrentPage > 3)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+
+                                int startPage = Math.Max(2, CurrentPage - 1);
+                                int endPage = Math.Min(TotalPages - 1, CurrentPage + 1);
+
+                                if (CurrentPage <= 2 && startPage > 1) startPage = Math.Max(1, CurrentPage - 1);
+                                if (CurrentPage >= TotalPages - 1 && endPage < TotalPages) endPage = Math.Min(TotalPages, CurrentPage + 1);
 
 
-                        for (int i = startPage; i <= endPage; i++)
-                        {
-                            if (i == 1 || i == TotalPages) continue;
-                            var pageNum = i;
-                            <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
-                                <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                                for (int i = startPage; i <= endPage; i++)
+                                {
+                                    if (i == 1 || i == TotalPages) continue;
+                                    var pageNum = i;
+                                    <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                                    </li>
+                                }
+
+                                @if (CurrentPage < TotalPages - 2)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+
+                                if (TotalPages > 1)
+                                {
+                                    <li class="page-item @(TotalPages == CurrentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="() => ChangePage(TotalPages)">@TotalPages</button>
+                                    </li>
+                                }
+                            }
+
+                            <li class="page-item @(CurrentPage == TotalPages || TotalPages == 0 ? "disabled" : "")">
+                                <button class="page-link" @onclick="() => ChangePage(CurrentPage + 1)" disabled="@(CurrentPage == TotalPages || TotalPages == 0)">
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </button>
                             </li>
-                        }
+                        </ul>
+                    </nav>
 
-                        @if (CurrentPage < TotalPages - 2)
-                        {
-                            <li class="page-item disabled">
-                                <span class="page-link">...</span>
-                            </li>
-                        }
-
-                        if (TotalPages > 1)
-                        {
-                            <li class="page-item @(TotalPages == CurrentPage ? "active" : "")">
-                                <button class="page-link" @onclick="() => ChangePage(TotalPages)">@TotalPages</button>
-                            </li>
-                        }
-                    }
-
-                    <li class="page-item @(CurrentPage == TotalPages || TotalPages == 0 ? "disabled" : "")">
-                        <button class="page-link" @onclick="() => ChangePage(CurrentPage + 1)" disabled="@(CurrentPage == TotalPages || TotalPages == 0)">
-                            Next <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-            
-            <div class="gallery-stats">
-                Showing @pagedPaintings.Data.Count of @pagedPaintings.Count paintings. Page @CurrentPage of @TotalPages.
-            </div>
+                    <div class="gallery-stats">
+                        Showing @pagedPaintings.Data.Count of @pagedPaintings.Count paintings. Page @CurrentPage of @TotalPages.
+                    </div>
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="gallery-message">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        @errorMessage
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="gallery-message">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        No paintings found. Try adjusting your search or filter parameters.
+                    </div>
+                </div>
+            }
         </div>
-    }
-    else if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="gallery-message">
-            <div class="alert alert-danger">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                @errorMessage
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="gallery-message">
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle-fill me-2"></i>
-                No paintings found. Try adjusting your search or filter parameters.
-            </div>
-        </div>
-    }
+    </div>
 </div>
-
 
 @code {
     private Pagination_1OfOfPaintingDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null? pagedPaintings;
@@ -172,9 +277,21 @@
     private string? errorMessage;
     private bool _hasCompletedInitialParameterSet = false;
 
+    private List<ArtistDto> artists;
+    private List<GenreDto> genres;
+    private List<MuseumBriefDto> museums;
+
+    private bool HasActiveFilters =>
+        ArtistId.HasValue ||
+        GenreId.HasValue ||
+        MuseumId.HasValue ||
+        !string.IsNullOrEmpty(PaintTypeString) ||
+        FromYear.HasValue ||
+        ToYear.HasValue;
+
     [Parameter] [SupplyParameterFromQuery] public int CurrentPage { get; set; } = 1;
 
-    [Parameter] [SupplyParameterFromQuery] public int PageSize { get; set; } = 6; // Changed from 9 to 6
+    [Parameter] [SupplyParameterFromQuery] public int PageSize { get; set; } = 6;
 
     [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
 
@@ -279,12 +396,73 @@
         {
             CurrentSearch = ActiveSearch;
         }
+
+        await Task.WhenAll(
+            LoadArtists(),
+            LoadGenres(),
+            LoadMuseums()
+        );
+    }
+
+    private async Task LoadArtists()
+    {
+        try
+        {
+// Get all artists (paginated with a large size)
+            var artistsResponse = await ApiClient.ArtistsGET2Async(1, 100, "", "", "lastName", "1.0");
+            artists = artistsResponse.Data.ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading artists for filter");
+            artists = new List<ArtistDto>();
+        }
+    }
+
+    private async Task LoadGenres()
+    {
+        try
+        {
+// For genres, we'll extract unique genres from paintings since there's no direct genre endpoint
+            var paintings = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
+            genres = paintings.Data
+                .Where(p => p.Genre != null)
+                .GroupBy(p => p.Genre.Id)
+                .Select(g => g.First().Genre)
+                .OrderBy(g => g.Name)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading genres for filter");
+            genres = new List<GenreDto>();
+        }
+    }
+
+    private async Task LoadMuseums()
+    {
+        try
+        {
+// For museums, we'll extract unique museums from paintings
+            var paintings = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
+            museums = paintings.Data
+                .Where(p => p.Museum != null)
+                .GroupBy(p => p.Museum.Id)
+                .Select(g => g.First().Museum)
+                .OrderBy(m => m.Name)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading museums for filter");
+            museums = new List<MuseumBriefDto>();
+        }
     }
 
     protected override async Task OnParametersSetAsync()
     {
         if (CurrentPage < 1) CurrentPage = 1;
-        if (PageSize < 1) PageSize = 6; // Changed from 9 to 6
+        if (PageSize < 1) PageSize = 6;
 
         if (string.IsNullOrEmpty(CurrentSearch) && !string.IsNullOrEmpty(ActiveSearch))
         {
@@ -369,6 +547,40 @@
         NavigateToPage();
     }
 
+    private void ApplyYearFilter()
+    {
+        ApplyFilters();
+    }
+
+    private void ClearAllFilters()
+    {
+        ArtistId = null;
+        GenreId = null;
+        MuseumId = null;
+        PaintTypeString = null;
+        FromYear = null;
+        ToYear = null;
+    
+        CurrentPage = 1;
+    
+        var queryParameters = new Dictionary<string, object?>
+        {
+            ["currentPage"] = "1",
+            ["pageSize"] = PageSize.ToString(),
+            ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
+            ["currentSort"] = CurrentSort
+        };
+    
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+    
+        var baseUri = NavigationManager.Uri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
+    
+        NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+    }
+
     private void ClearSearch()
     {
         CurrentSearch = string.Empty;
@@ -381,19 +593,22 @@
             ["currentPage"] = "1",
             ["pageSize"] = PageSize.ToString(),
             ["currentSort"] = CurrentSort,
+            ["artistId"] = ArtistId?.ToString(),
+            ["genreId"] = GenreId?.ToString(),
+            ["museumId"] = MuseumId?.ToString(),
+            ["paintType"] = PaintTypeString,
+            ["fromYear"] = FromYear?.ToString(),
+            ["toYear"] = ToYear?.ToString()
         };
     
-        if (ArtistId.HasValue) queryParameters["artistId"] = ArtistId.Value.ToString();
-        if (GenreId.HasValue) queryParameters["genreId"] = GenreId.Value.ToString();
-        if (MuseumId.HasValue) queryParameters["museumId"] = MuseumId.Value.ToString();
-        if (!string.IsNullOrEmpty(PaintTypeString)) queryParameters["paintType"] = PaintTypeString;
-        if (FromYear.HasValue) queryParameters["fromYear"] = FromYear.Value.ToString();
-        if (ToYear.HasValue) queryParameters["toYear"] = ToYear.Value.ToString();
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     
         var baseUri = NavigationManager.Uri.Split('?')[0];
-        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, queryParameters);
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
     
-        NavigationManager.NavigateTo(newUri, forceLoad: true);
+        NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
     }
 
     private void ApplyFilters()
@@ -408,7 +623,7 @@
         {
             if (TotalPages == 0 && pageNumber == 1 && CurrentPage == 1)
             {
-                // Allow
+// Allow
             }
             else return;
         }
@@ -453,4 +668,5 @@
             ApplySearch();
         }
     }
+
 }
