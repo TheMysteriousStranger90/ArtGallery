@@ -60,7 +60,7 @@ else
                         else
                         {
                             <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                                <a href="/register" class="btn btn-primary btn-lg px-5 py-3">
+                                <a href="/register" class="btn btn-outline-light btn-lg px-5 py-3">
                                     <i class="fas fa-user-plus me-2"></i>
                                     Get Started
                                 </a>
@@ -222,11 +222,11 @@ else
                                 Join thousands of art enthusiasts and discover your next favorite masterpiece.
                             </p>
                             <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                                <a href="/register" class="btn btn-primary btn-lg px-5 py-3">
+                                <a href="/register" class="btn btn-outline-light btn-lg px-5 py-3">
                                     <i class="fas fa-user-plus me-2"></i>
                                     Create Free Account
                                 </a>
-                                <a href="/gallery" class="btn btn-outline-primary btn-lg px-5 py-3">
+                                <a href="/gallery" class="btn btn-outline-light btn-lg px-5 py-3">
                                     <i class="fas fa-eye me-2"></i>
                                     Browse Gallery
                                 </a>
@@ -416,7 +416,6 @@ else
     window.initializeIndexPage = function() {
         console.log('Initializing Index page client-side features');
 
-        // Counter animation for statistics
         const observerOptions = {
             threshold: 0.5,
             rootMargin: '0px 0px -100px 0px'
@@ -443,7 +442,6 @@ else
             observer.observe(statsSection);
         }
 
-        // Smooth scroll for scroll indicator
         const scrollIndicator = document.querySelector('.scroll-indicator');
         if (scrollIndicator) {
             scrollIndicator.addEventListener('click', () => {
@@ -460,7 +458,7 @@ else
         function animateCounter(element, target) {
             let current = 0;
             const increment = Math.ceil(target / 100);
-            const duration = 2000; // 2 seconds
+            const duration = 2000;
             const stepTime = duration / (target / increment);
 
             const timer = setInterval(() => {
@@ -476,7 +474,6 @@ else
         console.log('Index page client-side features initialized successfully');
     };
 
-    // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof window.initializeIndexPage === 'function') {
             window.initializeIndexPage();
@@ -508,7 +505,6 @@ else
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to initialize client-side features: {ex.Message}");
-                // Don't show error to user for non-critical client-side features
             }
         }
     }
