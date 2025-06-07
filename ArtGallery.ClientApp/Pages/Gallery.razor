@@ -13,23 +13,23 @@
     <h1 class="gallery-page-title">Painting Gallery</h1>
 
     <div class="gallery-controls mb-4">
-        <div class="row">
+        <div class="row align-items-end">
             <div class="col-md-9">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Search by title..."
                            @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp"/>
-                    <button class="btn btn-primary" type="button" @onclick="ApplySearch">
+                    <button class="btn btn-outline-primary" type="button" @onclick="ApplySearch">
                         <i class="bi bi-search me-1"></i> Search
                     </button>
                     @if (!string.IsNullOrEmpty(ActiveSearch))
                     {
-                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch">
-                            <i class="bi bi-x-lg"></i> Clear
-                        </button>
+                    <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch">
+                        <i class="bi bi-x-lg"></i> Clear
+                    </button>
                     }
                 </div>
             </div>
-            <div class="col-md-3 text-md-end">
+            <div class="col-md-3">
                 <label for="sortOrder" class="form-label-sm">Sort by:</label>
                 <select id="sortOrder" class="form-select" @bind="CurrentSort">
                     <option value="title">Title (A-Z)</option>
