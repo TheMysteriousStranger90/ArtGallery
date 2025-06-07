@@ -1,0 +1,432 @@
+﻿@page "/gallery"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using ArtGallery.ClientApp.Shared
+@inject IPaintingService PaintingService
+@inject NavigationManager NavigationManager
+@inject ILogger<Gallery> Logger
+
+<PageTitle>Painting Gallery</PageTitle>
+
+<h1>Painting Gallery</h1>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search by title..." @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp"/>
+            <button class="btn btn-outline-primary" type="button" @onclick="ApplySearch">Search</button>
+            @if (!string.IsNullOrEmpty(ActiveSearch))
+            {
+                <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch">Clear</button>
+            }
+        </div>
+    </div>
+    <div class="col-md-3">
+
+    </div>
+    <div class="col-md-3 text-md-end">
+        <label for="sortOrder" class="form-label-sm">Sort by:</label>
+        <select id="sortOrder" class="form-select form-select-sm" @bind="CurrentSort">
+            <option value="title">Title (A-Z)</option>
+            <option value="-title">Title (Z-A)</option>
+            <option value="year">Creation Year (Oldest)</option>
+            <option value="-year">Creation Year (Newest)</option>
+            <option value="artist">Artist (A-Z)</option>
+            <option value="-artist">Artist (Z-A)</option>
+        </select>
+    </div>
+</div>
+
+
+@if (isLoading)
+{
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Loading paintings...</p>
+    </div>
+}
+else if (pagedPaintings?.Data != null && pagedPaintings.Data.Any())
+{
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
+        @foreach (var painting in pagedPaintings.Data)
+        {
+            <div class="col">
+                <PaintingCard Painting="painting"/>
+            </div>
+        }
+    </div>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="() => ChangePage(CurrentPage - 1)" disabled="@(CurrentPage == 1)">Previous</button>
+            </li>
+
+            @if (TotalPages <= 7)
+            {
+                for (int i = 1; i <= TotalPages; i++)
+                {
+                    var pageNum = i;
+                    <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
+                        <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                    </li>
+                }
+            }
+            else
+            {
+                <li class="page-item @(1 == CurrentPage ? "active" : "")">
+                    <button class="page-link" @onclick="() => ChangePage(1)">1</button>
+                </li>
+
+                @if (CurrentPage > 3)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+
+                int startPage = Math.Max(2, CurrentPage - 1);
+                int endPage = Math.Min(TotalPages - 1, CurrentPage + 1);
+
+                if (CurrentPage <= 2 && startPage > 1) startPage = Math.Max(1, CurrentPage - 1);
+                if (CurrentPage >= TotalPages - 1 && endPage < TotalPages) endPage = Math.Min(TotalPages, CurrentPage + 1);
+
+
+                for (int i = startPage; i <= endPage; i++)
+                {
+                    if (i == 1 || i == TotalPages) continue;
+                    var pageNum = i;
+                    <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
+                        <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                    </li>
+                }
+
+                @if (CurrentPage < TotalPages - 2)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+
+                if (TotalPages > 1)
+                {
+                    <li class="page-item @(TotalPages == CurrentPage ? "active" : "")">
+                        <button class="page-link" @onclick="() => ChangePage(TotalPages)">@TotalPages</button>
+                    </li>
+                }
+            }
+
+            <li class="page-item @(CurrentPage == TotalPages || TotalPages == 0 ? "disabled" : "")">
+                <button class="page-link" @onclick="() => ChangePage(CurrentPage + 1)" disabled="@(CurrentPage == TotalPages || TotalPages == 0)">Next</button>
+            </li>
+        </ul>
+    </nav>
+    <div class="text-center text-muted small">
+        Showing @pagedPaintings.Data.Count of @pagedPaintings.Count paintings. Page @CurrentPage of @TotalPages.
+    </div>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <div class="alert alert-info">No paintings found. Try adjusting your search or filter parameters.</div>
+}
+
+
+@code {
+    private Pagination_1OfOfPaintingDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null? pagedPaintings;
+    private bool isLoading = true;
+    private string? errorMessage;
+    private bool _hasCompletedInitialParameterSet = false;
+
+    [Parameter] [SupplyParameterFromQuery] public int CurrentPage { get; set; } = 1;
+
+    [Parameter] [SupplyParameterFromQuery] public int PageSize { get; set; } = 6; // Changed from 9 to 6
+
+    [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
+
+    private string _currentSort = "title";
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string CurrentSort
+    {
+        get => _currentSort;
+        set
+        {
+            if (_currentSort != value)
+            {
+                _currentSort = value;
+                if (_hasCompletedInitialParameterSet)
+                {
+                    CurrentPage = 1;
+                    NavigateToPage();
+                }
+            }
+        }
+    }
+
+    private Guid? _artistId;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public Guid? ArtistId
+    {
+        get => _artistId;
+        set
+        {
+            if (_artistId != value)
+            {
+                _artistId = value;
+                if (_hasCompletedInitialParameterSet) ApplyFilters();
+            }
+        }
+    }
+
+    private Guid? _genreId;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public Guid? GenreId
+    {
+        get => _genreId;
+        set
+        {
+            if (_genreId != value)
+            {
+                _genreId = value;
+                if (_hasCompletedInitialParameterSet) ApplyFilters();
+            }
+        }
+    }
+
+    [Parameter] [SupplyParameterFromQuery] public Guid? MuseumId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "paintType")]
+    public string? PaintTypeString { get; set; }
+
+    private PaintType? _paintType;
+
+    public PaintType? PaintType
+    {
+        get => string.IsNullOrEmpty(PaintTypeString) ? null :
+            Enum.TryParse<PaintType>(PaintTypeString, out var result) ? result : null;
+        set
+        {
+            if (_paintType != value)
+            {
+                _paintType = value;
+                PaintTypeString = value?.ToString();
+                if (_hasCompletedInitialParameterSet) ApplyFilters();
+            }
+        }
+    }
+
+    [Parameter] [SupplyParameterFromQuery] public int? FromYear { get; set; }
+
+    [Parameter] [SupplyParameterFromQuery] public int? ToYear { get; set; }
+
+    public string? CurrentSearch { get; set; }
+
+    public int TotalPages => (pagedPaintings != null && pagedPaintings.Count > 0 && PageSize > 0) ? (int)Math.Ceiling((double)pagedPaintings.Count / PageSize) : 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentSort = CurrentSort;
+        _artistId = ArtistId;
+        _genreId = GenreId;
+
+        if (!string.IsNullOrEmpty(PaintTypeString) && Enum.TryParse<PaintType>(PaintTypeString, out var paintType))
+        {
+            _paintType = paintType;
+        }
+
+        if (!string.IsNullOrEmpty(ActiveSearch))
+        {
+            CurrentSearch = ActiveSearch;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (CurrentPage < 1) CurrentPage = 1;
+        if (PageSize < 1) PageSize = 6; // Changed from 9 to 6
+
+        if (string.IsNullOrEmpty(CurrentSearch) && !string.IsNullOrEmpty(ActiveSearch))
+        {
+            CurrentSearch = ActiveSearch;
+        }
+        else if (ActiveSearch == null && CurrentSearch != null)
+        {
+            CurrentSearch = string.Empty;
+        }
+
+        await LoadPaintings();
+        _hasCompletedInitialParameterSet = true;
+    }
+
+    private async Task LoadPaintings()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            string apiSortParam;
+
+            if (string.IsNullOrEmpty(CurrentSort))
+            {
+                apiSortParam = "title";
+            }
+            else if (CurrentSort.StartsWith("-"))
+            {
+                string field = CurrentSort.Substring(1);
+                apiSortParam = $"{field}_desc";
+            }
+            else
+            {
+                apiSortParam = CurrentSort;
+            }
+
+            pagedPaintings = await PaintingService.GetPaintingsAsync(
+                pageIndex: CurrentPage,
+                pageSize: PageSize,
+                search: ActiveSearch ?? "",
+                sort: apiSortParam,
+                artistId: ArtistId,
+                genreId: GenreId,
+                museumId: MuseumId,
+                paintType: PaintType,
+                fromYear: FromYear,
+                toYear: ToYear
+            );
+
+            if (CurrentPage > TotalPages && TotalPages > 0)
+            {
+                CurrentPage = TotalPages;
+                NavigateToPage(true);
+                return;
+            }
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API Error loading paintings. Status: {StatusCode}, Response: {Response}", ex.StatusCode, ex.Response);
+            errorMessage = $"API Error: {ex.Message} (Status: {ex.StatusCode})";
+            pagedPaintings = new Pagination_1OfOfPaintingDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null { Data = new List<PaintingDto>(), Count = 0, PageIndex = CurrentPage, PageSize = PageSize };
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading paintings");
+            errorMessage = "An error occurred while loading paintings.";
+            pagedPaintings = new Pagination_1OfOfPaintingDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null { Data = new List<PaintingDto>(), Count = 0, PageIndex = CurrentPage, PageSize = PageSize };
+        }
+        finally
+        {
+            isLoading = false;
+        }
+
+        StateHasChanged();
+    }
+
+    private void ApplySearch()
+    {
+        ActiveSearch = CurrentSearch;
+        CurrentPage = 1;
+        NavigateToPage();
+    }
+
+    private void ClearSearch()
+    {
+        // Fix for Clear button functionality
+        CurrentSearch = string.Empty;
+        
+        // Important: Set to empty string instead of null to ensure consistent behavior
+        ActiveSearch = string.Empty;
+        
+        CurrentPage = 1;
+        
+        // Force a navigation with completely rebuilt query parameters
+        var queryParameters = new Dictionary<string, object?>
+        {
+            ["currentPage"] = "1",
+            ["pageSize"] = PageSize.ToString(),
+            ["currentSort"] = CurrentSort,
+            ["artistId"] = ArtistId?.ToString(),
+            ["genreId"] = GenreId?.ToString(),
+            ["museumId"] = MuseumId?.ToString(),
+            ["paintType"] = PaintTypeString,
+            ["fromYear"] = FromYear?.ToString(),
+            ["toYear"] = ToYear?.ToString()
+        };
+
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        var newUri = NavigationManager.GetUriWithQueryParameters(nonNullQueryParameters!);
+        NavigationManager.NavigateTo(newUri, forceLoad: true);
+    }
+
+    private void ApplyFilters()
+    {
+        CurrentPage = 1;
+        NavigateToPage();
+    }
+
+    private void ChangePage(int pageNumber)
+    {
+        if (pageNumber < 1 || (TotalPages > 0 && pageNumber > TotalPages) || pageNumber == CurrentPage)
+        {
+            if (TotalPages == 0 && pageNumber == 1 && CurrentPage == 1)
+            {
+                // Allow
+            }
+            else return;
+        }
+
+        CurrentPage = pageNumber;
+        NavigateToPage();
+    }
+
+    private void NavigateToPage(bool isPageAdjustment = false)
+    {
+        var queryParameters = new Dictionary<string, object?>
+        {
+            ["currentPage"] = CurrentPage.ToString(),
+            ["pageSize"] = PageSize.ToString(),
+            ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
+            ["currentSort"] = CurrentSort,
+            ["artistId"] = ArtistId?.ToString(),
+            ["genreId"] = GenreId?.ToString(),
+            ["museumId"] = MuseumId?.ToString(),
+            ["paintType"] = PaintTypeString,
+            ["fromYear"] = FromYear?.ToString(),
+            ["toYear"] = ToYear?.ToString()
+        };
+
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        var currentUri = NavigationManager.Uri;
+        var newUri = NavigationManager.GetUriWithQueryParameters(nonNullQueryParameters!);
+
+        if (currentUri != newUri || isPageAdjustment)
+        {
+            NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+        }
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            ApplySearch();
+        }
+    }
+}
