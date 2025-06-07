@@ -1,36 +1,51 @@
 ﻿@using ArtGallery.ClientApp.Services
 
-<div class="card h-100">
-    @if (!string.IsNullOrEmpty(Painting?.ImageUrl))
-    {
+@if (!string.IsNullOrEmpty(Painting?.ImageUrl))
+{
+    <div class="card-img-container">
         <a href="@($"/paintings/{Painting.Id}")">
-            <img src="@GetFullImageUrl(Painting.ImageUrl)" class="card-img-top" alt="@Painting.Title" style="object-fit: cover; height: 300px;">
+            <img src="@GetFullImageUrl(Painting.ImageUrl)" class="card-img-top" alt="@Painting.Title">
         </a>
-    }
-    else
-    {
+    </div>
+}
+else
+{
+    <div class="card-img-container">
         <a href="@($"/paintings/{Painting.Id}")">
-
-            <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 300px; background-color: #f8f9fa;">
-                <span>No Image</span>
+            <div class="card-img-placeholder d-flex align-items-center justify-content-center">
+                <i class="bi bi-image text-muted"></i>
+                <span>No Image Available</span>
             </div>
         </a>
+    </div>
+}
+<div class="card-body d-flex flex-column">
+    <h5 class="card-title">
+        <a href="@($"/paintings/{Painting.Id}")" class="text-decoration-none">@Painting?.Title</a>
+    </h5>
+    <p class="card-text small">
+        <i class="bi bi-person me-1"></i>
+        @Painting?.Artist.FullName
+    </p>
+    @if (Painting?.CreationYear > 0)
+    {
+        <p class="card-text small">
+            <i class="bi bi-calendar me-1"></i>
+            <small>@Painting.CreationYear</small>
+        </p>
     }
-    <div class="card-body d-flex flex-column">
-        <h5 class="card-title">
-            <a href="@($"/paintings/{Painting.Id}")" class="text-decoration-none">@Painting?.Title</a>
-        </h5>
-        <p class="card-text small text-muted">@Painting?.Artist?.FullName</p>
-        @if (Painting?.CreationYear > 0)
-        {
-            <p class="card-text small">
-                <small class="text-muted">@Painting.CreationYear</small>
-            </p>
-        }
-    </div>
-    <div class="card-footer">
-        <a href="@($"/paintings/{Painting.Id}")" class="btn btn-sm btn-outline-primary w-100">Details</a>
-    </div>
+    @if (!string.IsNullOrEmpty(Painting?.Genre?.Name))
+    {
+        <p class="card-text small">
+            <i class="bi bi-palette me-1"></i>
+            <small>@Painting.Genre.Name</small>
+        </p>
+    }
+</div>
+<div class="card-footer">
+    <a href="@($"/paintings/{Painting.Id}")" class="btn btn-outline-primary w-100">
+        <i class="bi bi-eye me-1"></i> View Details
+    </a>
 </div>
 
 @code {

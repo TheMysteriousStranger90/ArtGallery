@@ -8,133 +8,162 @@
 
 <PageTitle>Painting Gallery</PageTitle>
 
-<h1>Painting Gallery</h1>
+<div class="gallery-container">
+    <h1 class="gallery-page-title">Painting Gallery</h1>
 
-<div class="row mb-3">
-    <div class="col-md-6">
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="Search by title..." @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp"/>
-            <button class="btn btn-outline-primary" type="button" @onclick="ApplySearch">Search</button>
-            @if (!string.IsNullOrEmpty(ActiveSearch))
-            {
-                <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch">Clear</button>
-            }
-        </div>
-    </div>
-    <div class="col-md-3">
-
-    </div>
-    <div class="col-md-3 text-md-end">
-        <label for="sortOrder" class="form-label-sm">Sort by:</label>
-        <select id="sortOrder" class="form-select form-select-sm" @bind="CurrentSort">
-            <option value="title">Title (A-Z)</option>
-            <option value="-title">Title (Z-A)</option>
-            <option value="year">Creation Year (Oldest)</option>
-            <option value="-year">Creation Year (Newest)</option>
-            <option value="artist">Artist (A-Z)</option>
-            <option value="-artist">Artist (Z-A)</option>
-        </select>
-    </div>
-</div>
-
-
-@if (isLoading)
-{
-    <div class="text-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-        <p>Loading paintings...</p>
-    </div>
-}
-else if (pagedPaintings?.Data != null && pagedPaintings.Data.Any())
-{
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
-        @foreach (var painting in pagedPaintings.Data)
-        {
-            <div class="col">
-                <PaintingCard Painting="painting"/>
+    <div class="gallery-controls">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search by title..." 
+                           @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp"/>
+                    <button class="btn btn-primary" type="button" @onclick="ApplySearch">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    @if (!string.IsNullOrEmpty(ActiveSearch))
+                    {
+                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch">
+                            <i class="bi bi-x-lg"></i> Clear
+                        </button>
+                    }
+                </div>
             </div>
-        }
+            <div class="col-md-3">
+                <!-- Reserved for future filters -->
+            </div>
+            <div class="col-md-3 text-md-end">
+                <label for="sortOrder" class="form-label-sm">Sort by:</label>
+                <select id="sortOrder" class="form-select" @bind="CurrentSort">
+                    <option value="title">Title (A-Z)</option>
+                    <option value="-title">Title (Z-A)</option>
+                    <option value="year">Creation Year (Oldest)</option>
+                    <option value="-year">Creation Year (Newest)</option>
+                    <option value="artist">Artist (A-Z)</option>
+                    <option value="-artist">Artist (Z-A)</option>
+                </select>
+            </div>
+        </div>
     </div>
 
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
-                <button class="page-link" @onclick="() => ChangePage(CurrentPage - 1)" disabled="@(CurrentPage == 1)">Previous</button>
-            </li>
-
-            @if (TotalPages <= 7)
-            {
-                for (int i = 1; i <= TotalPages; i++)
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border loading-spinner" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="loading-text">Loading masterpieces...</p>
+        </div>
+    }
+    else if (pagedPaintings?.Data != null && pagedPaintings.Data.Any())
+    {
+        <div class="painting-grid">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
+                @foreach (var painting in pagedPaintings.Data)
                 {
-                    var pageNum = i;
-                    <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
-                        <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
-                    </li>
+                    <div class="col">
+                        <div class="painting-card">
+                            <PaintingCard Painting="painting"/>
+                        </div>
+                    </div>
                 }
-            }
-            else
-            {
-                <li class="page-item @(1 == CurrentPage ? "active" : "")">
-                    <button class="page-link" @onclick="() => ChangePage(1)">1</button>
-                </li>
+            </div>
+        </div>
 
-                @if (CurrentPage > 3)
-                {
-                    <li class="page-item disabled">
-                        <span class="page-link">...</span>
+        <div class="pagination-container">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => ChangePage(CurrentPage - 1)" disabled="@(CurrentPage == 1)">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </button>
                     </li>
-                }
 
-                int startPage = Math.Max(2, CurrentPage - 1);
-                int endPage = Math.Min(TotalPages - 1, CurrentPage + 1);
+                    @if (TotalPages <= 7)
+                    {
+                        for (int i = 1; i <= TotalPages; i++)
+                        {
+                            var pageNum = i;
+                            <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
+                                <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="page-item @(1 == CurrentPage ? "active" : "")">
+                            <button class="page-link" @onclick="() => ChangePage(1)">1</button>
+                        </li>
 
-                if (CurrentPage <= 2 && startPage > 1) startPage = Math.Max(1, CurrentPage - 1);
-                if (CurrentPage >= TotalPages - 1 && endPage < TotalPages) endPage = Math.Min(TotalPages, CurrentPage + 1);
+                        @if (CurrentPage > 3)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+
+                        int startPage = Math.Max(2, CurrentPage - 1);
+                        int endPage = Math.Min(TotalPages - 1, CurrentPage + 1);
+
+                        if (CurrentPage <= 2 && startPage > 1) startPage = Math.Max(1, CurrentPage - 1);
+                        if (CurrentPage >= TotalPages - 1 && endPage < TotalPages) endPage = Math.Min(TotalPages, CurrentPage + 1);
 
 
-                for (int i = startPage; i <= endPage; i++)
-                {
-                    if (i == 1 || i == TotalPages) continue;
-                    var pageNum = i;
-                    <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
-                        <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                        for (int i = startPage; i <= endPage; i++)
+                        {
+                            if (i == 1 || i == TotalPages) continue;
+                            var pageNum = i;
+                            <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
+                                <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                            </li>
+                        }
+
+                        @if (CurrentPage < TotalPages - 2)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+
+                        if (TotalPages > 1)
+                        {
+                            <li class="page-item @(TotalPages == CurrentPage ? "active" : "")">
+                                <button class="page-link" @onclick="() => ChangePage(TotalPages)">@TotalPages</button>
+                            </li>
+                        }
+                    }
+
+                    <li class="page-item @(CurrentPage == TotalPages || TotalPages == 0 ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => ChangePage(CurrentPage + 1)" disabled="@(CurrentPage == TotalPages || TotalPages == 0)">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </button>
                     </li>
-                }
-
-                @if (CurrentPage < TotalPages - 2)
-                {
-                    <li class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
-                }
-
-                if (TotalPages > 1)
-                {
-                    <li class="page-item @(TotalPages == CurrentPage ? "active" : "")">
-                        <button class="page-link" @onclick="() => ChangePage(TotalPages)">@TotalPages</button>
-                    </li>
-                }
-            }
-
-            <li class="page-item @(CurrentPage == TotalPages || TotalPages == 0 ? "disabled" : "")">
-                <button class="page-link" @onclick="() => ChangePage(CurrentPage + 1)" disabled="@(CurrentPage == TotalPages || TotalPages == 0)">Next</button>
-            </li>
-        </ul>
-    </nav>
-    <div class="text-center text-muted small">
-        Showing @pagedPaintings.Data.Count of @pagedPaintings.Count paintings. Page @CurrentPage of @TotalPages.
-    </div>
-}
-else if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
-else
-{
-    <div class="alert alert-info">No paintings found. Try adjusting your search or filter parameters.</div>
-}
+                </ul>
+            </nav>
+            
+            <div class="gallery-stats">
+                Showing @pagedPaintings.Data.Count of @pagedPaintings.Count paintings. Page @CurrentPage of @TotalPages.
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="gallery-message">
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                @errorMessage
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="gallery-message">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                No paintings found. Try adjusting your search or filter parameters.
+            </div>
+        </div>
+    }
+</div>
 
 
 @code {
