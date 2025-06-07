@@ -97,27 +97,7 @@
                         }
                     </select>
                 </div>
-
-                <!-- Paint Type Filter -->
-                <div class="filter-group">
-                    <label for="paintTypeFilter" class="form-label-sm">Paint Type</label>
-                    <select id="paintTypeFilter" class="form-select form-select-sm"
-                            @bind="PaintTypeString" @bind:after="ApplyFilters">
-                        <option value="">All Types</option>
-                        <option value="Oil">Oil</option>
-                        <option value="Acrylic">Acrylic</option>
-                        <option value="Watercolor">Watercolor</option>
-                        <option value="Gouache">Gouache</option>
-                        <option value="Tempera">Tempera</option>
-                        <option value="Fresco">Fresco</option>
-                        <option value="Encaustic">Encaustic</option>
-                        <option value="Pastel">Pastel</option>
-                        <option value="Digital">Digital</option>
-                        <option value="MixedMedia">Mixed Media</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
+                
                 <!-- Year Range Filters -->
                 <div class="filter-group">
                     <label class="form-label-sm">Creation Year</label>
@@ -285,7 +265,6 @@
         ArtistId.HasValue ||
         GenreId.HasValue ||
         MuseumId.HasValue ||
-        !string.IsNullOrEmpty(PaintTypeString) ||
         FromYear.HasValue ||
         ToYear.HasValue;
 
@@ -345,32 +324,65 @@
             if (_genreId != value)
             {
                 _genreId = value;
-                if (_hasCompletedInitialParameterSet) ApplyFilters();
+                if (_hasCompletedInitialParameterSet) 
+                {
+                    CurrentPage = 1;
+                    NavigateToPage();
+                }
             }
         }
     }
+
 
     [Parameter] [SupplyParameterFromQuery] public Guid? MuseumId { get; set; }
 
     [Parameter]
     [SupplyParameterFromQuery(Name = "paintType")]
-    public string? PaintTypeString { get; set; }
+    public string? PaintTypeString 
+    { 
+        get => _paintType?.ToString().Replace("_", "");
+        set
+        {
+            PaintType? newPaintType = null;
+        
+            if (!string.IsNullOrEmpty(value))
+            {
+                // Try to map string values to the numeric enum values
+                switch (value.ToLowerInvariant())
+                {
+                    case "oil": newPaintType = Services.PaintType._0; break;
+                    case "acrylic": newPaintType = Services.PaintType._1; break;
+                    case "watercolor": newPaintType = Services.PaintType._2; break;
+                    case "gouache": newPaintType = Services.PaintType._3; break;
+                    case "tempera": newPaintType = Services.PaintType._4; break;
+                    case "pastel": newPaintType = Services.PaintType._5; break;
+                    case "encaustic": newPaintType = Services.PaintType._6; break;
+                    case "fresco": newPaintType = Services.PaintType._7; break;
+                    case "ink": newPaintType = Services.PaintType._8; break;
+                    case "digital": newPaintType = Services.PaintType._9; break;
+                    case "mixedmedia": newPaintType = Services.PaintType._10; break;
+                    case "other": newPaintType = Services.PaintType._11; break;
+                }
+            }
+        
+            if (_paintType != newPaintType)
+            {
+                _paintType = newPaintType;
+                if (_hasCompletedInitialParameterSet) 
+                {
+                    CurrentPage = 1;
+                    NavigateToPage();
+                }
+            }
+        }
+    }
 
     private PaintType? _paintType;
 
     public PaintType? PaintType
     {
-        get => string.IsNullOrEmpty(PaintTypeString) ? null :
-            Enum.TryParse<PaintType>(PaintTypeString, out var result) ? result : null;
-        set
-        {
-            if (_paintType != value)
-            {
-                _paintType = value;
-                PaintTypeString = value?.ToString();
-                if (_hasCompletedInitialParameterSet) ApplyFilters();
-            }
-        }
+        get => _paintType;
+        set => PaintTypeString = value?.ToString();
     }
 
     [Parameter] [SupplyParameterFromQuery] public int? FromYear { get; set; }
@@ -408,7 +420,6 @@
     {
         try
         {
-// Get all artists (paginated with a large size)
             var artistsResponse = await ApiClient.ArtistsGET2Async(1, 100, "", "", "lastName", "1.0");
             artists = artistsResponse.Data.ToList();
         }
@@ -423,7 +434,6 @@
     {
         try
         {
-// For genres, we'll extract unique genres from paintings since there's no direct genre endpoint
             var paintings = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
             genres = paintings.Data
                 .Where(p => p.Genre != null)
@@ -443,7 +453,6 @@
     {
         try
         {
-// For museums, we'll extract unique museums from paintings
             var paintings = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
             museums = paintings.Data
                 .Where(p => p.Museum != null)
@@ -623,7 +632,6 @@
         {
             if (TotalPages == 0 && pageNumber == 1 && CurrentPage == 1)
             {
-// Allow
             }
             else return;
         }
