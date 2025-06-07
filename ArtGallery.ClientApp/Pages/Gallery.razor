@@ -342,33 +342,28 @@ else
 
     private void ClearSearch()
     {
-        // Fix for Clear button functionality
         CurrentSearch = string.Empty;
-        
-        // Important: Set to empty string instead of null to ensure consistent behavior
-        ActiveSearch = string.Empty;
-        
+        ActiveSearch = null;
+    
         CurrentPage = 1;
-        
-        // Force a navigation with completely rebuilt query parameters
+    
         var queryParameters = new Dictionary<string, object?>
         {
             ["currentPage"] = "1",
             ["pageSize"] = PageSize.ToString(),
             ["currentSort"] = CurrentSort,
-            ["artistId"] = ArtistId?.ToString(),
-            ["genreId"] = GenreId?.ToString(),
-            ["museumId"] = MuseumId?.ToString(),
-            ["paintType"] = PaintTypeString,
-            ["fromYear"] = FromYear?.ToString(),
-            ["toYear"] = ToYear?.ToString()
         };
-
-        var nonNullQueryParameters = queryParameters
-            .Where(kvp => kvp.Value != null)
-            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-        var newUri = NavigationManager.GetUriWithQueryParameters(nonNullQueryParameters!);
+    
+        if (ArtistId.HasValue) queryParameters["artistId"] = ArtistId.Value.ToString();
+        if (GenreId.HasValue) queryParameters["genreId"] = GenreId.Value.ToString();
+        if (MuseumId.HasValue) queryParameters["museumId"] = MuseumId.Value.ToString();
+        if (!string.IsNullOrEmpty(PaintTypeString)) queryParameters["paintType"] = PaintTypeString;
+        if (FromYear.HasValue) queryParameters["fromYear"] = FromYear.Value.ToString();
+        if (ToYear.HasValue) queryParameters["toYear"] = ToYear.Value.ToString();
+    
+        var baseUri = NavigationManager.Uri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, queryParameters);
+    
         NavigationManager.NavigateTo(newUri, forceLoad: true);
     }
 
