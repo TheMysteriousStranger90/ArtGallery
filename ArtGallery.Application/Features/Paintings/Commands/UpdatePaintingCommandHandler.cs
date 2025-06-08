@@ -43,7 +43,8 @@ namespace ArtGallery.Application.Features.Paintings.Commands
             {
                 await _unitOfWork.ExecuteWithTransactionAsync(async () =>
                 {
-                    var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.Id);
+                    //var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.Id);
+                    var painting = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(request.Id);
 
                     if (painting == null)
                     {

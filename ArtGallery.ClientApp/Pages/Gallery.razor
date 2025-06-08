@@ -154,6 +154,12 @@
                     </div>
                 </div>
 
+                <div class="gallery-stats-container">
+                    <div class="gallery-stats">
+                        Showing @pagedPaintings.Data.Count of @pagedPaintings.Count paintings. Page @CurrentPage of @TotalPages.
+                    </div>
+                </div>
+                
                 <div class="pagination-container">
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center">
@@ -225,9 +231,7 @@
                         </ul>
                     </nav>
 
-                    <div class="gallery-stats">
-                        Showing @pagedPaintings.Data.Count of @pagedPaintings.Count paintings. Page @CurrentPage of @TotalPages.
-                    </div>
+
                 </div>
             }
             else if (!string.IsNullOrEmpty(errorMessage))

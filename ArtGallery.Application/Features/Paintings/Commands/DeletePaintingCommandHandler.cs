@@ -46,7 +46,8 @@ public class DeletePaintingCommandHandler : IRequestHandler<DeletePaintingComman
                     }
                 }
             
-                await _unitOfWork.Repository<Painting>().RemoveAsync(painting);
+                //await _unitOfWork.Repository<Painting>().RemoveAsync(painting);
+                await _unitOfWork.PaintingRepository.RemoveAsync(painting);
             
                 await _unitOfWork.Complete();
             });

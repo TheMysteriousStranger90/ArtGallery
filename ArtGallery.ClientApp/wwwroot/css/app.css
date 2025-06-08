@@ -649,6 +649,25 @@ a:hover {
     box-shadow: 0 0 0 0.25rem rgba(161, 136, 127, 0.25);
 }
 
+/* Stats counter container */
+.gallery-stats-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Stats counter */
+.gallery-stats {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    background-color: rgba(93, 64, 55, 0.2);
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* Paintings Grid */
 .painting-grid {
     margin-top: 2rem;

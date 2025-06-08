@@ -22,7 +22,8 @@ public class
 
         try
         {
-            var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.PaintingId);
+           //var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.PaintingId);
+            var painting = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(request.PaintingId);
             if (painting == null)
             {
                 response.Success = false;
