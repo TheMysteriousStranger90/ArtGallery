@@ -4,6 +4,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IPaintingService PaintingService
 @inject ILogger<PaintingCard> Logger
+@inject IJSRuntime JSRuntime
 
 @if (!string.IsNullOrEmpty(Painting?.ImageUrl))
 {
@@ -56,11 +57,28 @@ else
             <i class="bi bi-eye me-1"></i> View Details
         </a>
 
+        @if (isAdministrator)
+        {
+            <button class="btn btn-outline-danger flex-grow-1"
+                    @onclick="DeletePainting"
+                    disabled="@isDeletingProcessing"
+                    title="Delete painting">
+                @if (isDeletingProcessing)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                }
+                else
+                {
+                    <i class="bi bi-trash me-1"></i>
+                }
+            </button>
+        }
+
         @if (isAuthenticated)
         {
             <button class="btn @GetFavoriteButtonClass() favorite-btn"
-                    @onclick="AddToFavorites" 
-                    disabled="@(isFavoriteProcessing || isAddedToFavorites)" 
+                    @onclick="AddToFavorites"
+                    disabled="@(isFavoriteProcessing || isAddedToFavorites)"
                     title="@(isAddedToFavorites ? "Already in favorites" : "Add to favorites")">
                 @if (isFavoriteProcessing)
                 {
@@ -72,26 +90,28 @@ else
                 }
             </button>
         }
-        }
     </div>
 
     @if (isAddedToFavorites)
     {
-    <div class="mt-2 favorite-confirmation">
-        <small>
-            <i class="bi bi-check-circle me-1"></i> Added to favorites
-        </small>
-    </div>
+        <div class="mt-2 favorite-confirmation">
+            <small>
+                <i class="bi bi-check-circle me-1"></i> Added to favorites
+            </small>
+        </div>
     }
 </div>
 
 @code {
     [Parameter] public PaintingDto? Painting { get; set; }
     [Inject] public IConfiguration? Configuration { get; set; }
+    [Parameter] public EventCallback<Guid> OnPaintingDeleted { get; set; }
 
     private bool isAuthenticated = false;
+    private bool isAdministrator = false;
     private bool isAddedToFavorites = false;
     private bool isFavoriteProcessing = false;
+    private bool isDeletingProcessing = false;
 
     private async Task CheckIfInFavorites()
     {
@@ -111,7 +131,7 @@ else
             Logger.LogError(ex, "Error checking if painting is in favorites: {PaintingId}", Painting.Id);
         }
     }
-    
+
     private string GetFavoriteButtonClass()
     {
         if (isFavoriteProcessing)
@@ -125,9 +145,11 @@ else
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
-    
+
         if (isAuthenticated)
         {
+// Check if user has Administrator role
+            isAdministrator = authState.User.IsInRole("Administrator");
             await CheckIfInFavorites();
         }
     }
@@ -178,6 +200,51 @@ else
         finally
         {
             isFavoriteProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DeletePainting()
+    {
+        if (Painting == null || isDeletingProcessing || !isAdministrator)
+            return;
+
+// Confirm deletion with the user
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the painting '{Painting.Title}'?");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            isDeletingProcessing = true;
+            StateHasChanged();
+
+            var result = await PaintingService.DeletePaintingAsync(Painting.Id);
+
+            if (result)
+            {
+                Logger.LogInformation("Painting {PaintingId} deleted successfully by administrator", Painting.Id);
+
+// Notify parent component that painting was deleted
+                if (OnPaintingDeleted.HasDelegate)
+                {
+                    await OnPaintingDeleted.InvokeAsync(Painting.Id);
+                }
+            }
+            else
+            {
+                Logger.LogWarning("Failed to delete painting {PaintingId}", Painting.Id);
+                await JSRuntime.InvokeVoidAsync("alert", "Failed to delete the painting. Please try again later.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error deleting painting: {PaintingId}", Painting.Id);
+            await JSRuntime.InvokeVoidAsync("alert", "An error occurred while deleting the painting.");
+        }
+        finally
+        {
+            isDeletingProcessing = false;
             StateHasChanged();
         }
     }

@@ -4,6 +4,7 @@ using ArtGallery.Application.Contracts.Persistence;
 using ArtGallery.Domain.Common;
 using ArtGallery.Persistence.Context;
 using ArtGallery.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ArtGallery.Persistence
@@ -75,19 +76,16 @@ namespace ArtGallery.Persistence
 
             try
             {
-                // Start transaction if one isn't already active
                 if (_transaction == null)
                 {
                     await BeginTransactionAsync();
                 }
 
-                // Save changes and commit
                 result = await _context.SaveChangesAsync();
                 await CommitTransactionAsync();
             }
             catch
             {
-                // Rollback on exceptions
                 await RollbackTransactionAsync();
                 throw;
             }
@@ -97,7 +95,6 @@ namespace ArtGallery.Persistence
 
         public async Task BeginTransactionAsync()
         {
-            // Create new transaction if none exists
             _transaction ??= await _context.Database.BeginTransactionAsync();
         }
 
@@ -132,13 +129,53 @@ namespace ArtGallery.Persistence
                 }
             }
         }
+        
+        public async Task ExecuteWithTransactionAsync(Func<Task> operation)
+        {
+            var strategy = _context.Database.CreateExecutionStrategy();
+    
+            await strategy.ExecuteAsync(async () =>
+            {
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    await operation();
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
+        }
+
+        public async Task<T> ExecuteWithTransactionAsync<T>(Func<Task<T>> operation)
+        {
+            var strategy = _context.Database.CreateExecutionStrategy();
+    
+            return await strategy.ExecuteAsync(async () =>
+            {
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    var result = await operation();
+                    await transaction.CommitAsync();
+                    return result;
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
+        }
 
         public bool HasChanges()
         {
             return _context.ChangeTracker.HasChanges();
         }
-
-        // IDisposable pattern implementation
+        
         public void Dispose()
         {
             Dispose(true);
@@ -151,10 +188,8 @@ namespace ArtGallery.Persistence
             {
                 if (disposing)
                 {
-                    // Dispose transaction if active
                     _transaction?.Dispose();
 
-                    // Dispose context
                     _context.Dispose();
                 }
             }

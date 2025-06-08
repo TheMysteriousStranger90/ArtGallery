@@ -17,6 +17,8 @@ namespace ArtGallery.Application.Contracts
         Task BeginTransactionAsync();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
+        Task ExecuteWithTransactionAsync(Func<Task> operation);
+        Task<T> ExecuteWithTransactionAsync<T>(Func<Task<T>> operation);
         bool HasChanges();
     }
 }

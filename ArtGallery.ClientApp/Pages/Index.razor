@@ -416,14 +416,27 @@ else
     window.initializeIndexPage = function() {
         console.log('Initializing Index page client-side features');
 
+        setTimeout(function() {
+            const counters = document.querySelectorAll('.stat-number');
+            if (counters.length > 0) {
+                counters.forEach(counter => {
+                    if (!counter.hasAttribute('data-animated')) {
+                        animateCounter(counter, parseInt(counter.getAttribute('data-target')));
+                        counter.setAttribute('data-animated', 'true');
+                    }
+                });
+            }
+        }, 1000);
+        
         const observerOptions = {
-            threshold: 0.5,
-            rootMargin: '0px 0px -100px 0px'
+            threshold: 0.1,
+            rootMargin: '0px 0px -10% 0px'
         };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
+                    console.log('Stats section is visible, animating counters');
                     const counters = entry.target.querySelectorAll('.stat-number');
                     counters.forEach(counter => {
                         const target = parseInt(counter.getAttribute('data-target'));
@@ -440,6 +453,9 @@ else
         const statsSection = document.querySelector('.stats-section');
         if (statsSection) {
             observer.observe(statsSection);
+            console.log('Observer attached to stats section');
+        } else {
+            console.warn('Stats section not found');
         }
 
         const scrollIndicator = document.querySelector('.scroll-indicator');
@@ -456,16 +472,28 @@ else
         }
 
         function animateCounter(element, target) {
+            if (!target || isNaN(target)) {
+                console.warn('Invalid target value for counter', element);
+                element.textContent = '0';
+                return;
+            }
+
+            console.log(`Animating counter to ${target}`);
+
             let current = 0;
-            const increment = Math.ceil(target / 100);
+            const increment = Math.max(1, Math.ceil(target / 100));
             const duration = 2000;
-            const stepTime = duration / (target / increment);
+            const steps = Math.ceil(target / increment);
+            const stepTime = Math.max(10, Math.floor(duration / steps));
+
+            element.textContent = '0';
 
             const timer = setInterval(() => {
                 current += increment;
                 if (current >= target) {
                     current = target;
                     clearInterval(timer);
+                    console.log(`Counter finished at ${target}`);
                 }
                 element.textContent = Math.floor(current).toLocaleString();
             }, stepTime);
@@ -474,11 +502,13 @@ else
         console.log('Index page client-side features initialized successfully');
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof window.initializeIndexPage === 'function') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
             window.initializeIndexPage();
-        }
-    });
+        });
+    } else {
+        window.initializeIndexPage();
+    }
 </script>
 
 @code {
@@ -555,11 +585,13 @@ else
         try
         {
             await JS.InvokeVoidAsync("initializeIndexPage");
+        
+            await Task.Delay(500);
+            await JS.InvokeVoidAsync("initializeIndexPage");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to initialize client-side features: {ex.Message}");
-            throw;
         }
     }
 }
