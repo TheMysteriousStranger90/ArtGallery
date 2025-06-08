@@ -967,10 +967,75 @@ a:hover {
     margin-bottom: 1.25rem;
 }
 
+
+/* Make filter selects match sort select styling */
+.filter-group .form-select-sm {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid var(--input-border);
+    height: 45px; /* Match the height of the sort select */
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23A1887F' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    padding: 0.375rem 2.25rem 0.375rem 0.75rem; /* Match the regular form-select padding */
+}
+
+.filter-group .form-select-sm:focus {
+    border-color: var(--brand-secondary);
+    box-shadow: 0 0 0 0.25rem rgba(161, 136, 127, 0.25);
+}
+
+/* Make the filter year button match other buttons */
+.filter-group .btn-primary {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+    transition: all 0.3s ease;
+    height: 31px; /* Match the height of small inputs */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure form-label-sm is consistent across filter and sort */
+.filter-group .form-label-sm {
+    color: var(--brand-secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 500;
+}
+
+/* Make the filter inputs match other inputs */
+.filter-group .form-control-sm {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--input-text);
+    transition: all 0.3s ease;
+}
+
+.filter-group .form-control-sm:focus {
+    border-color: var(--brand-secondary);
+    box-shadow: 0 0 0 0.25rem rgba(93, 64, 55, 0.25);
+    outline: none;
+}
+
 /* Make select elements smaller for better fit */
 .filter-group .form-select-sm {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+}
+
+.filter-group .btn-outline-primary {
+    color: var(--brand-secondary);
+    border-color: var(--brand-secondary);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.filter-group .btn-outline-primary:hover {
+    background-color: var(--brand-primary);
+    color: var(--text-light);
+    border-color: var(--brand-primary);
 }
 
 /* Responsive adjustments */

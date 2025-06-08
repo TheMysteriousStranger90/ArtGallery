@@ -25,12 +25,14 @@ else
     </h5>
     <p class="card-text small">
         <i class="bi bi-person me-1"></i>
+        <span class="field-label">Artist: </span>
         @Painting?.Artist.FullName
     </p>
     @if (Painting?.CreationYear > 0)
     {
         <p class="card-text small">
             <i class="bi bi-calendar me-1"></i>
+            <span class="field-label">Year: </span>
             <small>@Painting.CreationYear</small>
         </p>
     }
@@ -38,6 +40,7 @@ else
     {
         <p class="card-text small">
             <i class="bi bi-palette me-1"></i>
+            <span class="field-label">Genre: </span>
             <small>@Painting.Genre.Name</small>
         </p>
     }
