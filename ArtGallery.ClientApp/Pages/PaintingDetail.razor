@@ -1,0 +1,324 @@
+﻿@page "/paintings/{Id:guid}"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IPaintingService PaintingService
+@inject NavigationManager NavigationManager
+@inject ILogger<PaintingDetail> Logger
+
+<PageTitle>@(painting?.Title ?? "Painting Details") - Art Gallery</PageTitle>
+
+<div class="painting-detail-container">
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border loading-spinner" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="loading-text">Loading masterpiece...</p>
+        </div>
+    }
+    else if (painting != null)
+    {
+        <nav aria-label="breadcrumb" class="my-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/gallery">Gallery</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@painting.Title</li>
+            </ol>
+        </nav>
+
+        <div class="painting-detail-content">
+            <div class="row g-4">
+                <!-- Left side - Image -->
+                <div class="col-lg-7">
+                    <div class="painting-image-container">
+                        <img src="@painting.ImageUrl" alt="@painting.Title" class="painting-main-image" />
+                        
+                        @if (painting.Images != null && painting.Images.Count > 1)
+                        {
+                            <div class="painting-image-thumbnails mt-3">
+                                @foreach (var image in painting.Images)
+                                {
+                                    <div class="thumbnail @(image.IsMain ? "active" : "")" @onclick="() => SwitchMainImage(image.PictureUrl)">
+                                        <img src="@image.PictureUrl" alt="@painting.Title" />
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Right side - Details -->
+                <div class="col-lg-5">
+                    <div class="painting-info">
+                        <h1 class="painting-title">@painting.Title</h1>
+                        
+                        <div class="artist-info mt-3">
+                            <h5>Artist</h5>
+                            <a href="/artists/@painting.Artist.Id" class="artist-link">
+                                <span class="artist-name">@painting.Artist.FullName</span>
+                            </a>
+                        </div>
+
+                        @if (painting.CreationYear > 0)
+                        {
+                            <div class="year-info mt-3">
+                                <h5>Year</h5>
+                                <p>@painting.CreationYear</p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(painting.Medium))
+                        {
+                            <div class="medium-info mt-3">
+                                <h5>Medium</h5>
+                                <p>@painting.Medium</p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(painting.Genre?.Name))
+                        {
+                            <div class="genre-info mt-3">
+                                <h5>Genre</h5>
+                                <p>@painting.Genre.Name</p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(painting.PaintTypeName))
+                        {
+                            <div class="paint-type-info mt-3">
+                                <h5>Paint Type</h5>
+                                <p>@painting.PaintTypeName</p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(painting.Dimensions))
+                        {
+                            <div class="dimensions-info mt-3">
+                                <h5>Dimensions</h5>
+                                <p>@painting.Dimensions</p>
+                            </div>
+                        }
+
+                        @if (painting.Museum != null)
+                        {
+                            <div class="museum-info mt-3">
+                                <h5>Museum</h5>
+                                <p>
+                                    @painting.Museum.Name
+                                    @painting.Museum.City, @painting.Museum.Country
+                                </p>
+                            </div>
+                        }
+
+                        @if (painting.Tags != null && painting.Tags.Any())
+                        {
+                            <div class="tags-info mt-3">
+                                <h5>Tags</h5>
+                                <div class="tags-container">
+                                    @foreach (var tag in painting.Tags)
+                                    {
+                                        <span class="tag-badge">@tag.Name</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="actions mt-4">
+                            <a href="/gallery" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Gallery
+                            </a>
+                            @if (isAuthenticated)
+                            {
+                                <button class="btn @(isFavoriteProcessing ? "btn-outline-secondary disabled" : "btn-outline-primary") favorite-btn ms-2"
+                                        @onclick="AddToFavorites" disabled="@(isFavoriteProcessing || isAddedToFavorites)">
+                                    @if (isFavoriteProcessing)
+                                    {
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-heart@(isAddedToFavorites ? "-fill" : "") heart-icon @(isAddedToFavorites ? "heart-filled" : "")" aria-hidden="true"></i>
+                                    }
+                                    @(isAddedToFavorites ? "Added to Favorites" : "Add to Favorites")
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description Section -->
+            @if (!string.IsNullOrEmpty(painting.Description))
+            {
+                <div class="painting-description mt-5">
+                    <h3>Description</h3>
+                    <div class="description-content">
+                        @((MarkupString)FormatDescription(painting.Description))
+                    </div>
+                </div>
+            }
+
+            <!-- Current & Upcoming Exhibitions -->
+            @if (painting.Exhibitions != null && painting.Exhibitions.Any())
+            {
+                <div class="exhibitions-section mt-5">
+                    <h3>Exhibitions</h3>
+                    <div class="exhibition-list">
+                        @foreach (var exhibition in painting.Exhibitions.OrderBy(e => e.StartDate))
+                        {
+      
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="error-container">
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                @errorMessage
+            </div>
+            <a href="/gallery" class="btn btn-outline-primary mt-3">
+                <i class="bi bi-arrow-left me-1"></i> Return to Gallery
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="error-container">
+            <div class="alert alert-warning">
+                <i class="bi bi-question-circle-fill me-2"></i>
+                Painting not found or has been removed.
+            </div>
+            <a href="/gallery" class="btn btn-outline-primary mt-3">
+                <i class="bi bi-arrow-left me-1"></i> Return to Gallery
+            </a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    [Inject] public AuthenticationStateProvider AuthStateProvider { get; set; }
+
+    private PaintingDetailDto painting;
+    private bool isLoading = true;
+    private string errorMessage;
+    private string currentMainImage;
+
+    private bool isAuthenticated = false;
+    private bool isAddedToFavorites = false;
+    private bool isFavoriteProcessing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadPainting();
+    }
+
+    private async Task LoadPainting()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            painting = await PaintingService.GetPaintingAsync(Id);
+            
+            if (painting != null)
+            {
+                currentMainImage = painting.ImageUrl;
+                
+                if (isAuthenticated)
+                {
+                    await CheckIfInFavorites();
+                }
+            }
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API Error loading painting details. Status: {StatusCode}, Response: {Response}", 
+                ex.StatusCode, ex.Response);
+            errorMessage = $"Error loading painting details. {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading painting details for ID: {PaintingId}", Id);
+            errorMessage = "An unexpected error occurred while loading the painting details.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void SwitchMainImage(string imageUrl)
+    {
+        currentMainImage = imageUrl;
+    }
+
+    private string FormatDescription(string description)
+    {
+        if (string.IsNullOrEmpty(description))
+            return string.Empty;
+
+        return string.Join("", description.Split("\n", StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => $"<p>{p}</p>"));
+    }
+
+    private async Task CheckIfInFavorites()
+    {
+        if (painting == null || !isAuthenticated)
+            return;
+
+        try
+        {
+            var favorites = await PaintingService.GetFavoritePaintingsAsync();
+            if (favorites.Success && favorites.FavoritePaintings.Any(p => p.Id == painting.Id))
+            {
+                isAddedToFavorites = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error checking if painting is in favorites: {PaintingId}", painting.Id);
+        }
+    }
+
+    private async Task AddToFavorites()
+    {
+        if (painting == null || isFavoriteProcessing)
+            return;
+
+        try
+        {
+            isFavoriteProcessing = true;
+            StateHasChanged();
+
+            var result = await PaintingService.AddPaintingToFavoritesAsync(painting.Id);
+
+            if (result)
+            {
+                isAddedToFavorites = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error adding painting to favorites: {PaintingId}", painting.Id);
+        }
+        finally
+        {
+            isFavoriteProcessing = false;
+            StateHasChanged();
+        }
+    }
+}

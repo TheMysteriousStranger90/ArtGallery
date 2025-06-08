@@ -1138,3 +1138,376 @@ a:hover {
 .favorite-btn.favorited:hover {
     border-color: var(--border-color);
 }
+
+
+
+
+
+/* Add to your existing CSS file or create a new one */
+
+/* Painting Detail Page Styles */
+.painting-detail-container {
+    padding: 2rem 0;
+    min-height: 85vh;
+    background-color: var(--bg-dark);
+}
+
+.painting-detail-content {
+    background-color: var(--bg-dark-card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    padding: 2rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* More aggressive breadcrumb styling */
+.painting-detail-container .breadcrumb {
+    background-color: rgba(62, 39, 35, 0.7) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.5rem !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid var(--border-color) !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.painting-detail-container .breadcrumb-item {
+    color: var(--text-light) !important;
+    font-size: 1rem !important;
+    position: relative !important;
+}
+
+.painting-detail-container .breadcrumb-item a {
+    color: var(--brand-secondary) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.painting-detail-container .breadcrumb-item a:hover {
+    color: var(--link-hover-color) !important;
+    text-decoration: underline !important;
+}
+
+.painting-detail-container .breadcrumb-item+.breadcrumb-item::before {
+    content: "/" !important;
+    color: var(--brand-secondary) !important;
+    padding: 0 0.75rem !important;
+    font-weight: bold !important;
+    opacity: 0.9 !important;
+}
+
+.painting-detail-container .breadcrumb-item.active {
+    color: var(--text-light) !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Image styles */
+.painting-image-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.painting-main-image {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.painting-image-thumbnails {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.thumbnail {
+    width: 80px;
+    height: 80px;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnail:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.thumbnail.active {
+    border-color: var(--brand-secondary);
+    opacity: 1;
+    box-shadow: 0 2px 8px rgba(161, 136, 127, 0.4);
+}
+
+/* Info section styles */
+.painting-info {
+    color: var(--text-light);
+    padding: 0 1rem;
+}
+
+.painting-title {
+    color: var(--brand-secondary);
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    line-height: 1.3;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.painting-info h5 {
+    color: var(--brand-secondary);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.painting-info p {
+    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
+}
+
+.artist-link {
+    color: var(--text-light);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.artist-link:hover {
+    color: var(--link-hover-color);
+}
+
+.artist-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Tags styling */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.tag-badge {
+    background-color: rgba(161, 136, 127, 0.2);
+    color: var(--brand-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(161, 136, 127, 0.3);
+}
+
+.tag-badge:hover {
+    background-color: rgba(161, 136, 127, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Description section */
+.painting-description {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.painting-description h3 {
+    color: var(--brand-secondary);
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+}
+
+.description-content {
+    color: var(--text-light);
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.description-content p {
+    margin-bottom: 1rem;
+}
+
+/* Exhibitions section */
+.exhibitions-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.exhibitions-section h3 {
+    color: var(--brand-secondary);
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+}
+
+.exhibition-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.exhibition-card {
+    background-color: rgba(62, 39, 35, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.exhibition-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    border-color: var(--brand-secondary);
+}
+
+.exhibition-date {
+    color: var(--brand-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.exhibition-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.exhibition-title a {
+    color: var(--text-light);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.exhibition-title a:hover {
+    color: var(--link-hover-color);
+}
+
+.exhibition-museum {
+    color: var(--brand-secondary);
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Error and loading states */
+.error-container,
+.loading-container {
+    text-align: center;
+    padding: 4rem 2rem;
+    margin: 2rem auto;
+    max-width: 800px;
+    background-color: var(--bg-dark-card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.error-container .alert {
+    font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .painting-title {
+        font-size: 2rem;
+    }
+
+    .painting-image-container {
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .painting-detail-content {
+        padding: 1.5rem;
+    }
+
+    .painting-title {
+        font-size: 1.75rem;
+    }
+
+    .description-content {
+        font-size: 1rem;
+    }
+
+    .exhibition-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .painting-detail-content {
+        padding: 1rem;
+    }
+
+    .painting-title {
+        font-size: 1.5rem;
+    }
+
+    .painting-info h5 {
+        font-size: 0.9rem;
+    }
+
+    .painting-info p {
+        font-size: 1rem;
+    }
+
+    .thumbnail {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Detail view action buttons styling */
+.painting-info .actions .btn-outline-primary {
+    color: var(--brand-secondary);
+    border-color: var(--brand-secondary);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.painting-info .actions .btn-outline-primary:hover {
+    background-color: var(--brand-primary);
+    color: var(--text-light);
+    border-color: var(--brand-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.painting-info .actions .btn-outline-secondary {
+    color: var(--text-light);
+    border-color: #424242;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.painting-info .actions .favorite-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.painting-info .actions .favorite-btn.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.painting-info .actions .favorite-btn:not(.disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
