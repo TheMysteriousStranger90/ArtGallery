@@ -1,4 +1,9 @@
+/* ==========================================================================
+   1. CSS Variables & Root
+   ========================================================================== */
+
 :root {
+    /* Color Palette */
     --brand-primary: #5D4037;
     --brand-secondary: #A1887F;
     --brand-accent: #795548;
@@ -23,49 +28,18 @@
     --bs-link-color: var(--link-color);
     --bs-link-hover-color: var(--link-hover-color);
     --bs-border-color: var(--border-color);
+    --bs-primary-rgb: 93, 64, 55; /* Fix for focus shadows */
 
-    /* Fix for focus shadows */
-    --bs-primary-rgb: 93, 64, 55;
-
+    /* Blazor Loading */
     --blazor-load-percentage: 0%;
     --blazor-load-percentage-text: "Loading";
 }
 
-body {
-    background-color: var(--bs-body-bg);
-    color: var(--bs-body-color);
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
-}
+/* ==========================================================================
+   2. Base/Global Styles
+   ========================================================================== */
 
-/* Layout Components */
-.page {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: var(--bs-body-bg);
-}
-
-.gallery-container {
-    padding: 2rem 0;
-    min-height: 85vh;
-    background-color: var(--bg-dark);
-}
-
-.content {
-    flex: 1;
-    padding: 0;
-    background-color: var(--bg-dark);
-}
-
-.page {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+html {
     background-color: var(--bg-dark);
 }
 
@@ -78,7 +52,36 @@ body {
     line-height: 1.6;
 }
 
-html {
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--link-hover-color);
+}
+
+hr {
+    border-top: 1px solid var(--border-color);
+    margin: 1rem 0;
+}
+
+/* ==========================================================================
+   3. Layout Components
+   ========================================================================== */
+
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--bg-dark);
+}
+
+.content {
+    flex: 1;
+    padding: 0;
     background-color: var(--bg-dark);
 }
 
@@ -128,87 +131,10 @@ html {
     transform: translateY(-1px);
 }
 
-.content {
-    flex: 1;
-    padding: 0;
-}
+/* ==========================================================================
+   4. Form Components
+   ========================================================================== */
 
-/* Blazor Error UI */
-#blazor-error-ui {
-    background: var(--bg-dark);
-    color: var(--text-light);
-    bottom: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-    border-top: 2px solid var(--brand-primary);
-}
-
-#blazor-error-ui .dismiss {
-    cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
-    color: var(--text-light);
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
-}
-
-#blazor-error-ui .dismiss:hover {
-    color: var(--link-hover-color);
-}
-
-#blazor-error-ui a {
-    color: var(--link-color);
-    text-decoration: underline;
-    transition: color 0.3s ease;
-}
-
-#blazor-error-ui a:hover {
-    color: var(--link-hover-color);
-}
-
-/* Authentication Pages */
-.auth-container {
-    background: linear-gradient(135deg, var(--bg-dark) 0%, #2c1e1a 100%);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 0;
-}
-
-.auth-card {
-    background-color: var(--bg-dark-card);
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    color: var(--text-light);
-    width: 100%;
-    max-width: 500px;
-}
-
-.auth-card .card-body {
-    padding: 2.5rem !important;
-}
-
-.auth-card .text-primary {
-    color: var(--brand-secondary) !important;
-}
-
-.auth-card .text-muted {
-    color: #B0BEC5 !important;
-}
-
-.auth-card h2.fw-bold {
-    color: var(--brand-secondary) !important;
-}
-
-/* Forms */
 .form-control {
     background-color: var(--input-bg);
     border: 1px solid var(--input-border);
@@ -250,7 +176,65 @@ html {
     transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
 }
 
-/* Password Toggle Button */
+.form-check-input {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+}
+
+.form-check-input:checked {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(93, 64, 55, 0.25);
+    border-color: var(--brand-secondary);
+}
+
+.form-check-label {
+    color: var(--text-light);
+}
+
+.form-label-sm {
+    color: var(--brand-secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 500;
+}
+
+/* Form Select */
+.form-select {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid var(--input-border);
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23A1887F' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+}
+
+.form-select:focus {
+    border-color: var(--brand-secondary);
+    box-shadow: 0 0 0 0.25rem rgba(161, 136, 127, 0.25);
+}
+
+.form-select option {
+    background-color: var(--input-bg);
+    color: var(--text-light);
+}
+
+/* Form Validation */
+.invalid-feedback {
+    color: #ff6b6b;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.valid-feedback {
+    color: #51cf66;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Password Field */
 .password-toggle {
     position: absolute;
     right: 0.75rem;
@@ -275,56 +259,162 @@ html {
     box-shadow: 0 0 0 0.2rem rgba(93, 64, 55, 0.25);
 }
 
-/* Buttons */
-.btn-primary {
-    background-color: var(--brand-primary);
-    border-color: var(--brand-primary);
-    color: var(--text-light);
+/* Password Strength */
+.password-strength-meter {
+    height: 8px;
+    background-color: #424242;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+    position: relative;
+}
+
+.password-strength-bar {
+    height: 100%;
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    border-radius: 4px;
+}
+
+.strength-very-weak {
+    background-color: #d32f2f;
+    width: 20%;
+}
+.strength-weak {
+    background-color: #f57c00;
+    width: 40%;
+}
+.strength-fair {
+    background-color: #fbc02d;
+    width: 60%;
+}
+.strength-good {
+    background-color: #388e3c;
+    width: 80%;
+}
+.strength-strong {
+    background-color: #2e7d32;
+    width: 100%;
+}
+
+.password-strength .text-danger { color: #ff5252 !important; }
+.password-strength .text-warning { color: #ff9800 !important; }
+.password-strength .text-info { color: #03a9f4 !important; }
+.password-strength .text-primary { color: var(--brand-secondary) !important; }
+.password-strength .text-success { color: #4caf50 !important; }
+
+/* Webkit Autofill Fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-light) !important;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+}
+
+/* ==========================================================================
+   5. Button Components - Additional Specificity 
+   ========================================================================== */
+
+/* General button styling */
+.btn-outline-primary {
+    color: var(--brand-secondary) !important;
+    border-color: var(--brand-secondary) !important;
+    transition: all 0.3s ease;
     font-weight: 500;
-    transition: all 0.3s ease;
+    background-color: transparent;
 }
 
-.btn-primary:hover,
-.btn-primary:focus {
-    background-color: #4E342E;
-    border-color: #4E342E;
-    color: var(--text-light);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.btn-outline-primary:hover,
+.btn-outline-primary:active,
+.btn-outline-primary:focus {
+    background-color: var(--brand-primary) !important;
+    color: var(--text-light) !important;
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(93, 64, 55, 0.25) !important;
 }
 
-.btn-primary:disabled {
-    background-color: #6d6d6d;
-    border-color: #6d6d6d;
-    opacity: 0.6;
-    transform: none;
-    box-shadow: none;
+/* Gallery specific button styling */
+.gallery-controls .btn-outline-primary {
+    color: var(--brand-secondary) !important;
+    border-color: var(--brand-secondary) !important;
+    background-color: transparent;
 }
 
-.btn-outline-light {
-    color: var(--text-light);
-    border-color: rgba(255, 255, 255, 0.5);
-    transition: all 0.3s ease;
+.gallery-controls .btn-outline-primary:hover,
+.gallery-controls .btn-outline-primary:active,
+.gallery-controls .btn-outline-primary:focus {
+    background-color: var(--brand-primary) !important;
+    color: var(--text-light) !important;
+    border-color: var(--brand-primary) !important;
 }
 
-.btn-outline-light:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.8);
-    color: var(--text-light);
+/* Filter panel button styling */
+.filter-panel .btn-outline-primary,
+.filter-group .btn-outline-primary {
+    color: var(--brand-secondary) !important;
+    border-color: var(--brand-secondary) !important;
+    background-color: transparent;
 }
 
-.btn-link {
-    color: var(--link-color);
-    text-decoration: none;
-    transition: all 0.3s ease;
+.filter-panel .btn-outline-primary:hover,
+.filter-group .btn-outline-primary:hover {
+    background-color: var(--brand-primary) !important;
+    color: var(--text-light) !important;
+    border-color: var(--brand-primary) !important;
 }
 
-.btn-link:hover {
-    color: var(--link-hover-color);
-    text-decoration: underline;
+/* Search button specific styling */
+.gallery-controls .input-group .btn-outline-primary {
+    color: var(--brand-secondary) !important;
+    border-color: var(--brand-secondary) !important;
+    background-color: transparent;
 }
 
-/* Alerts */
+.gallery-controls .input-group .btn-outline-primary:hover {
+    background-color: var(--brand-primary) !important;
+    color: var(--text-light) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+/* Filter Apply button specific styling */
+.filter-group .btn-sm.btn-outline-primary {
+    color: var(--brand-secondary) !important;
+    border-color: var(--brand-secondary) !important;
+}
+
+/* Fix for primary buttons */
+.btn-primary {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+/* Fix for pagination buttons */
+.pagination .page-link {
+    color: var(--text-light) !important;
+    background-color: var(--bg-dark-card) !important;
+    border-color: var(--border-color) !important;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+/* ==========================================================================
+   6. Alert Components
+   ========================================================================== */
+
 .alert-danger {
     background-color: rgba(183, 28, 28, 0.9);
     color: var(--text-light);
@@ -355,163 +445,18 @@ html {
     opacity: 1;
 }
 
-/* Form Validation */
-.invalid-feedback {
-    color: #ff6b6b;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
+/* ==========================================================================
+   7. Loading & Progress Components
+   ========================================================================== */
 
-.valid-feedback {
-    color: #51cf66;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-/* Form Check (checkboxes, radio buttons) */
-.form-check-input {
-    background-color: var(--input-bg);
-    border-color: var(--input-border);
-}
-
-.form-check-input:checked {
-    background-color: var(--brand-primary);
-    border-color: var(--brand-primary);
-}
-
-.form-check-input:focus {
-    box-shadow: 0 0 0 0.25rem rgba(93, 64, 55, 0.25);
-    border-color: var(--brand-secondary);
-}
-
-.form-check-label {
-    color: var(--text-light);
-}
-
-/* Password Strength */
-.password-strength-meter {
-    height: 8px;
-    background-color: #424242;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: 0.5rem;
-    position: relative;
-}
-
-.password-strength-bar {
-    height: 100%;
-    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
-    border-radius: 4px;
-}
-
-/* Password strength classes */
-.strength-very-weak {
-    background-color: #d32f2f;
-    width: 20%;
-}
-.strength-weak {
-    background-color: #f57c00;
-    width: 40%;
-}
-.strength-fair {
-    background-color: #fbc02d;
-    width: 60%;
-}
-.strength-good {
-    background-color: #388e3c;
-    width: 80%;
-}
-.strength-strong {
-    background-color: #2e7d32;
-    width: 100%;
-}
-
-.password-strength .text-danger { color: #ff5252 !important; }
-.password-strength .text-warning { color: #ff9800 !important; }
-.password-strength .text-info { color: #03a9f4 !important; }
-.password-strength .text-primary { color: var(--brand-secondary) !important; }
-.password-strength .text-success { color: #4caf50 !important; }
-
-/* Dividers */
-hr {
-    border-top: 1px solid var(--border-color);
-    margin: 1rem 0;
-}
-
-.auth-card hr + span {
-    background-color: var(--bg-dark-card) !important;
-    color: var(--text-light) !important;
-    padding: 0 1rem;
-}
-
-/* Loading states */
+/* Loading spinner */
 .spinner-border {
     width: 1rem;
     height: 1rem;
     border-width: 0.125rem;
 }
 
-/* Links */
-a {
-    color: var(--link-color);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: var(--link-hover-color);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .auth-container {
-        padding: 1rem;
-    }
-
-    .auth-card .card-body {
-        padding: 2rem !important;
-    }
-
-    .hero-section h1 {
-        font-size: 2.5rem;
-    }
-
-    .stat-number {
-        font-size: 2rem;
-    }
-
-    .top-row {
-        padding: 0.5rem 1rem;
-        flex-wrap: wrap;
-        gap: 0.25rem;
-    }
-
-    .top-row .btn {
-        font-size: 0.875rem;
-        padding: 0.25rem 0.75rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .auth-card .card-body {
-        padding: 1.5rem !important;
-    }
-
-    .hero-section h1 {
-        font-size: 2rem;
-    }
-
-    .hero-section .lead {
-        font-size: 1.1rem;
-    }
-
-    .top-row {
-        padding: 0.5rem;
-        font-size: 0.875rem;
-    }
-}
-
-/* Loading Progress */
+/* Blazor Loading Progress */
 .loading-progress {
     position: relative;
     display: block;
@@ -546,211 +491,6 @@ a:hover {
     content: var(--blazor-load-percentage-text, "Loading");
 }
 
-
-/* Gallery Page Styles */
-.gallery-container {
-    padding: 2rem 0;
-    min-height: 85vh;
-}
-
-/* Page Title and Header */
-.gallery-page-title {
-    color: var(--brand-secondary);
-    margin-bottom: 1.5rem;
-    font-weight: 300;
-    font-size: 2.5rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.75rem;
-    position: relative;
-}
-
-.gallery-page-title::after {
-    content: "";
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100px;
-    height: 3px;
-    background-color: var(--brand-primary);
-}
-
-/* Search and Filters Bar */
-.gallery-controls {
-    background-color: rgba(33, 33, 33, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    padding: 1.25rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.gallery-controls .input-group {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 0.375rem;
-    overflow: hidden;
-}
-
-.gallery-controls .input-group .form-control {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-right: none;
-    transition: all 0.3s ease;
-    height: 45px;
-    font-size: 1rem;
-}
-
-.gallery-controls .input-group .form-control:focus {
-    border-color: var(--brand-secondary);
-    box-shadow: inset 0 0 0 1px var(--brand-secondary);
-}
-
-.gallery-controls .input-group .btn {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-    font-weight: 500;
-}
-
-.gallery-controls .form-label-sm {
-    color: var(--brand-secondary);
-    margin-bottom: 0.5rem;
-    display: block;
-    font-weight: 500;
-}
-
-.gallery-controls .form-select {
-    background-color: var(--input-bg);
-    color: var(--input-text);
-    border: 1px solid var(--input-border);
-    height: 45px;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23A1887F' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-}
-
-.gallery-controls .btn-outline-primary {
-    color: var(--brand-secondary);
-    border-color: var(--brand-secondary);
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.gallery-controls .btn-outline-primary:hover {
-    background-color: var(--brand-primary);
-    color: var(--text-light);
-    border-color: var(--brand-primary);
-}
-
-.gallery-controls .form-select:focus {
-    border-color: var(--brand-secondary);
-    box-shadow: 0 0 0 0.25rem rgba(161, 136, 127, 0.25);
-}
-
-/* Stats counter container */
-.gallery-stats-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-}
-
-/* Stats counter */
-.gallery-stats {
-    color: var(--text-light);
-    font-size: 0.95rem;
-    background-color: rgba(93, 64, 55, 0.2);
-    padding: 0.75rem 1.5rem;
-    border-radius: 2rem;
-    display: inline-block;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Paintings Grid */
-.painting-grid {
-    margin-top: 2rem;
-}
-
-.painting-card {
-    height: 100%;
-    background-color: var(--bg-dark-card);
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    position: relative;
-}
-
-.painting-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
-    border-color: var(--brand-secondary);
-}
-
-.painting-card .card-img-top {
-    object-fit: cover;
-    height: 320px; /* Increased height */
-    width: 100%;
-    transition: all 0.5s ease;
-}
-
-.painting-card:hover .card-img-top {
-    transform: scale(1.05);
-}
-
-.painting-card .card-body {
-    padding: 1.25rem;
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.painting-card .card-title {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
-}
-
-.painting-card .card-title a {
-    color: var(--brand-secondary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.painting-card .card-title a:hover {
-    color: var(--link-hover-color);
-}
-
-.painting-card .card-text {
-    color: #F5F5F5;
-    margin-bottom: 0.5rem;
-}
-
-.painting-card .card-footer {
-    background-color: rgba(33, 33, 33, 0.8);
-    border-top: 1px solid var(--border-color);
-    padding: 1rem;
-}
-
-.painting-card .btn-outline-primary {
-    color: var(--brand-secondary);
-    border-color: var(--brand-secondary);
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.painting-card .btn-outline-primary:hover {
-    background-color: var(--brand-primary);
-    color: var(--text-light);
-    border-color: var(--brand-primary);
-}
-
-/* Loading Animation */
 .loading-container {
     padding: 4rem 0;
     text-align: center;
@@ -765,12 +505,6 @@ a:hover {
     animation: pulse 1.5s infinite ease-in-out;
 }
 
-@keyframes pulse {
-    0% { transform: scale(0.95); opacity: 0.7; }
-    50% { transform: scale(1.05); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0.7; }
-}
-
 .loading-text {
     color: var(--brand-secondary);
     font-size: 1.1rem;
@@ -778,9 +512,56 @@ a:hover {
     letter-spacing: 0.05rem;
 }
 
+/* ==========================================================================
+   8. Navigation Components
+   ========================================================================== */
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background-color: rgba(62, 39, 35, 0.7) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.5rem !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid var(--border-color) !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.breadcrumb-item {
+    color: var(--text-light) !important;
+    font-size: 1rem !important;
+    position: relative !important;
+}
+
+.breadcrumb-item a {
+    color: var(--brand-secondary) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--link-hover-color) !important;
+    text-decoration: underline !important;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: "/" !important;
+    color: var(--brand-secondary) !important;
+    padding: 0 0.75rem !important;
+    font-weight: bold !important;
+    opacity: 0.9 !important;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-light) !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
 /* Pagination */
 .pagination-container {
-    margin: 2.5rem 0 1rem 0;
+    margin: 1rem 0 2rem 0;
 }
 
 .pagination {
@@ -830,7 +611,146 @@ a:hover {
     color: var(--text-light);
 }
 
-/* No results and Error states */
+/* ==========================================================================
+   9. Authentication Feature
+   ========================================================================== */
+
+.auth-container {
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #2c1e1a 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.auth-card {
+    background-color: var(--bg-dark-card);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    color: var(--text-light);
+    width: 100%;
+    max-width: 500px;
+}
+
+.auth-card .card-body {
+    padding: 2.5rem !important;
+}
+
+.auth-card .text-primary {
+    color: var(--brand-secondary) !important;
+}
+
+.auth-card .text-muted {
+    color: #B0BEC5 !important;
+}
+
+.auth-card h2.fw-bold {
+    color: var(--brand-secondary) !important;
+}
+
+.auth-card hr + span {
+    background-color: var(--bg-dark-card) !important;
+    color: var(--text-light) !important;
+    padding: 0 1rem;
+}
+
+/* ==========================================================================
+   10. Gallery Feature
+   ========================================================================== */
+
+.gallery-container {
+    padding: 2rem 0;
+    min-height: 85vh;
+    background-color: var(--bg-dark);
+}
+
+/* Page Title */
+.gallery-page-title {
+    color: var(--brand-secondary);
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+    font-size: 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    position: relative;
+}
+
+.gallery-page-title::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100px;
+    height: 3px;
+    background-color: var(--brand-primary);
+}
+
+/* Search and Filters */
+.gallery-controls {
+    background-color: rgba(33, 33, 33, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-controls .input-group {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.gallery-controls .input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    transition: all 0.3s ease;
+    height: 45px;
+    font-size: 1rem;
+}
+
+.gallery-controls .input-group .form-control:focus {
+    border-color: var(--brand-secondary);
+    box-shadow: inset 0 0 0 1px var(--brand-secondary);
+}
+
+.gallery-controls .input-group .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    font-weight: 500;
+}
+
+.gallery-controls .form-select {
+    height: 45px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+/* Stats counter */
+.gallery-stats-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.gallery-stats {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    background-color: rgba(93, 64, 55, 0.2);
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Gallery Messages */
 .gallery-message {
     background-color: var(--bg-dark-card);
     border: 1px solid var(--border-color);
@@ -848,77 +768,77 @@ a:hover {
     font-size: 1.1rem;
 }
 
-/* Stats counter */
-.gallery-stats {
-    text-align: center;
-    color: var(--text-light);
-    margin-top: 1.5rem;
-    font-size: 0.95rem;
-    background-color: rgba(93, 64, 55, 0.2);
-    padding: 0.75rem;
-    border-radius: 2rem;
-    display: inline-block;
-    margin: 0 auto;
+/* Paintings Grid */
+.painting-grid {
+    margin-top: 2rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 991.98px) {
-    .gallery-controls {
-        padding: 1rem;
-    }
-
-    .gallery-controls .col-md-3:last-child {
-        margin-top: 1rem;
-    }
-
-    .painting-card .card-img-top {
-        height: 280px;
-    }
+/* Painting Card */
+.painting-card {
+    height: 100%;
+    background-color: var(--bg-dark-card);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
-@media (max-width: 767.98px) {
-    .gallery-page-title {
-        font-size: 2rem;
-    }
-
-    .gallery-controls .col-md-3 {
-        margin-top: 1rem;
-    }
-
-    .gallery-controls .form-select,
-    .gallery-controls .input-group .form-control {
-        height: 40px;
-    }
-
-    .painting-card .card-img-top {
-        height: 260px;
-    }
-
-    .pagination .page-link {
-        padding: 0.4rem 0.6rem;
-        font-size: 0.9rem;
-    }
+.painting-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+    border-color: var(--brand-secondary);
 }
 
-@media (max-width: 575.98px) {
-    .gallery-page-title {
-        font-size: 1.75rem;
-    }
-
-    .painting-card .card-img-top {
-        height: 230px;
-    }
-
-    .painting-grid .col {
-        padding: 0 0.5rem;
-    }
-
-    .painting-grid .row {
-        margin: 0 -0.5rem;
-    }
+.painting-card .card-img-top {
+    object-fit: cover;
+    height: 320px;
+    width: 100%;
+    transition: all 0.5s ease;
 }
 
-/* PaintingCard specific styles */
+.painting-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.painting-card .card-body {
+    padding: 1.25rem;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.painting-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.painting-card .card-title a {
+    color: var(--brand-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.painting-card .card-title a:hover {
+    color: var(--link-hover-color);
+}
+
+.painting-card .card-text {
+    color: #F5F5F5;
+    margin-bottom: 0.5rem;
+}
+
+.painting-card .card-footer {
+    background-color: rgba(33, 33, 33, 0.8);
+    border-top: 1px solid var(--border-color);
+    padding: 1rem;
+}
+
+/* Card Image Container */
 .card-img-container {
     position: relative;
     overflow: hidden;
@@ -936,6 +856,10 @@ a:hover {
     pointer-events: none;
 }
 
+.painting-card:hover .card-img-container::after {
+    background: linear-gradient(to bottom, rgba(93, 64, 55, 0.2) 0%, rgba(0,0,0,0.7) 100%);
+}
+
 .card-img-placeholder {
     height: 320px;
     background-color: #2C2C2C;
@@ -949,12 +873,7 @@ a:hover {
     opacity: 0.5;
 }
 
-/* For adding hover effects */
-.painting-card:hover .card-img-container::after {
-    background: linear-gradient(to bottom, rgba(93, 64, 55, 0.2) 0%, rgba(0,0,0,0.7) 100%);
-}
-
-/* Improved Filter Panel Styles */
+/* Filter Panel */
 .filter-panel {
     background-color: var(--bg-dark-card);
     border: 1px solid var(--border-color);
@@ -975,29 +894,20 @@ a:hover {
     padding-bottom: 0.75rem;
 }
 
-.form-label-sm {
-    color: var(--brand-secondary);
-    margin-bottom: 0.5rem;
-    display: block;
-    font-weight: 500;
-}
-
 .filter-group {
     margin-bottom: 1.25rem;
 }
 
-
-/* Make filter selects match sort select styling */
 .filter-group .form-select-sm {
     background-color: var(--input-bg);
     color: var(--input-text);
     border: 1px solid var(--input-border);
-    height: 45px; /* Match the height of the sort select */
+    height: 45px;
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23A1887F' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-    padding: 0.375rem 2.25rem 0.375rem 0.75rem; /* Match the regular form-select padding */
+    padding: 0.375rem 2.25rem 0.375rem 0.75rem;
 }
 
 .filter-group .form-select-sm:focus {
@@ -1005,26 +915,16 @@ a:hover {
     box-shadow: 0 0 0 0.25rem rgba(161, 136, 127, 0.25);
 }
 
-/* Make the filter year button match other buttons */
 .filter-group .btn-primary {
     background-color: var(--brand-primary);
     border-color: var(--brand-primary);
     transition: all 0.3s ease;
-    height: 31px; /* Match the height of small inputs */
+    height: 31px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Ensure form-label-sm is consistent across filter and sort */
-.filter-group .form-label-sm {
-    color: var(--brand-secondary);
-    margin-bottom: 0.5rem;
-    display: block;
-    font-weight: 500;
-}
-
-/* Make the filter inputs match other inputs */
 .filter-group .form-control-sm {
     background-color: var(--input-bg);
     border: 1px solid var(--input-border);
@@ -1038,34 +938,12 @@ a:hover {
     outline: none;
 }
 
-/* Make select elements smaller for better fit */
 .filter-group .form-select-sm {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
 }
 
-.filter-group .btn-outline-primary {
-    color: var(--brand-secondary);
-    border-color: var(--brand-secondary);
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.filter-group .btn-outline-primary:hover {
-    background-color: var(--brand-primary);
-    color: var(--text-light);
-    border-color: var(--brand-primary);
-}
-
-/* Responsive adjustments */
-@media (max-width: 767.98px) {
-    .filter-panel {
-        position: static;
-        margin-bottom: 1.5rem;
-    }
-}
-
-/* Enhanced heart icon styling */
+/* Favorite Button & Heart Icon */
 .heart-icon {
     font-size: 1.2rem;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -1074,14 +952,7 @@ a:hover {
 .heart-filled {
     color: var(--brand-secondary);
     animation: heartBeat 0.6s ease-in-out;
-}
-
-@keyframes heartBeat {
-    0% { transform: scale(1); }
-    15% { transform: scale(1.3); }
-    30% { transform: scale(0.95); }
-    45% { transform: scale(1.2); }
-    60% { transform: scale(1); }
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
 }
 
 .favorite-btn:hover .heart-icon:not(.heart-filled) {
@@ -1092,7 +963,6 @@ a:hover {
     transform: scale(0.9);
 }
 
-/* Improve the favorite confirmation message */
 .favorite-confirmation {
     animation: fadeInOut 3s ease;
     color: var(--brand-secondary);
@@ -1100,6 +970,10 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: rgba(161, 136, 127, 0.1);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    margin-top: 0.5rem !important;
 }
 
 .favorite-confirmation i {
@@ -1107,41 +981,6 @@ a:hover {
     animation: checkmark 0.5s ease-in-out;
 }
 
-@keyframes checkmark {
-    0% { transform: scale(0); opacity: 0; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-/* Favorited button styles */
-.favorite-btn.favorited {
-    color: var(--brand-secondary);
-    border-color: var(--brand-secondary);
-    background-color: rgba(161, 136, 127, 0.15);
-    opacity: 0.8;
-    cursor: default;
-}
-
-.favorite-btn.favorited .heart-icon {
-    color: var(--brand-secondary);
-}
-
-/* Add this to your existing heart-filled class */
-.heart-filled {
-    color: var(--brand-secondary);
-    animation: heartBeat 0.6s ease-in-out;
-    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
-}
-
-/* Add this for the favorite confirmation message */
-.favorite-confirmation {
-    background-color: rgba(161, 136, 127, 0.1);
-    border-radius: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    margin-top: 0.5rem !important;
-}
-
-/* Dark-themed favorited button */
 .favorite-btn.favorited {
     color: var(--brand-secondary);
     border-color: #424242;
@@ -1158,13 +997,10 @@ a:hover {
     border-color: var(--border-color);
 }
 
+/* ==========================================================================
+   11. Painting Detail Feature
+   ========================================================================== */
 
-
-
-
-/* Add to your existing CSS file or create a new one */
-
-/* Painting Detail Page Styles */
 .painting-detail-container {
     padding: 2rem 0;
     min-height: 85vh;
@@ -1177,49 +1013,6 @@ a:hover {
     border: 1px solid var(--border-color);
     padding: 2rem;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
-/* More aggressive breadcrumb styling */
-.painting-detail-container .breadcrumb {
-    background-color: rgba(62, 39, 35, 0.7) !important;
-    padding: 0.75rem 1rem !important;
-    border-radius: 0.5rem !important;
-    margin-bottom: 1.5rem !important;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
-    border: 1px solid var(--border-color) !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-.painting-detail-container .breadcrumb-item {
-    color: var(--text-light) !important;
-    font-size: 1rem !important;
-    position: relative !important;
-}
-
-.painting-detail-container .breadcrumb-item a {
-    color: var(--brand-secondary) !important;
-    text-decoration: none !important;
-    font-weight: 500 !important;
-}
-
-.painting-detail-container .breadcrumb-item a:hover {
-    color: var(--link-hover-color) !important;
-    text-decoration: underline !important;
-}
-
-.painting-detail-container .breadcrumb-item+.breadcrumb-item::before {
-    content: "/" !important;
-    color: var(--brand-secondary) !important;
-    padding: 0 0.75rem !important;
-    font-weight: bold !important;
-    opacity: 0.9 !important;
-}
-
-.painting-detail-container .breadcrumb-item.active {
-    color: var(--text-light) !important;
-    font-weight: 500 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Image styles */
@@ -1423,75 +1216,6 @@ a:hover {
     opacity: 0.8;
 }
 
-/* Error and loading states */
-.error-container,
-.loading-container {
-    text-align: center;
-    padding: 4rem 2rem;
-    margin: 2rem auto;
-    max-width: 800px;
-    background-color: var(--bg-dark-card);
-    border-radius: 0.75rem;
-    border: 1px solid var(--border-color);
-}
-
-.error-container .alert {
-    font-size: 1.1rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 991.98px) {
-    .painting-title {
-        font-size: 2rem;
-    }
-
-    .painting-image-container {
-        margin-bottom: 2rem;
-    }
-}
-
-@media (max-width: 767.98px) {
-    .painting-detail-content {
-        padding: 1.5rem;
-    }
-
-    .painting-title {
-        font-size: 1.75rem;
-    }
-
-    .description-content {
-        font-size: 1rem;
-    }
-
-    .exhibition-list {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .painting-detail-content {
-        padding: 1rem;
-    }
-
-    .painting-title {
-        font-size: 1.5rem;
-    }
-
-    .painting-info h5 {
-        font-size: 0.9rem;
-    }
-
-    .painting-info p {
-        font-size: 1rem;
-    }
-
-    .thumbnail {
-        width: 60px;
-        height: 60px;
-    }
-}
-
-/* Detail view action buttons styling */
 .painting-info .actions .btn-outline-primary {
     color: var(--brand-secondary);
     border-color: var(--brand-secondary);
@@ -1505,13 +1229,6 @@ a:hover {
     border-color: var(--brand-primary);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.painting-info .actions .btn-outline-secondary {
-    color: var(--text-light);
-    border-color: #424242;
-    background-color: transparent;
-    transition: all 0.3s ease;
 }
 
 .painting-info .actions .favorite-btn {
@@ -1531,42 +1248,9 @@ a:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-
-
-/* Admin Panel - Painting Edit Form */
-
-/* Keep text white in all input states */
-.painting-edit-form .form-control,
-.painting-edit-form .form-select,
-.painting-edit-form .form-control:focus,
-.painting-edit-form .form-select:focus,
-.painting-edit-form .form-control:active,
-.painting-edit-form .form-control::placeholder {
-    color: var(--text-light) !important;
-}
-
-/* Fix for webkit browsers (Chrome, Safari) */
-.painting-edit-form input:-webkit-autofill,
-.painting-edit-form input:-webkit-autofill:hover,
-.painting-edit-form input:-webkit-autofill:focus,
-.painting-edit-form textarea:-webkit-autofill,
-.painting-edit-form textarea:-webkit-autofill:hover,
-.painting-edit-form textarea:-webkit-autofill:focus,
-.painting-edit-form select:-webkit-autofill,
-.painting-edit-form select:-webkit-autofill:hover,
-.painting-edit-form select:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--text-light) !important;
-    transition: background-color 5000s ease-in-out 0s;
-    box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
-}
-
-/* Additional specificity for InputText and InputTextArea components */
-.painting-edit-form input.form-control,
-.painting-edit-form textarea.form-control {
-    color: var(--text-light) !important;
-}
-
-
+/* ==========================================================================
+   12. Admin Panel - Painting Edit Form
+   ========================================================================== */
 
 .painting-edit-form {
     margin-bottom: 2rem;
@@ -1605,24 +1289,17 @@ a:hover {
 }
 
 .painting-edit-form .form-control,
-.painting-edit-form .form-select {
-    background-color: var(--input-bg);
-    border: 1px solid var(--input-border);
-    color: var(--input-text);
-    border-radius: 0.375rem;
-    padding: 0.625rem 0.75rem;
-    transition: all 0.3s ease;
-}
-
+.painting-edit-form .form-select,
 .painting-edit-form .form-control:focus,
-.painting-edit-form .form-select:focus {
-    background-color: var(--input-bg);
-    border-color: var(--brand-secondary);
-    box-shadow: 0 0 0 0.25rem rgba(161, 136, 127, 0.25);
+.painting-edit-form .form-select:focus,
+.painting-edit-form .form-control:active,
+.painting-edit-form .form-control::placeholder {
+    color: var(--text-light) !important;
 }
 
-.painting-edit-form .form-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23A1887F' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+.painting-edit-form input.form-control,
+.painting-edit-form textarea.form-control {
+    color: var(--text-light) !important;
 }
 
 .painting-edit-form .tag-badge {
@@ -1697,91 +1374,200 @@ a:hover {
     transform: translateY(-2px);
 }
 
-/* Breadcrumb styling */
-.breadcrumb {
-    background-color: rgba(62, 39, 35, 0.7) !important;
-    padding: 0.75rem 1rem !important;
-    border-radius: 0.5rem !important;
-    margin-bottom: 1.5rem !important;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
-    border: 1px solid var(--border-color) !important;
-    display: flex !important;
-    align-items: center !important;
+.painting-edit-form .form-control,
+.painting-edit-form .form-select {
+    color: #212121 !important;
+    background-color: #f5f5f5 !important;
+    border-color: var(--input-border);
 }
 
-.breadcrumb-item {
-    color: var(--text-light) !important;
-    font-size: 1rem !important;
-    position: relative !important;
+.painting-edit-form .form-control:focus,
+.painting-edit-form .form-select:focus {
+    color: #212121 !important;
+    background-color: #ffffff !important;
+    border-color: var(--brand-secondary);
+    box-shadow: 0 0 0 0.25rem rgba(161, 136, 127, 0.25);
 }
 
-.breadcrumb-item a {
-    color: var(--brand-secondary) !important;
-    text-decoration: none !important;
-    font-weight: 500 !important;
+.painting-edit-form .form-control::placeholder {
+    color: #757575 !important;
 }
 
-.breadcrumb-item a:hover {
-    color: var(--link-hover-color) !important;
-    text-decoration: underline !important;
+.painting-edit-form input[type="text"],
+.painting-edit-form input[type="number"],
+.painting-edit-form textarea,
+.painting-edit-form select {
+    color: #212121 !important;
 }
 
-.breadcrumb-item+.breadcrumb-item::before {
-    content: "/" !important;
-    color: var(--brand-secondary) !important;
-    padding: 0 0.75rem !important;
-    font-weight: bold !important;
-    opacity: 0.9 !important;
-}
-
-.breadcrumb-item.active {
-    color: var(--text-light) !important;
-    font-weight: 500 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* Form input text color fix */
-.form-control,
-.form-select,
-.form-control:focus,
-.form-select:focus,
-.form-control:active,
-.form-select:active,
-.form-control:hover,
-.form-select:hover {
-    color: var(--text-light) !important;
-}
-
-/* Fix for webkit browsers autofill */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover,
-textarea:-webkit-autofill:focus,
-select:-webkit-autofill,
-select:-webkit-autofill:hover,
-select:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--text-light) !important;
-    transition: background-color 5000s ease-in-out 0s;
-    box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
-}
-
-/* Ensure Blazor specific form controls maintain white text */
+.painting-edit-form .form-control:not(:placeholder-shown),
+.painting-edit-form .form-select,
 .painting-edit-form input.form-control,
-.painting-edit-form textarea.form-control,
-.painting-edit-form select.form-select,
-.painting-edit-form .form-select option {
-    color: var(--text-light) !important;
+.painting-edit-form textarea.form-control {
+    color: #212121 !important;
 }
 
-/* Extra specificity for select options */
-.form-select option {
-    background-color: var(--input-bg);
+
+.painting-edit-form .form-label {
+    color: var(--brand-secondary);
+}
+
+.painting-edit-form .form-select option {
+    background-color: #ffffff;
+    color: #212121;
+}
+
+/* ==========================================================================
+   13. Error & Loading States
+   ========================================================================== */
+
+#blazor-error-ui {
+    background: var(--bg-dark);
     color: var(--text-light);
+    bottom: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    border-top: 2px solid var(--brand-primary);
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+    color: var(--text-light);
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+#blazor-error-ui .dismiss:hover {
+    color: var(--link-hover-color);
+}
+
+#blazor-error-ui a {
+    color: var(--link-color);
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+#blazor-error-ui a:hover {
+    color: var(--link-hover-color);
+}
+
+.error-container,
+.loading-container {
+    text-align: center;
+    padding: 4rem 2rem;
+    margin: 2rem auto;
+    max-width: 800px;
+    background-color: var(--bg-dark-card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.error-container .alert {
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   14. Animations
+   ========================================================================== */
+
+@keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+@keyframes checkmark {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    15% { transform: scale(1.3); }
+    30% { transform: scale(0.95); }
+    45% { transform: scale(1.2); }
+    60% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   15. Media Queries
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+    .gallery-controls {
+        padding: 1rem;
+    }
+
+    .gallery-controls .col-md-3:last-child {
+        margin-top: 1rem;
+    }
+
+    .painting-card .card-img-top {
+        height: 280px;
+    }
+
+    .painting-title {
+        font-size: 2rem;
+    }
+
+    .painting-image-container {
+        margin-bottom: 2rem;
+    }
 }
 
 @media (max-width: 767.98px) {
+    .gallery-page-title {
+        font-size: 2rem;
+    }
+
+    .gallery-controls .col-md-3 {
+        margin-top: 1rem;
+    }
+
+    .gallery-controls .form-select,
+    .gallery-controls .input-group .form-control {
+        height: 40px;
+    }
+
+    .painting-card .card-img-top {
+        height: 260px;
+    }
+
+    .pagination .page-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .filter-panel {
+        position: static;
+        margin-bottom: 1.5rem;
+    }
+
+    .painting-detail-content {
+        padding: 1.5rem;
+    }
+
+    .painting-title {
+        font-size: 1.75rem;
+    }
+
+    .description-content {
+        font-size: 1rem;
+    }
+
+    .exhibition-list {
+        grid-template-columns: 1fr;
+    }
+
     .painting-edit-form .card-body {
         padding: 1.25rem;
     }
@@ -1789,5 +1575,90 @@ select:-webkit-autofill:focus {
     .painting-edit-form .btn-primary,
     .painting-edit-form .btn-outline-secondary {
         padding: 0.6rem 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .auth-card .card-body {
+        padding: 1.5rem !important;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .hero-section .lead {
+        font-size: 1.1rem;
+    }
+
+    .top-row {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .gallery-page-title {
+        font-size: 1.75rem;
+    }
+
+    .painting-card .card-img-top {
+        height: 230px;
+    }
+
+    .painting-grid .col {
+        padding: 0 0.5rem;
+    }
+
+    .painting-grid .row {
+        margin: 0 -0.5rem;
+    }
+
+    .painting-detail-content {
+        padding: 1rem;
+    }
+
+    .painting-title {
+        font-size: 1.5rem;
+    }
+
+    .painting-info h5 {
+        font-size: 0.9rem;
+    }
+
+    .painting-info p {
+        font-size: 1rem;
+    }
+
+    .thumbnail {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 1rem;
+    }
+
+    .auth-card .card-body {
+        padding: 2rem !important;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+    }
+
+    .top-row {
+        padding: 0.5rem 1rem;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .top-row .btn {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.75rem;
     }
 }
