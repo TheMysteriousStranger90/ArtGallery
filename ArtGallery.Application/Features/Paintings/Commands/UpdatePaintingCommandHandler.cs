@@ -1,7 +1,6 @@
 ﻿using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.DTOs;
-using ArtGallery.Application.Exceptions;
 using ArtGallery.Application.Specifications;
 using ArtGallery.Domain.Entities;
 using AutoMapper;
@@ -42,103 +41,104 @@ namespace ArtGallery.Application.Features.Paintings.Commands
 
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
-
-                var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.Id);
-
-                if (painting == null)
+                await _unitOfWork.ExecuteWithTransactionAsync(async () =>
                 {
-                    throw new Exception(nameof(Painting));
-                }
+                    var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.Id);
 
-                var existingMainImage = await _unitOfWork.Repository<PaintingImage>()
-                    .GetByConditionAsync(pi => pi.PaintingId == request.Id && pi.IsMain);
-
-                if (request.Image != null)
-                {
-                    var imageUploadResult = await _imageService.AddImageAsync(request.Image);
-
-                    if (imageUploadResult.Error != null)
+                    if (painting == null)
                     {
-                        throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
+                        throw new Exception(nameof(Painting));
                     }
 
-                    painting.ImageUrl = imageUploadResult.SecureUrl.ToString();
+                    var existingMainImage = await _unitOfWork.Repository<PaintingImage>()
+                        .GetByConditionAsync(pi => pi.PaintingId == request.Id && pi.IsMain);
 
-                    if (existingMainImage != null)
+                    if (request.Image != null)
+                    {
+                        var imageUploadResult = await _imageService.AddImageAsync(request.Image);
+
+                        if (imageUploadResult.Error != null)
+                        {
+                            throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
+                        }
+
+                        painting.ImageUrl = imageUploadResult.SecureUrl.ToString();
+
+                        if (existingMainImage != null)
+                        {
+                            if (!string.IsNullOrEmpty(existingMainImage.PublicId))
+                            {
+                                await _imageService.DeleteImageAsync(existingMainImage.PublicId);
+                            }
+
+                            existingMainImage.PictureUrl = imageUploadResult.SecureUrl.ToString();
+                            existingMainImage.PublicId = imageUploadResult.PublicId;
+                            await _unitOfWork.Repository<PaintingImage>().UpdateAsync(existingMainImage);
+                        }
+                        else
+                        {
+                            var paintingImage = new PaintingImage
+                            {
+                                PictureUrl = imageUploadResult.SecureUrl.ToString(),
+                                PublicId = imageUploadResult.PublicId,
+                                IsMain = true,
+                                PaintingId = painting.Id
+                            };
+
+                            await _unitOfWork.Repository<PaintingImage>().AddAsync(paintingImage);
+                        }
+                    }
+                    else if (!request.KeepExistingImage && existingMainImage != null)
                     {
                         if (!string.IsNullOrEmpty(existingMainImage.PublicId))
                         {
                             await _imageService.DeleteImageAsync(existingMainImage.PublicId);
                         }
 
-                        existingMainImage.PictureUrl = imageUploadResult.SecureUrl.ToString();
-                        existingMainImage.PublicId = imageUploadResult.PublicId;
-                        await _unitOfWork.Repository<PaintingImage>().UpdateAsync(existingMainImage);
+                        _unitOfWork.ImageRepository.RemovePaintingImage(existingMainImage);
+                        painting.ImageUrl = null;
                     }
-                    else
+
+                    painting.Title = request.Title;
+                    painting.Description = request.Description;
+                    painting.CreationYear = request.CreationYear;
+                    painting.Medium = request.Medium;
+                    painting.Dimensions = request.Dimensions;
+                    painting.PaintType = request.PaintType;
+                    painting.ArtistId = request.ArtistId;
+                    painting.GenreId = request.GenreId;
+                    painting.MuseumId = request.MuseumId;
+
+                    await _unitOfWork.Repository<Painting>().UpdateAsync(painting);
+
+                    var existingTags = await _unitOfWork.Repository<PaintingTag>()
+                        .ListAsync(new BaseSpecification<PaintingTag>(pt => pt.PaintingId == request.Id));
+
+                    foreach (var tag in existingTags)
                     {
-                        var paintingImage = new PaintingImage
+                        await _unitOfWork.Repository<PaintingTag>().RemoveAsync(tag);
+                    }
+
+                    foreach (var tagId in request.TagIds)
+                    {
+                        var paintingTag = new PaintingTag
                         {
-                            PictureUrl = imageUploadResult.SecureUrl.ToString(),
-                            PublicId = imageUploadResult.PublicId,
-                            IsMain = true,
-                            PaintingId = painting.Id
+                            PaintingId = painting.Id,
+                            TagId = tagId
                         };
 
-                        await _unitOfWork.Repository<PaintingImage>().AddAsync(paintingImage);
-                    }
-                }
-                else if (!request.KeepExistingImage && existingMainImage != null)
-                {
-                    if (!string.IsNullOrEmpty(existingMainImage.PublicId))
-                    {
-                        await _imageService.DeleteImageAsync(existingMainImage.PublicId);
+                        await _unitOfWork.Repository<PaintingTag>().AddAsync(paintingTag);
                     }
 
-                    _unitOfWork.ImageRepository.RemovePaintingImage(existingMainImage);
-                    painting.ImageUrl = null;
-                }
+                    await _unitOfWork
+                        .Complete();
+                });
 
-                painting.Title = request.Title;
-                painting.Description = request.Description;
-                painting.CreationYear = request.CreationYear;
-                painting.Medium = request.Medium;
-                painting.Dimensions = request.Dimensions;
-                painting.PaintType = request.PaintType;
-                painting.ArtistId = request.ArtistId;
-                painting.GenreId = request.GenreId;
-                painting.MuseumId = request.MuseumId;
-
-                await _unitOfWork.Repository<Painting>().UpdateAsync(painting);
-
-                var existingTags = await _unitOfWork.Repository<PaintingTag>()
-                    .ListAsync(new BaseSpecification<PaintingTag>(pt => pt.PaintingId == request.Id));
-
-                foreach (var tag in existingTags)
-                {
-                    await _unitOfWork.Repository<PaintingTag>().RemoveAsync(tag);
-                }
-
-                foreach (var tagId in request.TagIds)
-                {
-                    var paintingTag = new PaintingTag
-                    {
-                        PaintingId = painting.Id,
-                        TagId = tagId
-                    };
-
-                    await _unitOfWork.Repository<PaintingTag>().AddAsync(paintingTag);
-                }
-
-                await _unitOfWork.CommitTransactionAsync();
-
-                var updatedPainting = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(painting.Id);
+                var updatedPainting = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(request.Id);
                 response.Painting = _mapper.Map<PaintingDto>(updatedPainting);
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackTransactionAsync();
                 response.Success = false;
                 response.Message = $"An error occurred while updating the painting: {ex.Message}";
             }

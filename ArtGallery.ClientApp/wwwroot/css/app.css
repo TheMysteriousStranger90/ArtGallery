@@ -1678,6 +1678,90 @@ a:hover {
     transform: translateY(-2px);
 }
 
+/* Breadcrumb styling */
+.breadcrumb {
+    background-color: rgba(62, 39, 35, 0.7) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.5rem !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid var(--border-color) !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.breadcrumb-item {
+    color: var(--text-light) !important;
+    font-size: 1rem !important;
+    position: relative !important;
+}
+
+.breadcrumb-item a {
+    color: var(--brand-secondary) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--link-hover-color) !important;
+    text-decoration: underline !important;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: "/" !important;
+    color: var(--brand-secondary) !important;
+    padding: 0 0.75rem !important;
+    font-weight: bold !important;
+    opacity: 0.9 !important;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-light) !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Form input text color fix */
+.form-control,
+.form-select,
+.form-control:focus,
+.form-select:focus,
+.form-control:active,
+.form-select:active,
+.form-control:hover,
+.form-select:hover {
+    color: var(--text-light) !important;
+}
+
+/* Fix for webkit browsers autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-light) !important;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+}
+
+/* Ensure Blazor specific form controls maintain white text */
+.painting-edit-form input.form-control,
+.painting-edit-form textarea.form-control,
+.painting-edit-form select.form-select,
+.painting-edit-form .form-select option {
+    color: var(--text-light) !important;
+}
+
+/* Extra specificity for select options */
+.form-select option {
+    background-color: var(--input-bg);
+    color: var(--text-light);
+}
+
 @media (max-width: 767.98px) {
     .painting-edit-form .card-body {
         padding: 1.25rem;
