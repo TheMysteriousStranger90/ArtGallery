@@ -6,6 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject ILogger<Gallery> Logger
 @inject IClient ApiClient
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Painting Gallery</PageTitle>
 
@@ -144,11 +145,11 @@
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
                         @foreach (var painting in pagedPaintings.Data)
                         {
-                            <div class="col">
-                                <div class="painting-card">
-                                    <PaintingCard Painting="painting"/>
-                                </div>
+                        <div class="col">
+                            <div class="painting-card">
+                                <PaintingCard Painting="painting" OnPaintingDeleted="HandlePaintingDeleted"/>
                             </div>
+                        </div>
                         }
                     </div>
                 </div>
@@ -698,6 +699,15 @@
         {
             ApplySearch();
         }
+    }
+    
+    private async Task HandlePaintingDeleted(Guid paintingId)
+    {
+        Logger.LogInformation("Painting deleted from gallery: {PaintingId}", paintingId);
+        
+        await JSRuntime.InvokeVoidAsync("alert", "Painting has been successfully deleted");
+        
+        await LoadPaintings();
     }
 
 }
