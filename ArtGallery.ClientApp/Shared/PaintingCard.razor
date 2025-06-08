@@ -5,6 +5,7 @@
 @inject IPaintingService PaintingService
 @inject ILogger<PaintingCard> Logger
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 @if (!string.IsNullOrEmpty(Painting?.ImageUrl))
 {
@@ -59,19 +60,25 @@ else
 
         @if (isAdministrator)
         {
-            <button class="btn btn-outline-danger flex-grow-1"
-                    @onclick="DeletePainting"
-                    disabled="@isDeletingProcessing"
-                    title="Delete painting">
-                @if (isDeletingProcessing)
-                {
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                }
-                else
-                {
-                    <i class="bi bi-trash me-1"></i>
-                }
-            </button>
+            <div class="d-flex gap-2 flex-grow-1">
+                <a href="@($"/admin/paintings/edit/{Painting.Id}")" class="btn btn-outline-secondary flex-grow-1">
+                    <i class="bi bi-pencil me-1"></i> Edit
+                </a>
+                
+                <button class="btn btn-outline-danger flex-grow-1"
+                        @onclick="DeletePainting"
+                        disabled="@isDeletingProcessing"
+                        title="Delete painting">
+                    @if (isDeletingProcessing)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-trash me-1"></i>
+                    }
+                </button>
+            </div>
         }
 
         @if (isAuthenticated)
@@ -148,7 +155,7 @@ else
 
         if (isAuthenticated)
         {
-// Check if user has Administrator role
+            // Check if user has Administrator role
             isAdministrator = authState.User.IsInRole("Administrator");
             await CheckIfInFavorites();
         }
@@ -209,7 +216,7 @@ else
         if (Painting == null || isDeletingProcessing || !isAdministrator)
             return;
 
-// Confirm deletion with the user
+        // Confirm deletion with the user
         bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the painting '{Painting.Title}'?");
         if (!confirmed)
             return;
@@ -225,7 +232,7 @@ else
             {
                 Logger.LogInformation("Painting {PaintingId} deleted successfully by administrator", Painting.Id);
 
-// Notify parent component that painting was deleted
+                // Notify parent component that painting was deleted
                 if (OnPaintingDeleted.HasDelegate)
                 {
                     await OnPaintingDeleted.InvokeAsync(Painting.Id);
@@ -248,5 +255,4 @@ else
             StateHasChanged();
         }
     }
-
 }
