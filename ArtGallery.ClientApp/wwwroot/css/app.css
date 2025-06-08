@@ -899,10 +899,6 @@ a:hover {
     }
 }
 
-
-
-
-
 /* PaintingCard specific styles */
 .card-img-container {
     position: relative;
@@ -939,7 +935,6 @@ a:hover {
     background: linear-gradient(to bottom, rgba(93, 64, 55, 0.2) 0%, rgba(0,0,0,0.7) 100%);
 }
 
-
 /* Improved Filter Panel Styles */
 .filter-panel {
     background-color: var(--bg-dark-card);
@@ -959,6 +954,13 @@ a:hover {
     font-weight: 500;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.75rem;
+}
+
+.form-label-sm {
+    color: var(--brand-secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 500;
 }
 
 .filter-group {

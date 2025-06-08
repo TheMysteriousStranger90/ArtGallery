@@ -1,5 +1,4 @@
-﻿using ArtGallery.ClientApp.Models;
-using ArtGallery.ClientApp.ViewModels;
+﻿using ArtGallery.ClientApp.ViewModels;
 
 namespace ArtGallery.ClientApp.Services.Interfaces;
 

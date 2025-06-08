@@ -1,5 +1,4 @@
-﻿using ArtGallery.ClientApp.Services; // For FileParameter and NSwag DTOs
-using ArtGallery.ClientApp.Models; // If you create custom client-side models
+﻿using ArtGallery.ClientApp.Services;
 
 namespace ArtGallery.ClientApp.Services.Interfaces
 {
