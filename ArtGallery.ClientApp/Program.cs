@@ -5,6 +5,7 @@ using ArtGallery.ClientApp;
 using ArtGallery.ClientApp.Services;
 using ArtGallery.ClientApp.Services.Interfaces;
 using ArtGallery.ClientApp.Auth;
+using ArtGallery.ClientApp.Constants;
 using Blazored.LocalStorage;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -32,7 +33,7 @@ builder.Services.AddAuthorizationCore();
 // Register HttpClient with authentication handler
 builder.Services.AddHttpClient<IClient, Client>("ApiClient", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:8081/");
+    client.BaseAddress = new Uri(Const.DefaultApiUrl);
     client.Timeout = TimeSpan.FromSeconds(30);
 }).AddHttpMessageHandler<AuthenticationMessageHandler>();
 
@@ -41,7 +42,7 @@ builder.Services.AddScoped<IClient>(sp =>
 {
     var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
     var httpClient = httpClientFactory.CreateClient("ApiClient");
-    return new Client("https://localhost:8081/", httpClient);
+    return new Client(Const.DefaultApiUrl, httpClient);
 });
 
 // Register Authentication service (now uses IClient directly)
