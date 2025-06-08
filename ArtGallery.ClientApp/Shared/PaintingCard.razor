@@ -1,4 +1,9 @@
 ﻿@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IPaintingService PaintingService
+@inject ILogger<PaintingCard> Logger
 
 @if (!string.IsNullOrEmpty(Painting?.ImageUrl))
 {
@@ -46,15 +51,86 @@ else
     }
 </div>
 <div class="card-footer">
-    <a href="@($"/paintings/{Painting.Id}")" class="btn btn-outline-primary w-100">
-        <i class="bi bi-eye me-1"></i> View Details
-    </a>
+    <div class="d-flex gap-2">
+        <a href="@($"/paintings/{Painting.Id}")" class="btn btn-outline-primary flex-grow-1">
+            <i class="bi bi-eye me-1"></i> View Details
+        </a>
+
+        @if (isAuthenticated)
+        {
+            <button class="btn @GetFavoriteButtonClass() favorite-btn"
+                    @onclick="AddToFavorites" 
+                    disabled="@(isFavoriteProcessing || isAddedToFavorites)" 
+                    title="@(isAddedToFavorites ? "Already in favorites" : "Add to favorites")">
+                @if (isFavoriteProcessing)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                }
+                else
+                {
+                    <i class="bi bi-heart@(isAddedToFavorites ? "-fill" : "") heart-icon @(isAddedToFavorites ? "heart-filled" : "")" aria-hidden="true"></i>
+                }
+            </button>
+        }
+        }
+    </div>
+
+    @if (isAddedToFavorites)
+    {
+    <div class="mt-2 favorite-confirmation">
+        <small>
+            <i class="bi bi-check-circle me-1"></i> Added to favorites
+        </small>
+    </div>
+    }
 </div>
 
 @code {
     [Parameter] public PaintingDto? Painting { get; set; }
-
     [Inject] public IConfiguration? Configuration { get; set; }
+
+    private bool isAuthenticated = false;
+    private bool isAddedToFavorites = false;
+    private bool isFavoriteProcessing = false;
+
+    private async Task CheckIfInFavorites()
+    {
+        if (Painting == null || !isAuthenticated)
+            return;
+
+        try
+        {
+            var favorites = await PaintingService.GetFavoritePaintingsAsync();
+            if (favorites.Success && favorites.FavoritePaintings.Any(p => p.Id == Painting.Id))
+            {
+                isAddedToFavorites = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error checking if painting is in favorites: {PaintingId}", Painting.Id);
+        }
+    }
+    
+    private string GetFavoriteButtonClass()
+    {
+        if (isFavoriteProcessing)
+            return "btn-outline-secondary disabled";
+        if (isAddedToFavorites)
+            return "btn-dark favorited";
+        return "btn-outline-primary";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+    
+        if (isAuthenticated)
+        {
+            await CheckIfInFavorites();
+        }
+    }
 
     private string GetFullImageUrl(string? relativeUrl)
     {
@@ -75,6 +151,35 @@ else
         }
 
         return $"{apiBaseUrl.TrimEnd('/')}/{relativeUrl.TrimStart('/')}";
+    }
+
+    private async Task AddToFavorites()
+    {
+        if (Painting == null || isFavoriteProcessing)
+            return;
+
+        try
+        {
+            isFavoriteProcessing = true;
+            StateHasChanged();
+
+            var result = await PaintingService.AddPaintingToFavoritesAsync(Painting.Id);
+
+            if (result)
+            {
+                isAddedToFavorites = true;
+                await Task.Delay(2000);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error adding painting to favorites: {PaintingId}", Painting.Id);
+        }
+        finally
+        {
+            isFavoriteProcessing = false;
+            StateHasChanged();
+        }
     }
 
 }
