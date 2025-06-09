@@ -48,6 +48,7 @@ builder.Services.AddScoped<IClient>(sp =>
 // Register Authentication service (now uses IClient directly)
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IPaintingService, PaintingService>();
+builder.Services.AddScoped<IArtistService, ArtistService>();
 
 // Default HttpClient for other purposes
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
