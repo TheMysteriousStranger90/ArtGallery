@@ -1,0 +1,478 @@
+﻿@page "/admin/paintings/edit/{Id:guid}"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Authorization
+@using System.ComponentModel.DataAnnotations
+@using ArtGallery.ClientApp.ViewModels
+@inject IPaintingService PaintingService
+@inject IClient ApiClient
+@inject NavigationManager NavigationManager
+@inject ILogger<PaintingEdit> Logger
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Administrator")]
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb" class="my-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/gallery">Gallery</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Painting</li>
+                </ol>
+            </nav>
+            <h1 class="mb-4" style="color: var(--brand-secondary); font-weight: 300; font-size: 2.5rem; 
+                        border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+                Edit Painting
+            </h1>
+
+            @if (isLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border loading-spinner" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="loading-text">Loading painting data...</p>
+                </div>
+            }
+            else if (errorMessage != null)
+            {
+                <div class="alert alert-danger">
+                    <h4 class="alert-heading">Error</h4>
+                    <p>@errorMessage</p>
+                    <hr>
+                    <div>
+                        <button class="btn btn-primary" @onclick="LoadData">Try Again</button>
+                        <a href="/gallery" class="btn btn-outline-secondary ms-2">Return to Gallery</a>
+                    </div>
+                </div>
+            }
+            else if (model != null)
+            {
+                <EditForm Model="model" OnValidSubmit="HandleValidSubmit" class="painting-edit-form">
+                    <DataAnnotationsValidator/>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Basic Information</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="title" class="form-label">Title</label>
+                                        <InputText id="title" class="form-control" @bind-Value="model.Title"/>
+                                        <ValidationMessage For="@(() => model.Title)" class="text-danger"/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description</label>
+                                        <InputTextArea id="description" class="form-control" rows="5" @bind-Value="model.Description"/>
+                                        <ValidationMessage For="@(() => model.Description)" class="text-danger"/>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="creationYear" class="form-label">Creation Year</label>
+                                            <InputNumber id="creationYear" class="form-control" @bind-Value="model.CreationYear"/>
+                                            <ValidationMessage For="@(() => model.CreationYear)" class="text-danger"/>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="paintType" class="form-label">Paint Type</label>
+                                            <InputSelect id="paintType" class="form-select" @bind-Value="model.PaintType">
+                                                @foreach (var paintType in Enum.GetValues(typeof(PaintType)))
+                                                {
+                                                    <option value="@paintType">@GetPaintTypeName((PaintType)paintType)</option>
+                                                }
+                                            </InputSelect>
+                                            <ValidationMessage For="@(() => model.PaintType)" class="text-danger"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="medium" class="form-label">Medium</label>
+                                            <InputText id="medium" class="form-control" @bind-Value="model.Medium"/>
+                                            <ValidationMessage For="@(() => model.Medium)" class="text-danger"/>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="dimensions" class="form-label">Dimensions</label>
+                                            <InputText id="dimensions" class="form-control" @bind-Value="model.Dimensions"/>
+                                            <ValidationMessage For="@(() => model.Dimensions)" class="text-danger"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Classification</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="artistId" class="form-label">Artist</label>
+                                        <InputSelect id="artistId" class="form-select" @bind-Value="model.ArtistId">
+                                            <option value="">-- Select an artist --</option>
+                                            @if (artists != null)
+                                            {
+                                                @foreach (var artist in artists)
+                                                {
+                                                    <option value="@artist.Id">@artist.FullName</option>
+                                                }
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => model.ArtistId)" class="text-danger"/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="genreId" class="form-label">Genre</label>
+                                        <InputSelect id="genreId" class="form-select" @bind-Value="model.GenreId">
+                                            <option value="">-- Select a genre --</option>
+                                            @if (genres != null)
+                                            {
+                                                @foreach (var genre in genres)
+                                                {
+                                                    <option value="@genre.Id">@genre.Name</option>
+                                                }
+                                            }
+                                        </InputSelect>
+                                        <small class="form-text text-light">Optional</small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="museumId" class="form-label">Museum</label>
+                                        <InputSelect id="museumId" class="form-select" @bind-Value="model.MuseumId">
+                                            <option value="">-- Select a museum --</option>
+                                            @if (museums != null)
+                                            {
+                                                @foreach (var museum in museums)
+                                                {
+                                                    <option value="@museum.Id">@museum.Name</option>
+                                                }
+                                            }
+                                        </InputSelect>
+                                        <small class="form-text text-light">Optional</small>
+                                    </div>
+
+                                    @if (painting?.Tags?.Any() == true)
+                                    {
+                                        <div class="mb-3">
+                                            <label class="form-label d-block">Current Tags</label>
+                                            <div class="tags-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                                                @foreach (var tag in painting.Tags)
+                                                {
+                                                    <span class="tag-badge">@tag.Name</span>
+                                                }
+                                            </div>
+                                            <small class="form-text text-light">Tags can only be updated through the API directly.</small>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Image</h4>
+                                </div>
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(painting?.ImageUrl))
+                                    {
+                                        <div class="text-center mb-3">
+                                            <img src="@painting.ImageUrl" class="img-fluid mb-2"
+                                                 style="width: 100%; height: auto; border-radius: 0.5rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);"
+                                                 alt="@painting.Title"/>
+                                            <div class="form-check">
+                                                <InputCheckbox id="keepExistingImage" class="form-check-input" @bind-Value="model.KeepExistingImage"/>
+                                                <label class="form-check-label" for="keepExistingImage">
+                                                    Keep existing image
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="mb-3">
+                                        <label for="imageFile" class="form-label">Upload new image</label>
+                                        <InputFile id="imageFile" OnChange="HandleFileSelected" class="form-control" accept="image/*"/>
+                                        <small class="form-text text-light">Recommended size: 1200x800px. Max file size: 5MB.</small>
+
+                                        @if (selectedFile != null)
+                                        {
+                                        <div class="mt-2">
+                                            <span class="badge bg-info">Selected: @selectedFile.Name (@FormatFileSize(selectedFile.Size))</span>
+                                        </div>
+                                        }
+                                    </div>
+
+                                    @if (imagePreviewUrl != null)
+                                    {
+                                        <div class="text-center mt-3">
+                                            <h6>Preview:</h6>
+                                            <img src="@imagePreviewUrl" class="img-fluid painting-preview border" alt="Preview"/>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-outline-secondary flex-grow-1" disabled="@isSaving">
+                                    @if (isSaving)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span>Saving...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Save Changes</span>
+                                    }
+                                </button>
+                                <a href="@($"/paintings/{Id}")" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private PaintingDetailDto painting;
+    private PaintingEditModel model;
+    private bool isLoading = true;
+    private bool isSaving = false;
+    private string errorMessage;
+    private IBrowserFile selectedFile;
+    private string imagePreviewUrl;
+
+    private List<ArtistDto> artists;
+    private List<GenreDto> genres;
+    private List<MuseumBriefDto> museums;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            painting = await PaintingService.GetPaintingAsync(Id);
+
+            if (painting == null)
+            {
+                errorMessage = "Painting not found. It may have been deleted or you don't have permission to edit it.";
+                return;
+            }
+
+            model = new PaintingEditModel
+            {
+                Title = painting.Title,
+                Description = painting.Description,
+                CreationYear = painting.CreationYear,
+                Medium = painting.Medium,
+                Dimensions = painting.Dimensions,
+                PaintType = painting.PaintType,
+                ArtistId = painting.Artist.Id,
+                GenreId = painting.Genre?.Id,
+                MuseumId = painting.Museum?.Id,
+                KeepExistingImage = true
+            };
+
+            var loadArtistsTask = LoadArtists();
+            var loadGenresTask = LoadGenres();
+            var loadMuseumsTask = LoadMuseums();
+
+            await Task.WhenAll(loadArtistsTask, loadGenresTask, loadMuseumsTask);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading painting data for editing. ID: {PaintingId}", Id);
+            errorMessage = "Failed to load painting data. Please try again later.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadArtists()
+    {
+        try
+        {
+            var response = await ApiClient.ArtistsGET2Async(1, 100, "", "", "lastName", "1.0");
+            artists = response.Data.ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading artists");
+            artists = new List<ArtistDto>();
+        }
+    }
+
+    private async Task LoadGenres()
+    {
+        try
+        {
+            var response = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
+            genres = response.Data
+                .Where(p => p.Genre != null)
+                .GroupBy(p => p.Genre.Id)
+                .Select(g => g.First().Genre)
+                .OrderBy(g => g.Name)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading genres");
+            genres = new List<GenreDto>();
+        }
+    }
+
+    private async Task LoadMuseums()
+    {
+        try
+        {
+            var response = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
+            museums = response.Data
+                .Where(p => p.Museum != null)
+                .GroupBy(p => p.Museum.Id)
+                .Select(g => g.First().Museum)
+                .OrderBy(m => m.Name)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading museums");
+            museums = new List<MuseumBriefDto>();
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        model.KeepExistingImage = false;
+
+        try
+        {
+            var imageFile = e.File;
+            if (imageFile.Size > 5 * 1024 * 1024)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Image is too large. Maximum file size is 5MB.");
+                selectedFile = null;
+                return;
+            }
+
+            var buffer = new byte[imageFile.Size];
+            await imageFile.OpenReadStream(5 * 1024 * 1024).ReadAsync(buffer);
+            var imageBase64 = Convert.ToBase64String(buffer);
+            var fileFormat = imageFile.ContentType;
+
+            imagePreviewUrl = $"data:{fileFormat};base64,{imageBase64}";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error generating image preview");
+            imagePreviewUrl = null;
+        }
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        int order = 0;
+        double size = bytes;
+
+        while (size >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            size /= 1024;
+        }
+
+        return $"{size:0.##} {sizes[order]}";
+    }
+
+    private string GetPaintTypeName(PaintType paintType)
+    {
+        return paintType switch
+        {
+            PaintType._0 => "Oil",
+            PaintType._1 => "Acrylic",
+            PaintType._2 => "Watercolor",
+            PaintType._3 => "Gouache",
+            PaintType._4 => "Tempera",
+            PaintType._5 => "Pastel",
+            PaintType._6 => "Encaustic",
+            PaintType._7 => "Fresco",
+            PaintType._8 => "Ink",
+            PaintType._9 => "Digital",
+            PaintType._10 => "Mixed Media",
+            PaintType._11 => "Other",
+            _ => paintType.ToString()
+        };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSaving = true;
+
+        try
+        {
+            FileParameter? imageFile = null;
+            if (selectedFile != null)
+            {
+                var ms = new MemoryStream();
+                await selectedFile.OpenReadStream(5 * 1024 * 1024).CopyToAsync(ms);
+                ms.Position = 0;
+
+                imageFile = new FileParameter(ms, selectedFile.Name, selectedFile.ContentType);
+            }
+            
+            var tagIds = painting.Tags?.Select(t => t.TagId)?.ToList() ?? new List<Guid>();
+
+            var result = await PaintingService.UpdatePaintingAsync(
+                Id,
+                Id,
+                model.Title,
+                model.Description,
+                model.CreationYear,
+                model.Medium,
+                model.Dimensions,
+                imageFile,
+                model.KeepExistingImage,
+                model.PaintType,
+                model.ArtistId,
+                model.GenreId ?? Guid.Empty,
+                model.MuseumId ?? Guid.Empty,
+                tagIds
+            );
+
+            await JSRuntime.InvokeVoidAsync("alert", "Painting successfully updated!");
+            NavigationManager.NavigateTo($"/paintings/{Id}");
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API error updating painting. Status: {StatusCode}, Response: {Response}", ex.StatusCode, ex.Response);
+            await JSRuntime.InvokeVoidAsync("alert", $"Error updating painting: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error updating painting");
+            await JSRuntime.InvokeVoidAsync("alert", "An unexpected error occurred while updating the painting. Please try again later.");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+}

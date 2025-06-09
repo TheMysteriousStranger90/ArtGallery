@@ -4,6 +4,7 @@ using ArtGallery.Application.Exceptions;
 using ArtGallery.Application.Specifications;
 using ArtGallery.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace ArtGallery.Application.Features.Paintings.Commands;
 
@@ -25,34 +26,36 @@ public class DeletePaintingCommandHandler : IRequestHandler<DeletePaintingComman
 
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
-
             var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.Id);
 
             if (painting == null)
             {
                 throw new Exception(nameof(Painting));
             }
-            
-            var paintingImages = await _unitOfWork.Repository<PaintingImage>()
-                .ListAsync(new BaseSpecification<PaintingImage>(pi => pi.PaintingId == request.Id));
 
-            foreach (var image in paintingImages)
+            await _unitOfWork.ExecuteWithTransactionAsync(async () =>
             {
-                if (!string.IsNullOrEmpty(image.PublicId))
+                var paintingImages = await _unitOfWork.Repository<PaintingImage>()
+                    .ListAsync(new BaseSpecification<PaintingImage>(pi => pi.PaintingId == request.Id));
+
+                foreach (var image in paintingImages)
                 {
-                    await _imageService.DeleteImageAsync(image.PublicId);
+                    if (!string.IsNullOrEmpty(image.PublicId))
+                    {
+                        await _imageService.DeleteImageAsync(image.PublicId);
+                    }
                 }
-            }
             
-            await _unitOfWork.Repository<Painting>().RemoveAsync(painting);
-            await _unitOfWork.CommitTransactionAsync();
+                //await _unitOfWork.Repository<Painting>().RemoveAsync(painting);
+                await _unitOfWork.PaintingRepository.RemoveAsync(painting);
+            
+                await _unitOfWork.Complete();
+            });
 
             response.Message = $"Painting {painting.Title} was successfully deleted.";
         }
         catch (Exception ex)
         {
-            await _unitOfWork.RollbackTransactionAsync();
             response.Success = false;
             response.Message = $"An error occurred while deleting the painting: {ex.Message}";
         }

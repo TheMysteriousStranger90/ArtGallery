@@ -1,5 +1,4 @@
-﻿using ArtGallery.ClientApp.Models;
-using ArtGallery.ClientApp.Services.Interfaces;
+﻿using ArtGallery.ClientApp.Services.Interfaces;
 using ArtGallery.ClientApp.ViewModels;
 using ArtGallery.ClientApp.Auth;
 
