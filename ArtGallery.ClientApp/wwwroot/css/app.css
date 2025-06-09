@@ -1662,3 +1662,111 @@ select:-webkit-autofill:focus {
         padding: 0.25rem 0.75rem;
     }
 }
+
+
+
+/* Dropdown Menu Styling with !important */
+.dropdown-menu {
+    background-color: var(--bg-dark-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+    padding: 0.5rem 0 !important;
+    margin-top: 0.5rem !important;
+    min-width: 12rem !important;
+}
+
+.dropdown-item {
+    color: var(--text-light) !important;
+    padding: 0.6rem 1.25rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--brand-primary) !important;
+    color: var(--text-light) !important;
+}
+
+.dropdown-item i {
+    color: var(--brand-secondary) !important;
+    transition: all 0.3s ease !important;
+}
+
+.dropdown-item:hover i {
+    color: var(--text-light) !important;
+}
+
+.dropdown-divider {
+    border-top: 1px solid var(--border-color) !important;
+    margin: 0.25rem 0 !important;
+}
+
+.nav-user-button {
+    color: var(--text-light) !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    padding: 0.375rem 0.75rem !important;
+    text-decoration: none !important;
+}
+
+.nav-user-button:hover {
+    color: var(--brand-secondary) !important;
+}
+
+.nav-user-button::after {
+    color: var(--brand-secondary) !important;
+    vertical-align: middle !important;
+}
+
+
+
+/* Favorites page styling */
+.favorites-container {
+    padding: 1.5rem 0;
+}
+
+.favorites-container .page-title {
+    color: var(--brand-secondary);
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+    font-size: 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    position: relative;
+}
+
+.empty-favorites-container {
+    padding: 3rem 2rem;
+    background-color: var(--bg-dark-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.75rem !important;
+    max-width: 700px;
+    margin: 2rem auto;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.empty-favorites-icon {
+    opacity: 0.7;
+    color: var(--brand-secondary) !important;
+    font-size: 4rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.favorite-stats {
+    background-color: var(--bg-dark-card) !important;
+    padding: 1rem 1.25rem !important;
+    border-radius: 0.5rem !important;
+    border-left: 4px solid var(--brand-secondary) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.favorite-stats .lead {
+    color: var(--text-light) !important;
+    margin-bottom: 0 !important;
+}
+
+.favorite-stats .lead i {
+    color: var(--brand-secondary) !important;
+}
