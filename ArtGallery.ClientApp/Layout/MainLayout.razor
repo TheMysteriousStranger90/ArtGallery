@@ -5,43 +5,62 @@
 <div class="page">
     <main>
         <div class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    <div class="dropdown">
-                        <button class="btn btn-link dropdown-toggle nav-user-button" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle me-1"></i>
-                            @(context.User.Identity?.Name ?? "User")
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li>
-                                <a class="dropdown-item" href="/favorites">
-                                    <i class="bi bi-heart me-2"></i> My Favorites
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/profile">
-                                    <i class="bi bi-person me-2"></i> My Profile
-                                </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <button class="dropdown-item" @onclick="Logout">
-                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                </Authorized>
-                <NotAuthorized>
-                    <a href="/login" class="btn btn-primary btn-sm">Login</a>
-                </NotAuthorized>
-                <Authorizing>
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    <span>Loading...</span>
-                </Authorizing>
-            </AuthorizeView>
+            <!-- Left section (empty for now) -->
+            <div class="top-row-left">
+            </div>
+
+            <!-- Center navigation section -->
+            <div class="top-row-center">
+                <nav>
+                    <a href="/gallery" class="nav-link @(Navigation.Uri.Contains("/gallery") ? "active" : "")">
+                        Gallery
+                    </a>
+                    <a href="/artists" class="nav-link @(Navigation.Uri.Contains("/artists") ? "active" : "")">
+                        Artists
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Right section (auth controls) -->
+            <div class="top-row-right">
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="dropdown">
+                            <button class="btn btn-link dropdown-toggle nav-user-button" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i>
+                                @(context.User.Identity?.Name ?? "User")
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="/favorites">
+                                        <i class="bi bi-heart me-2"></i> My Favorites
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile">
+                                        <i class="bi bi-person me-2"></i> My Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" @onclick="Logout">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/login" class="btn btn-primary btn-sm">Login</a>
+                    </NotAuthorized>
+                    <Authorizing>
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        <span>Loading...</span>
+                    </Authorizing>
+                </AuthorizeView>
+            </div>
         </div>
 
         <article class="content px-4">

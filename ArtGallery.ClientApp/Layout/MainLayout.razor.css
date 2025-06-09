@@ -1,20 +1,61 @@
-.page {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
+/* Navigation bar layout */
 .top-row {
     background-color: #212121;
     border-bottom: 1px solid #424242;
     padding: 0.75rem 1rem;
-    display: flex;
-    justify-content: flex-end;
+    display: flex !important;
+    position: relative !important; /* This is important for absolute positioning */
     align-items: center;
     color: #F5F5F5;
+    height: 64px !important; /* Fixed height for consistency */
 }
 
+/* Left section */
+.top-row-left {
+    width: 25% !important;
+}
+
+/* Center section - absolutely positioned */
+.top-row-center {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    text-align: center !important;
+    z-index: 5 !important; /* Ensure it's above other elements */
+    width: auto !important;
+}
+
+.top-row-center nav {
+    display: flex !important;
+    gap: 2rem !important; /* Increased spacing between links */
+}
+
+.top-row-center .nav-link {
+    color: #F5F5F5 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 1.1rem !important; /* Slightly larger font */
+    transition: all 0.3s ease !important;
+}
+
+.top-row-center .nav-link:hover {
+    color: #A1887F !important;
+}
+
+.top-row-center .nav-link.active {
+    color: #A1887F !important;
+    border-bottom: 2px solid #A1887F !important;
+}
+
+/* Right section */
+.top-row-right {
+    width: 25% !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* Existing styles */
 .top-row a,
 .top-row span,
 .top-row .btn {
@@ -26,54 +67,33 @@
 }
 
 .top-row .btn-outline-secondary {
-    border-color: #F5F5F5;
-    color: #F5F5F5;
+    border-color: #F5F5F5 !important;
+    color: #F5F5F5 !important;
 }
 
 .top-row .btn-outline-secondary:hover {
-    background-color: #F5F5F5;
-    color: #212121;
+    background-color: #F5F5F5 !important;
+    color: #212121 !important;
 }
 
 .top-row .btn-primary {
-    background-color: #5D4037;
-    border-color: #5D4037;
+    background-color: #5D4037 !important;
+    border-color: #5D4037 !important;
 }
 
 .top-row .btn-primary:hover {
-    background-color: #4E342E;
-    border-color: #4E342E;
+    background-color: #4E342E !important;
+    border-color: #4E342E !important;
 }
 
-.content {
-    flex: 1;
-}
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .top-row-center .nav-link {
+        font-size: 0.9rem !important;
+        padding: 0.25rem !important;
+    }
 
-#blazor-error-ui {
-    background: #212121;
-    color: #F5F5F5;
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-}
-
-#blazor-error-ui .dismiss {
-    cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
-    color: #F5F5F5;
-}
-
-#blazor-error-ui a {
-    color: #D7CCC8;
-}
-
-#blazor-error-ui a:hover {
-    color: #F5F5F5;
+    .top-row-center nav {
+        gap: 1rem !important;
+    }
 }

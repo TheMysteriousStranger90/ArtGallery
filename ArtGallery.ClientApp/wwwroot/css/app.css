@@ -1770,3 +1770,25 @@ select:-webkit-autofill:focus {
 .favorite-stats .lead i {
     color: var(--brand-secondary) !important;
 }
+
+
+
+
+/* Artist Card Specific Styles */
+.painting-card .artist-nationality {
+    color: var(--brand-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.card-img-container .artist-image-placeholder {
+    background-color: var(--bg-dark-card);
+    color: var(--text-light);
+    font-size: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    opacity: 0.6;
+}

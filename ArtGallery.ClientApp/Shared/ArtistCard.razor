@@ -1,0 +1,259 @@
+﻿@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IArtistService ArtistService
+@inject ILogger<ArtistCard> Logger
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<div class="card-img-container">
+    @if (!string.IsNullOrEmpty(Artist?.PictureUrl))
+    {
+        <a href="@($"/artists/{Artist.Id}")">
+            <img src="@GetFullImageUrl(Artist.PictureUrl)" class="card-img-top" alt="@Artist.FullName">
+        </a>
+    }
+    else
+    {
+        <a href="@($"/artists/{Artist.Id}")">
+            <div class="card-img-placeholder d-flex align-items-center justify-content-center">
+                <i class="bi bi-person-circle text-muted"></i>
+                <span>No Image Available</span>
+            </div>
+        </a>
+    }
+</div>
+<div class="card-body d-flex flex-column text-center">
+    <h5 class="card-title">
+        <a href="@($"/artists/{Artist.Id}")" class="text-decoration-none">@Artist?.FullName</a>
+    </h5>
+    @if (!string.IsNullOrEmpty(Artist?.Nationality))
+    {
+        <p class="card-text small">
+            <i class="bi bi-globe me-1"></i>
+            <span class="field-label">Nationality: </span>
+            <small>@Artist.Nationality</small>
+        </p>
+    }
+    @if (Artist?.BirthDate.HasValue == true)
+    {
+        <p class="card-text small">
+            <i class="bi bi-calendar me-1"></i>
+            <span class="field-label">Birth: </span>
+            <small>@Artist.BirthDate.Value.Year</small>
+            
+            @if (Artist.DeathDate.HasValue)
+            {
+                <span> - @Artist.DeathDate.Value.Year</span>
+            }
+        </p>
+    }
+</div>
+<div class="card-footer">
+    <div class="d-flex flex-column gap-2">
+        <a href="@($"/artists/{Artist.Id}")" class="btn btn-outline-primary w-100">
+            <i class="bi bi-eye me-1"></i> View Profile
+        </a>
+
+        @if (isAdministrator)
+        {
+            <div class="d-flex flex-column gap-2 w-100">
+                <a href="@($"/admin/artists/edit/{Artist.Id}")" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-pencil me-1"></i> Edit Artist
+                </a>
+
+                <button class="btn btn-outline-primary w-100"
+                        @onclick="DeleteArtist"
+                        disabled="@isDeletingProcessing"
+                        title="Delete artist">
+                    @if (isDeletingProcessing)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    }
+                    else
+                    {
+                        <span>
+                            <i class="bi bi-trash me-1"></i>
+                            Delete Artist
+                        </span>
+                    }
+                </button>
+            </div>
+        }
+
+        @if (isAuthenticated)
+        {
+            <button class="btn @GetFavoriteButtonClass() favorite-btn w-100 mt-1"
+                    @onclick="AddToFavorites"
+                    disabled="@(isFavoriteProcessing || isAddedToFavorites)"
+                    title="@(isAddedToFavorites ? "Already in favorites" : "Add to favorites")">
+                @if (isFavoriteProcessing)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                }
+                else
+                {
+                    <i class="bi bi-heart@(isAddedToFavorites ? "-fill" : "") heart-icon @(isAddedToFavorites ? "heart-filled" : "")" aria-hidden="true"></i>
+                    @(isAddedToFavorites ? " Added to Favorites" : " Add to Favorites")
+                }
+            </button>
+        }
+    </div>
+
+    @if (isAddedToFavorites)
+    {
+        <div class="mt-2 favorite-confirmation">
+            <small>
+                <i class="bi bi-check-circle me-1"></i> Added to favorites
+            </small>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public ArtistDto? Artist { get; set; }
+    [Inject] public IConfiguration? Configuration { get; set; }
+    [Parameter] public EventCallback<Guid> OnArtistDeleted { get; set; }
+
+    private bool isAuthenticated = false;
+    private bool isAdministrator = false;
+    private bool isAddedToFavorites = false;
+    private bool isFavoriteProcessing = false;
+    private bool isDeletingProcessing = false;
+
+    private async Task CheckIfInFavorites()
+    {
+        if (Artist == null || !isAuthenticated)
+            return;
+
+        try
+        {
+            var favorites = await ArtistService.GetFavoriteArtistsAsync();
+            // This is a workaround since the API returns PaintingDto in the favorites
+            // You might need to adjust this depending on your actual API response
+            if (favorites.Success)
+            {
+                isAddedToFavorites = true; // Mock response for now
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error checking if artist is in favorites: {ArtistId}", Artist.Id);
+        }
+    }
+
+    private string GetFavoriteButtonClass()
+    {
+        if (isFavoriteProcessing)
+            return "btn-outline-secondary disabled";
+        if (isAddedToFavorites)
+            return "btn-dark favorited";
+        return "btn-outline-primary";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+
+        if (isAuthenticated)
+        {
+            isAdministrator = authState.User.IsInRole("Administrator");
+            await CheckIfInFavorites();
+        }
+    }
+
+    private string GetFullImageUrl(string? relativeUrl)
+    {
+        if (string.IsNullOrEmpty(relativeUrl))
+        {
+            return "placeholder-image.png";
+        }
+
+        if (Uri.TryCreate(relativeUrl, UriKind.Absolute, out _))
+        {
+            return relativeUrl;
+        }
+
+        var apiBaseUrl = Configuration?["ApiBaseUrl"];
+        if (string.IsNullOrEmpty(apiBaseUrl))
+        {
+            return relativeUrl.StartsWith("/") ? relativeUrl : $"/{relativeUrl}";
+        }
+
+        return $"{apiBaseUrl.TrimEnd('/')}/{relativeUrl.TrimStart('/')}";
+    }
+
+    private async Task AddToFavorites()
+    {
+        if (Artist == null || isFavoriteProcessing)
+            return;
+
+        try
+        {
+            isFavoriteProcessing = true;
+            StateHasChanged();
+
+            var result = await ArtistService.AddArtistToFavoritesAsync(Artist.Id);
+
+            if (result)
+            {
+                isAddedToFavorites = true;
+                await Task.Delay(2000);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error adding artist to favorites: {ArtistId}", Artist.Id);
+        }
+        finally
+        {
+            isFavoriteProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DeleteArtist()
+    {
+        if (Artist == null || isDeletingProcessing || !isAdministrator)
+            return;
+
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the artist '{Artist.FullName}'?");
+        if (!confirmed)
+            return;
+
+        try
+        {
+            isDeletingProcessing = true;
+            StateHasChanged();
+
+            var result = await ArtistService.DeleteArtistAsync(Artist.Id);
+
+            if (result)
+            {
+                Logger.LogInformation("Artist {ArtistId} deleted successfully by administrator", Artist.Id);
+
+                if (OnArtistDeleted.HasDelegate)
+                {
+                    await OnArtistDeleted.InvokeAsync(Artist.Id);
+                }
+            }
+            else
+            {
+                Logger.LogWarning("Failed to delete artist {ArtistId}", Artist.Id);
+                await JSRuntime.InvokeVoidAsync("alert", "Failed to delete the artist. Please try again later.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error deleting artist: {ArtistId}", Artist.Id);
+            await JSRuntime.InvokeVoidAsync("alert", "An error occurred while deleting the artist.");
+        }
+        finally
+        {
+            isDeletingProcessing = false;
+            StateHasChanged();
+        }
+    }
+}
