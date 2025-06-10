@@ -29,6 +29,10 @@ public class ArtistMappingProfile : Profile
             .ForMember(d => d.PictureUrl, o => o.MapFrom(s => 
                 s.ArtistImage.FirstOrDefault(i => i.IsMain).PictureUrl ?? ""));
         
+        CreateMap<Artist, ArtistDetailDto>()
+            .ForMember(d => d.PictureUrl, o => o.MapFrom(s => 
+                s.ArtistImage.FirstOrDefault(i => i.IsMain).PictureUrl ?? ""));
+        
         CreateMap<Painting, PaintingDto>()
             .ForMember(d => d.Artist, o => o.MapFrom(s => s.Artist))
             .ForMember(d => d.Genre, o => o.MapFrom(s => s.Genre))
