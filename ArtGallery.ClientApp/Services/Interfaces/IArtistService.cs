@@ -25,7 +25,7 @@ namespace ArtGallery.ClientApp.Services.Interfaces
             DateTimeOffset? birthDate, 
             DateTimeOffset? deathDate, 
             string nationality,
-            FileParameter image,
+            FileParameter? image,
             bool keepExistingImage,
             BiographyDto biography,
             string apiVersion = Const.DefaultApiVersion);

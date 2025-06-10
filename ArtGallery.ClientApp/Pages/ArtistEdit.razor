@@ -80,13 +80,11 @@
                                         <div class="col-md-6 mb-3">
                                             <label for="birthDate" class="form-label">Birth Date</label>
                                             <InputDate id="birthDate" class="form-control" @bind-Value="model.BirthDate"/>
-                                            <small class="form-text text-light">Optional</small>
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <label for="deathDate" class="form-label">Death Date</label>
                                             <InputDate id="deathDate" class="form-control" @bind-Value="model.DeathDate"/>
-                                            <small class="form-text text-light">Optional</small>
                                         </div>
                                     </div>
 
@@ -94,7 +92,7 @@
                                         <label for="nationality" class="form-label">Nationality</label>
                                         <InputText id="nationality" class="form-control" @bind-Value="model.Nationality"/>
                                         <ValidationMessage For="@(() => model.Nationality)" class="text-danger"/>
-                                        <small class="form-text text-light">E.g., Italian, French, American</small>
+                                        <small class="form-text text-light">E.g., Italian, French, Russian</small>
                                     </div>
                                 </div>
                             </div>
@@ -316,7 +314,6 @@
 
         try
         {
-            // Log the starting point with all model values
             Logger.LogInformation("Starting artist update for ID: {ArtistId}", Id);
             Logger.LogInformation("Model values: FirstName={FirstName}, LastName={LastName}, " +
                                   "BirthDate={BirthDate}, DeathDate={DeathDate}, Nationality={Nationality}, " +
@@ -324,7 +321,6 @@
                 model.FirstName, model.LastName, model.BirthDate, model.DeathDate,
                 model.Nationality, model.KeepExistingImage);
 
-            // Log biography details
             Logger.LogInformation("Biography: ID={BiographyId}, ContentLength={ContentLength}, " +
                                   "ShortDescriptionLength={ShortDescriptionLength}, ReferencesLength={ReferencesLength}",
                 artist.Biography?.Id ?? Guid.Empty,
@@ -351,7 +347,6 @@
                     model.KeepExistingImage);
             }
 
-            // Create a BiographyDto to pass to the update method
             var biographyDto = new BiographyDto
             {
                 Id = artist.Biography?.Id ?? Guid.Empty,
@@ -385,7 +380,6 @@
             Logger.LogError(ex, "API error updating artist. Status: {StatusCode}, Response: {Response}, Message: {Message}",
                 ex.StatusCode, ex.Response, ex.Message);
 
-            // Log the request details if available
             if (ex.GetType().GetProperty("Request") != null)
             {
                 var request = ex.GetType().GetProperty("Request").GetValue(ex);
