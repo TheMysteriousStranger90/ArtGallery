@@ -20,7 +20,8 @@ public class AddArtistToFavoriteCommandHandler : IRequestHandler<AddArtistToFavo
 
         try
         {
-            var artist = await _unitOfWork.Repository<Artist>().GetByIdAsync(request.ArtistId);
+            //var artist = await _unitOfWork.Repository<Artist>().GetByIdAsync(request.ArtistId);
+            var artist = await _unitOfWork.ArtistRepository.GetArtistWithPaintingsAsync(request.ArtistId);
             if (artist == null)
             {
                 response.Success = false;

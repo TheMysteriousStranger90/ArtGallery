@@ -1,0 +1,420 @@
+﻿@page "/artists/{Id:guid}"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IArtistService ArtistService
+@inject NavigationManager NavigationManager
+@inject ILogger<ArtistDetail> Logger
+
+<PageTitle>@(artist?.FullName ?? "Artist Details") - Art Gallery</PageTitle>
+
+<div class="painting-detail-container">
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border loading-spinner" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="loading-text">Loading artist profile...</p>
+        </div>
+    }
+    else if (artist != null)
+    {
+        <nav aria-label="breadcrumb" class="my-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="/">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="/artists">Artists</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">@artist.FullName</li>
+            </ol>
+        </nav>
+
+        <div class="painting-detail-content">
+            <div class="row g-4">
+                <!-- Left side - Image and basic info -->
+                <div class="col-lg-4">
+                    <div class="painting-image-container">
+                        @if (!string.IsNullOrEmpty(artist.PictureUrl))
+                        {
+                            <img src="@artist.PictureUrl" alt="@artist.FullName" class="painting-main-image"/>
+                        }
+                        else
+                        {
+                            <div class="card-img-placeholder d-flex flex-column align-items-center justify-content-center">
+                                <i class="bi bi-person-circle text-muted"></i>
+                                <small>No Image Available</small>
+                            </div>
+                        }
+
+                        @if (artist.Images != null && artist.Images.Count > 1)
+                        {
+                            <div class="painting-image-thumbnails mt-3">
+                                @foreach (var image in artist.Images)
+                                {
+                                    <div class="thumbnail @(image.IsMain ? "active" : "")" @onclick="() => SwitchMainImage(image.PictureUrl)">
+                                        <img src="@image.PictureUrl" alt="@artist.FullName"/>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="artist-quick-info mt-4">
+                        <div class="card artist-info-card">
+                            <div class="card-body">
+                                <h5 class="card-title border-bottom pb-2">Artist Information</h5>
+
+                                @if (!string.IsNullOrEmpty(artist.Nationality))
+                                {
+                                    <div class="info-row mb-2">
+                                        <i class="bi bi-globe me-2"></i>
+                                        <span class="fw-bold">Nationality:</span> @artist.Nationality
+                                    </div>
+                                }
+
+                                @if (artist.BirthDate.HasValue)
+                                {
+                                    <div class="info-row mb-2">
+                                        <i class="bi bi-calendar-event me-2"></i>
+                                        <span class="fw-bold">Born:</span>
+                                        @artist.BirthDate.Value.ToString("MMMM d, yyyy")
+                                    </div>
+                                }
+
+                                @if (artist.DeathDate.HasValue)
+                                {
+                                    <div class="info-row mb-2">
+                                        <i class="bi bi-calendar me-2"></i>
+                                        <span class="fw-bold">Died:</span>
+                                        @artist.DeathDate.Value.ToString("MMMM d, yyyy")
+                                    </div>
+                                }
+
+                                <div class="actions mt-3">
+                                    @if (isAuthenticated)
+                                    {
+                                        <button class="btn @(isFavoriteProcessing ? "btn-outline-secondary disabled" : "btn-outline-primary") favorite-btn w-100"
+                                                @onclick="AddToFavorites" disabled="@(isFavoriteProcessing || isAddedToFavorites)">
+                                            @if (isFavoriteProcessing)
+                                            {
+                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-heart@(isAddedToFavorites ? "-fill" : "") heart-icon @(isAddedToFavorites ? "heart-filled" : "")" aria-hidden="true"></i>
+                                            }
+                                            @(isAddedToFavorites ? "Added to Favorites" : "Add to Favorites")
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right side - Biography and paintings -->
+                <div class="col-lg-8">
+                    <div class="artist-info">
+                        <h1 class="painting-title">@artist.FullName</h1>
+
+                        <!-- Biography Section -->
+                        @if (artist.Biography != null && !string.IsNullOrEmpty(artist.Biography.Content))
+                        {
+                            <div class="biography-section mt-4">
+                                <h3 class="section-title">Biography</h3>
+                                <div class="description-content">
+                                    @((MarkupString)FormatDescription(artist.Biography.Content))
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Notable Works Section -->
+                        @if (artist.Paintings != null && artist.Paintings.Any())
+                        {
+                            <div class="notable-works-section mt-5">
+                                <h3 class="section-title">Notable Works</h3>
+                                <p class="text-muted mb-4">
+                                    @if (!string.IsNullOrEmpty(artist.Biography?.ShortDescription))
+                                    {
+                                        <span>@artist.Biography.ShortDescription</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Explore the masterpieces by @artist.FirstName @artist.LastName</span>
+                                    }
+                                </p>
+
+                                <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
+                                    @foreach (var painting in artist.Paintings)
+                                    {
+                                        <div class="col">
+                                            <div class="painting-card">
+                                                <div class="card-img-container">
+                                                    @if (!string.IsNullOrEmpty(painting.ImageUrl))
+                                                    {
+                                                        <a href="/paintings/@painting.Id">
+                                                            <img src="@painting.ImageUrl" class="card-img-top" alt="@painting.Title">
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="card-img-placeholder d-flex flex-column align-items-center justify-content-center">
+                                                            <i class="bi bi-image text-muted"></i>
+                                                            <small>No Image Available</small>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                <div class="card-body">
+                                                    <h5 class="card-title">
+                                                        <a href="/paintings/@painting.Id">@painting.Title</a>
+                                                    </h5>
+                                                    <p class="card-text small">
+                                                        @if (painting.CreationYear > 0)
+                                                        {
+                                                            <span class="text-muted me-2">@painting.CreationYear</span>
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                @if (artist.Paintings.Count > 4)
+                                {
+                                    <div class="text-center mt-4">
+                                        <a href="/gallery?artist=@artist.Id" class="btn btn-outline-primary">
+                                            View All Works <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- References Section -->
+                        @if (artist.Biography != null && !string.IsNullOrEmpty(artist.Biography.References))
+                        {
+                            <div class="references-section mt-5 pt-3 border-top">
+                                <h3 class="section-title">References & Further Reading</h3>
+                                <div class="description-content">
+                                    @((MarkupString)FormatDescription(artist.Biography.References))
+                                </div>
+                            </div>
+                        }
+
+                        <div class="actions mt-5">
+                            <a href="/artists" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Artists
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="error-container">
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                @errorMessage
+            </div>
+            <a href="/artists" class="btn btn-outline-primary mt-3">
+                <i class="bi bi-arrow-left me-1"></i> Return to Artists
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="error-container">
+            <div class="alert alert-warning">
+                <i class="bi bi-question-circle-fill me-2"></i>
+                Artist not found or has been removed.
+            </div>
+            <a href="/artists" class="btn btn-outline-primary mt-3">
+                <i class="bi bi-arrow-left me-1"></i> Return to Artists
+            </a>
+        </div>
+    }
+</div>
+
+<style>
+    .artist-info-card {
+        background-color: var(--bg-dark-card) !important;
+        color: var(--text-light) !important;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .artist-info-card .card-title {
+        color: var(--brand-secondary) !important;
+        font-weight: 500 !important;
+    }
+    
+    .artist-info-card .card-body {
+        background-color: var(--bg-dark-card) !important;
+        color: var(--text-light) !important;
+    }
+    
+    .section-title {
+        color: var(--brand-secondary) !important;
+        font-size: 1.75rem !important;
+        margin-bottom: 1.5rem !important;
+        font-weight: 300 !important;
+    }
+    
+    .info-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        color: var(--text-light) !important;
+    }
+    
+    .info-row i {
+        color: var(--brand-secondary) !important;
+        width: 20px !important;
+        text-align: center !important;
+    }
+    
+    .info-row .fw-bold {
+        margin-right: 0.5rem !important;
+        color: var(--brand-secondary) !important;
+    }
+    
+    .text-muted {
+        color: #B0BEC5 !important;
+    }
+    
+    .painting-card .card-body {
+        background-color: var(--bg-dark-card) !important;
+        color: var(--text-light) !important;
+    }
+    
+    .painting-card .card-text {
+        color: var(--text-light) !important;
+    }
+</style>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    [Inject] public AuthenticationStateProvider AuthStateProvider { get; set; }
+
+    private ArtistDetailDto artist;
+    private bool isLoading = true;
+    private string errorMessage;
+    private string currentMainImage;
+
+    private bool isAuthenticated = false;
+    private bool isAddedToFavorites = false;
+    private bool isFavoriteProcessing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadArtist();
+    }
+
+    private async Task LoadArtist()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            artist = await ArtistService.GetArtistAsync(Id);
+
+            if (artist != null)
+            {
+                currentMainImage = artist.PictureUrl;
+
+                if (isAuthenticated)
+                {
+                    await CheckIfInFavorites();
+                }
+            }
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API Error loading artist details. Status: {StatusCode}, Response: {Response}",
+                ex.StatusCode, ex.Response);
+            errorMessage = $"Error loading artist details. {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading artist details for ID: {ArtistId}", Id);
+            errorMessage = "An unexpected error occurred while loading the artist details.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void SwitchMainImage(string imageUrl)
+    {
+        currentMainImage = imageUrl;
+    }
+
+    private string FormatDescription(string description)
+    {
+        if (string.IsNullOrEmpty(description))
+            return string.Empty;
+
+        return string.Join("", description.Split("\n", StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => $"<p>{p}</p>"));
+    }
+
+    private async Task CheckIfInFavorites()
+    {
+        if (artist == null || !isAuthenticated)
+            return;
+
+        try
+        {
+            var favorites = await ArtistService.GetFavoriteArtistsAsync();
+            if (favorites.Success && favorites.FavoriteArtists.Any(a => a.Id == artist.Id))
+            {
+                isAddedToFavorites = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error checking if artist is in favorites: {ArtistId}", artist.Id);
+        }
+    }
+
+    private async Task AddToFavorites()
+    {
+        if (artist == null || isFavoriteProcessing)
+            return;
+
+        try
+        {
+            isFavoriteProcessing = true;
+            StateHasChanged();
+
+            var result = await ArtistService.AddArtistToFavoritesAsync(artist.Id);
+
+            if (result)
+            {
+                isAddedToFavorites = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error adding artist to favorites: {ArtistId}", artist.Id);
+        }
+        finally
+        {
+            isFavoriteProcessing = false;
+            StateHasChanged();
+        }
+    }
+}

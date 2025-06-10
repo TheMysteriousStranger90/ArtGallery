@@ -13,6 +13,9 @@
         <PackageReference Include="DotNetEnv" />
         <PackageReference Include="Elastic.Clients.Elasticsearch" />
         <PackageReference Include="Elastic.Serilog.Sinks" />
+        <PackageReference Include="Google.Apis.Auth" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
         <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Core" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">

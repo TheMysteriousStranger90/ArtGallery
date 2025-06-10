@@ -1,0 +1,516 @@
+﻿@page "/artists"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using ArtGallery.ClientApp.Shared
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IArtistService ArtistService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILogger<Artists> Logger
+@inject IClient ApiClient
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Artist Gallery</PageTitle>
+
+<div class="gallery-container">
+    <h1 class="gallery-page-title">Artist Gallery</h1>
+
+    <div class="gallery-controls mb-4">
+        <div class="row align-items-end">
+            <div class="col-md-9">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search by name..."
+                           @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp"/>
+                    <button class="btn btn-outline-primary" type="button" @onclick="ApplySearch">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    @if (!string.IsNullOrEmpty(ActiveSearch))
+                    {
+                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch">
+                            <i class="bi bi-x-lg"></i> Clear
+                        </button>
+                    }
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="sortOrder" class="form-label-sm">Sort by:</label>
+                <select id="sortOrder" class="form-select" @bind="CurrentSort">
+                    <option value="lastName">Name (A-Z)</option>
+                    <option value="-lastName">Name (Z-A)</option>
+                    <option value="birthDate">Birth Date</option>
+                </select>
+            </div>
+        </div>
+
+        @if (isAdministrator)
+        {
+            <div class="row mt-3">
+                <div class="col-12">
+                    <a href="/admin/artists/create" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-circle me-2"></i> Add New Artist
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Main Content with Filters on Left and Artists on Right -->
+    <div class="row">
+        <!-- Filter Panel (Left Sidebar) -->
+        <div class="col-md-3 mb-4">
+            <div class="filter-panel">
+                <h5 class="filter-heading">Filter By</h5>
+
+                <!-- Nationality Filter -->
+                <div class="filter-group">
+                    <label for="nationalityFilter" class="form-label-sm">Nationality</label>
+                    <select id="nationalityFilter" class="form-select form-select-sm"
+                            @bind="Nationality" @bind:after="ApplyFilters">
+                        <option value="">All Nationalities</option>
+                        @if (nationalities != null)
+                        {
+                            @foreach (var nationality in nationalities)
+                            {
+                                <option value="@nationality">@nationality</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                @if (HasActiveFilters)
+                {
+                    <div class="filter-actions mt-3">
+                        <button class="btn btn-sm btn-outline-secondary w-100" @onclick="ClearAllFilters">
+                            <i class="bi bi-x-circle me-1"></i> Clear All Filters
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Artists Content (Right Side) -->
+        <div class="col-md-9">
+            @if (isLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border loading-spinner" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="loading-text">Loading artists...</p>
+                </div>
+            }
+            else if (pagedArtists?.Data != null && pagedArtists.Data.Any())
+            {
+                <div class="painting-grid">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
+                        @foreach (var artist in pagedArtists.Data)
+                        {
+                            <div class="col">
+                                <div class="painting-card">
+                                    <ArtistCard Artist="artist" OnArtistDeleted="HandleArtistDeleted"/>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="gallery-stats-container">
+                    <div class="gallery-stats">
+                        Showing @pagedArtists.Data.Count of @pagedArtists.Count artists. Page @CurrentPage of @TotalPages.
+                    </div>
+                </div>
+
+                <div class="pagination-container">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                                <button class="page-link" @onclick="() => ChangePage(CurrentPage - 1)" disabled="@(CurrentPage == 1)">
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </button>
+                            </li>
+
+                            @if (TotalPages <= 7)
+                            {
+                                for (int i = 1; i <= TotalPages; i++)
+                                {
+                                    var pageNum = i;
+                                    <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="page-item @(1 == CurrentPage ? "active" : "")">
+                                    <button class="page-link" @onclick="() => ChangePage(1)">1</button>
+                                </li>
+
+                                @if (CurrentPage > 3)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+
+                                int startPage = Math.Max(2, CurrentPage - 1);
+                                int endPage = Math.Min(TotalPages - 1, CurrentPage + 1);
+
+                                if (CurrentPage <= 2 && startPage > 1) startPage = Math.Max(1, CurrentPage - 1);
+                                if (CurrentPage >= TotalPages - 1 && endPage < TotalPages) endPage = Math.Min(TotalPages, CurrentPage + 1);
+
+                                for (int i = startPage; i <= endPage; i++)
+                                {
+                                    if (i == 1 || i == TotalPages) continue;
+                                    var pageNum = i;
+                                    <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="() => ChangePage(pageNum)">@pageNum</button>
+                                    </li>
+                                }
+
+                                @if (CurrentPage < TotalPages - 2)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+
+                                if (TotalPages > 1)
+                                {
+                                    <li class="page-item @(TotalPages == CurrentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="() => ChangePage(TotalPages)">@TotalPages</button>
+                                    </li>
+                                }
+                            }
+
+                            <li class="page-item @(CurrentPage == TotalPages || TotalPages == 0 ? "disabled" : "")">
+                                <button class="page-link" @onclick="() => ChangePage(CurrentPage + 1)" disabled="@(CurrentPage == TotalPages || TotalPages == 0)">
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="gallery-message">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        @errorMessage
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="gallery-message">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        No artists found. Try adjusting your search or filter parameters.
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null? pagedArtists;
+    private bool isLoading = true;
+    private string? errorMessage;
+    private bool _hasCompletedInitialParameterSet = false;
+    private bool isAdministrator = false;
+    private ICollection<string>? nationalities;
+
+    private bool HasActiveFilters =>
+        !string.IsNullOrEmpty(Nationality) ||
+        FromYear.HasValue ||
+        ToYear.HasValue;
+
+    [Parameter] [SupplyParameterFromQuery] public int CurrentPage { get; set; } = 1;
+
+    [Parameter] [SupplyParameterFromQuery] public int PageSize { get; set; } = 6;
+
+    [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
+
+    private string _currentSort = "lastName";
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string CurrentSort
+    {
+        get => _currentSort;
+        set
+        {
+            if (_currentSort != value)
+            {
+                _currentSort = value;
+                if (_hasCompletedInitialParameterSet)
+                {
+                    CurrentPage = 1;
+                    NavigateToPage();
+                }
+            }
+        }
+    }
+
+    private string _nationality = string.Empty;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Nationality
+    {
+        get => _nationality;
+        set
+        {
+            if (_nationality != value)
+            {
+                _nationality = value;
+                if (_hasCompletedInitialParameterSet) ApplyFilters();
+            }
+        }
+    }
+
+    [Parameter] [SupplyParameterFromQuery] public int? FromYear { get; set; }
+
+    [Parameter] [SupplyParameterFromQuery] public int? ToYear { get; set; }
+
+    public string? CurrentSearch { get; set; }
+
+    public int TotalPages => (pagedArtists != null && pagedArtists.Count > 0 && PageSize > 0) ? (int)Math.Ceiling((double)pagedArtists.Count / PageSize) : 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAdministrator = authState.User.IsInRole("Administrator");
+
+        _currentSort = CurrentSort;
+        _nationality = Nationality;
+
+        if (!string.IsNullOrEmpty(ActiveSearch))
+        {
+            CurrentSearch = ActiveSearch;
+        }
+
+        await LoadNationalities();
+    }
+
+    private async Task LoadNationalities()
+    {
+        try
+        {
+            nationalities = await ArtistService.GetNationalitiesAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading nationalities for filter");
+            nationalities = new List<string>();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (CurrentPage < 1) CurrentPage = 1;
+        if (PageSize < 1) PageSize = 6;
+
+        if (string.IsNullOrEmpty(CurrentSearch) && !string.IsNullOrEmpty(ActiveSearch))
+        {
+            CurrentSearch = ActiveSearch;
+        }
+        else if (ActiveSearch == null && CurrentSearch != null)
+        {
+            CurrentSearch = string.Empty;
+        }
+
+        await LoadArtists();
+        _hasCompletedInitialParameterSet = true;
+    }
+
+    private async Task LoadArtists()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            string apiSortParam;
+
+            switch (CurrentSort)
+            {
+                case "lastName":
+                    apiSortParam = "lastName";
+                    break;
+                case "-lastName":
+                    apiSortParam = "lastname_desc";
+                    break;
+                case "birthDate":
+                    apiSortParam = "birthdate";
+                    break;
+                default:
+                    apiSortParam = "lastName";
+                    break;
+            }
+
+            pagedArtists = await ArtistService.GetArtistsAsync(
+                pageIndex: CurrentPage,
+                pageSize: PageSize,
+                search: ActiveSearch ?? "",
+                nationality: Nationality ?? "",
+                sort: apiSortParam
+            );
+
+            if (CurrentPage > TotalPages && TotalPages > 0)
+            {
+                CurrentPage = TotalPages;
+                NavigateToPage(true);
+                return;
+            }
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API Error loading artists. Status: {StatusCode}, Response: {Response}", ex.StatusCode, ex.Response);
+            errorMessage = $"API Error: {ex.Message} (Status: {ex.StatusCode})";
+            pagedArtists = new Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null { Data = new List<ArtistDto>(), Count = 0, PageIndex = CurrentPage, PageSize = PageSize };
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading artists");
+            errorMessage = "An error occurred while loading artists.";
+            pagedArtists = new Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null { Data = new List<ArtistDto>(), Count = 0, PageIndex = CurrentPage, PageSize = PageSize };
+        }
+        finally
+        {
+            isLoading = false;
+        }
+
+        StateHasChanged();
+    }
+
+    private void ApplySearch()
+    {
+        ActiveSearch = CurrentSearch;
+        CurrentPage = 1;
+        NavigateToPage();
+    }
+
+    private void ApplyYearFilter()
+    {
+        ApplyFilters();
+    }
+
+    private void ClearAllFilters()
+    {
+        Nationality = string.Empty;
+        FromYear = null;
+        ToYear = null;
+
+        CurrentPage = 1;
+
+        var queryParameters = new Dictionary<string, object?>
+        {
+            ["currentPage"] = "1",
+            ["pageSize"] = PageSize.ToString(),
+            ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
+            ["currentSort"] = CurrentSort
+        };
+
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        var baseUri = NavigationManager.Uri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
+
+        NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+    }
+
+    private void ClearSearch()
+    {
+        CurrentSearch = string.Empty;
+        ActiveSearch = null;
+
+        CurrentPage = 1;
+
+        var queryParameters = new Dictionary<string, object?>
+        {
+            ["currentPage"] = "1",
+            ["pageSize"] = PageSize.ToString(),
+            ["currentSort"] = CurrentSort,
+            ["nationality"] = string.IsNullOrEmpty(Nationality) ? null : Nationality,
+            ["fromYear"] = FromYear?.ToString(),
+            ["toYear"] = ToYear?.ToString()
+        };
+
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        var baseUri = NavigationManager.Uri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
+
+        NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+    }
+
+    private void ApplyFilters()
+    {
+        CurrentPage = 1;
+        NavigateToPage();
+    }
+
+    private void ChangePage(int pageNumber)
+    {
+        if (pageNumber < 1 || (TotalPages > 0 && pageNumber > TotalPages) || pageNumber == CurrentPage)
+        {
+            if (TotalPages == 0 && pageNumber == 1 && CurrentPage == 1)
+            {
+            }
+            else return;
+        }
+
+        CurrentPage = pageNumber;
+        NavigateToPage();
+    }
+
+    private void NavigateToPage(bool isPageAdjustment = false)
+    {
+        var queryParameters = new Dictionary<string, object?>
+        {
+            ["currentPage"] = CurrentPage.ToString(),
+            ["pageSize"] = PageSize.ToString(),
+            ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
+            ["currentSort"] = CurrentSort,
+            ["nationality"] = string.IsNullOrEmpty(Nationality) ? null : Nationality,
+            ["fromYear"] = FromYear?.ToString(),
+            ["toYear"] = ToYear?.ToString()
+        };
+
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        var currentUri = NavigationManager.Uri;
+        var newUri = NavigationManager.GetUriWithQueryParameters(nonNullQueryParameters!);
+
+        if (currentUri != newUri || isPageAdjustment)
+        {
+            NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+        }
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            ApplySearch();
+        }
+    }
+
+    private async Task HandleArtistDeleted(Guid artistId)
+    {
+        Logger.LogInformation("Artist deleted from gallery: {ArtistId}", artistId);
+
+        await JSRuntime.InvokeVoidAsync("alert", "Artist has been successfully deleted");
+
+        await LoadArtists();
+    }
+
+}

@@ -11,6 +11,8 @@
         <PackageReference Include="CloudinaryDotNet"/>
         <PackageReference Include="FluentValidation"/>
         <PackageReference Include="MediatR"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Features"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore"/>

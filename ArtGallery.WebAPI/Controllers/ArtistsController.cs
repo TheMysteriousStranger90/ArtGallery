@@ -150,6 +150,61 @@ public class ArtistsController : ControllerBase
             response.Artist
         );
     }
+    
+    /// <summary>
+    /// Update an existing artist
+    /// </summary>
+    /// <param name="artistId">Artist ID</param>
+    /// <param name="command">Updated artist information</param>
+    /// <returns>Updated artist information</returns>
+    [HttpPut("{artistId}")]
+    [Authorize(Policy = "RequireAdminRole")]
+    [ProducesResponseType(typeof(ArtistDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<ArtistDto>> UpdateArtist(Guid artistId, [FromForm] UpdateArtistCommand command)
+    {
+        if (artistId != command.Id)
+        {
+            return BadRequest("The ID in the URL must match the ID in the request body");
+        }
+
+        command.Id = artistId;
+
+        _logger.LogInformation("Updating artist with ID: {ArtistId}", artistId);
+
+        var response = await _mediator.Send(command);
+
+        if (!response.Success)
+        {
+            if (response.ValidationErrors?.Count > 0)
+            {
+                var problemDetails = new ValidationProblemDetails
+                {
+                    Title = "Validation errors occurred",
+                    Status = (int)HttpStatusCode.BadRequest
+                };
+            
+                foreach (var error in response.ValidationErrors)
+                {
+                    problemDetails.Errors.Add("Validation", new[] { error });
+                }
+
+                return BadRequest(problemDetails);
+            }
+
+            if (response.Message?.Contains(nameof(Artist)) == true)
+            {
+                throw new NotFoundException($"Artist with ID {artistId} not found");
+            }
+
+            throw new BadRequestException(response.Message ?? "Error updating artist");
+        }
+
+        return Ok(response.Artist);
+    }
 
     /// <summary>
     /// Delete an artist
@@ -221,7 +276,7 @@ public class ArtistsController : ControllerBase
     /// </summary>
     [HttpGet("artists")]
     [Authorize]
-    [ProducesResponseType(typeof(UserFavoritePaintingsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserFavoriteArtistsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<UserFavoriteArtistsResponse>> GetFavoriteArtists()
     {
