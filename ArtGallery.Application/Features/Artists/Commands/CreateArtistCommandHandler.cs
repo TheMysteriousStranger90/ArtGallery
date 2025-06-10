@@ -18,9 +18,9 @@ namespace ArtGallery.Application.Features.Artists.Commands
             IMapper mapper,
             IImageService imageService)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            _imageService = imageService;
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         }
 
         public async Task<CreateArtistCommandResponse> Handle(CreateArtistCommand request, CancellationToken cancellationToken)
@@ -39,59 +39,67 @@ namespace ArtGallery.Application.Features.Artists.Commands
 
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
+                Artist createdArtist = null;
                 
-                var artist = new Artist
+                await _unitOfWork.ExecuteWithTransactionAsync(async () =>
                 {
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
-                    BirthDate = request.BirthDate,
-                    DeathDate = request.DeathDate,
-                    Nationality = request.Nationality
-                };
-                
-                await _unitOfWork.Repository<Artist>().AddAsync(artist);
-
-                if (request.Biography != null)
-                {
-                    var biography = new Biography
+                    var artist = new Artist
                     {
-                        ArtistId = artist.Id,
-                        Content = request.Biography.Content,
-                        ShortDescription = request.Biography.ShortDescription,
-                        References = request.Biography.References
+                        FirstName = request.FirstName,
+                        LastName = request.LastName,
+                        BirthDate = request.BirthDate,
+                        DeathDate = request.DeathDate,
+                        Nationality = request.Nationality
                     };
                     
-                    await _unitOfWork.Repository<Biography>().AddAsync(biography);
-                }
-
-                if (request.Image != null)
-                {
-                    var imageUploadResult = await _imageService.AddImageAsync(request.Image);
+                    await _unitOfWork.Repository<Artist>().AddAsync(artist);
                     
-                    if (imageUploadResult.Error != null)
+                    if (request.Biography != null)
                     {
-                        throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
+                        var biography = new Biography
+                        {
+                            ArtistId = artist.Id,
+                            Content = request.Biography.Content,
+                            ShortDescription = request.Biography.ShortDescription,
+                            References = request.Biography.References
+                        };
+                        
+                        await _unitOfWork.Repository<Biography>().AddAsync(biography);
+                    }
+
+                    if (request.Image != null)
+                    {
+                        var imageUploadResult = await _imageService.AddImageAsync(request.Image);
+                        
+                        if (imageUploadResult.Error != null)
+                        {
+                            throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
+                        }
+                        
+                        var artistImage = new ArtistImage
+                        {
+                            ArtistId = artist.Id,
+                            PictureUrl = imageUploadResult.SecureUrl.ToString(),
+                            PublicId = imageUploadResult.PublicId,
+                            IsMain = true
+                        };
+                        
+                        await _unitOfWork.Repository<ArtistImage>().AddAsync(artistImage);
                     }
                     
-                    var artistImage = new ArtistImage
-                    {
-                        ArtistId = artist.Id,
-                        PictureUrl = imageUploadResult.SecureUrl.ToString(),
-                        PublicId = imageUploadResult.PublicId,
-                        IsMain = true
-                    };
+                    await _unitOfWork.Complete();
                     
-                    await _unitOfWork.Repository<ArtistImage>().AddAsync(artistImage);
+                    createdArtist = artist;
+                });
+
+                if (createdArtist != null)
+                {
+                    var artistWithDetails = await _unitOfWork.ArtistRepository.GetArtistWithPaintingsAsync(createdArtist.Id);
+                    response.Artist = _mapper.Map<CreateArtistDto>(artistWithDetails);
                 }
-                
-                await _unitOfWork.CommitTransactionAsync();
-                
-                response.Artist = _mapper.Map<CreateArtistDto>(artist);
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackTransactionAsync();
                 response.Success = false;
                 response.Message = $"An error occurred while creating the artist: {ex.Message}";
             }

@@ -1,0 +1,302 @@
+﻿@page "/admin/artists/create"
+@using System.ComponentModel.DataAnnotations
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@using ArtGallery.ClientApp.ViewModels
+@using Microsoft.AspNetCore.Authorization
+@inject IArtistService ArtistService
+@inject NavigationManager NavigationManager
+@inject ILogger<CreateArtist> Logger
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Administrator")]
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/artists">Artists</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add New Artist</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4" style="color: var(--brand-secondary); font-weight: 300; font-size: 2.5rem; 
+                border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        Add New Artist
+    </h1>
+
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border loading-spinner" role="status">
+                <span class="visually-hidden">Loading form...</span>
+            </div>
+            <p class="loading-text">Loading form data...</p>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="@artist" OnValidSubmit="HandleValidSubmit" class="artist-create-form">
+            <DataAnnotationsValidator />
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Basic Information</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <InputText id="firstName" class="form-control" @bind-Value="artist.FirstName" />
+                                    <ValidationMessage For="@(() => artist.FirstName)" class="text-danger" />
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <InputText id="lastName" class="form-control" @bind-Value="artist.LastName" />
+                                    <ValidationMessage For="@(() => artist.LastName)" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="birthDate" class="form-label">Birth Date</label>
+                                    <InputDate id="birthDate" class="form-control" @bind-Value="artist.BirthDate" />
+                                    <small class="form-text text-light">Optional</small>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="deathDate" class="form-label">Death Date</label>
+                                    <InputDate id="deathDate" class="form-control" @bind-Value="artist.DeathDate" />
+                                    <small class="form-text text-light">Optional</small>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="nationality" class="form-label">Nationality</label>
+                                <InputText id="nationality" class="form-control" @bind-Value="artist.Nationality" />
+                                <ValidationMessage For="@(() => artist.Nationality)" class="text-danger" />
+                                <small class="form-text text-light">E.g., Italian, French, Russian</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Biography</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="biographyShortDescription" class="form-label">Short Description</label>
+                                <InputTextArea id="biographyShortDescription" class="form-control" rows="2" @bind-Value="artist.BiographyShortDescription" />
+                                <ValidationMessage For="@(() => artist.BiographyShortDescription)" class="text-danger" />
+                                <small class="form-text text-light">A brief summary of the artist's life and importance (500 characters max)</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="biographyContent" class="form-label">Full Biography</label>
+                                <InputTextArea id="biographyContent" class="form-control" rows="10" @bind-Value="artist.BiographyContent" />
+                                <small class="form-text text-light">The detailed biography. You can use line breaks for paragraphs.</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="biographyReferences" class="form-label">References & Further Reading</label>
+                                <InputTextArea id="biographyReferences" class="form-control" rows="4" @bind-Value="artist.BiographyReferences" />
+                                <small class="form-text text-light">Optional. Books, articles or websites about the artist.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Artist Image</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="imageFile" class="form-label">Upload image</label>
+                                <InputFile id="imageFile" OnChange="HandleFileSelected" class="form-control" accept="image/*" />
+                                <small class="form-text text-light">Recommended size: 800x1200px portrait. Max file size: 5MB.</small>
+
+                                @if (selectedFile != null)
+                                {
+                                    <div class="mt-2">
+                                        <span class="badge bg-info">Selected: @selectedFile.Name (@FormatFileSize(selectedFile.Size))</span>
+                                    </div>
+                                }
+                            </div>
+
+                            @if (imagePreviewUrl != null)
+                            {
+                                <div class="text-center mt-3">
+                                    <h6>Preview:</h6>
+                                    <img src="@imagePreviewUrl" class="img-fluid border" alt="Preview" 
+                                         style="max-height: 300px; width: auto; border-radius: 0.5rem;" />
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="ClearImage">
+                                            <i class="bi bi-x-circle me-1"></i> Remove Image
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1" disabled="@isSaving">
+                            @if (isSaving)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>Creating...</span>
+                            }
+                            else
+                            {
+                                <span>Create Artist</span>
+                            }
+                        </button>
+                        <a href="/artists" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-4">
+                <h4 class="alert-heading">Error</h4>
+                <p>@errorMessage</p>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private CreateArtistModel artist = new();
+    private bool isLoading = false;
+    private bool isSaving = false;
+    private string errorMessage;
+    private IBrowserFile selectedFile;
+    private string imagePreviewUrl;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        try
+        {
+            await Task.Delay(100);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error initializing artist creation form");
+            errorMessage = "Failed to initialize the form. Please try again later.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+
+        try
+        {
+            var imageFile = e.File;
+            if (imageFile.Size > 5 * 1024 * 1024)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Image is too large. Maximum file size is 5MB.");
+                selectedFile = null;
+                return;
+            }
+
+            var buffer = new byte[imageFile.Size];
+            await imageFile.OpenReadStream(5 * 1024 * 1024).ReadAsync(buffer);
+            var imageBase64 = Convert.ToBase64String(buffer);
+            var fileFormat = imageFile.ContentType;
+
+            imagePreviewUrl = $"data:{fileFormat};base64,{imageBase64}";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error generating image preview");
+            imagePreviewUrl = null;
+        }
+    }
+
+    private void ClearImage()
+    {
+        selectedFile = null;
+        imagePreviewUrl = null;
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        int order = 0;
+        double size = bytes;
+
+        while (size >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            size /= 1024;
+        }
+
+        return $"{size:0.##} {sizes[order]}";
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (selectedFile == null)
+        {
+            errorMessage = "Please select an image for the artist.";
+            return;
+        }
+
+        isSaving = true;
+        errorMessage = null;
+
+        try
+        {
+            var ms = new MemoryStream();
+            await selectedFile.OpenReadStream(5 * 1024 * 1024).CopyToAsync(ms);
+            ms.Position = 0;
+
+            var imageFile = new FileParameter(ms, selectedFile.Name, selectedFile.ContentType);
+
+            var result = await ArtistService.CreateArtistAsync(
+                artist.FirstName,
+                artist.LastName,
+                artist.BirthDate,
+                artist.DeathDate,
+                artist.Nationality,
+                imageFile,
+                artist.BiographyContent,
+                artist.BiographyShortDescription,
+                artist.BiographyReferences
+            );
+
+            await JSRuntime.InvokeVoidAsync("alert", "Artist successfully created!");
+            NavigationManager.NavigateTo($"/artists/{result.Id}");
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API error creating artist. Status: {StatusCode}, Response: {Response}",
+                ex.StatusCode, ex.Response);
+            errorMessage = $"Error creating artist: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Unexpected error creating artist");
+            errorMessage = "An unexpected error occurred while creating the artist. Please try again later.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}
