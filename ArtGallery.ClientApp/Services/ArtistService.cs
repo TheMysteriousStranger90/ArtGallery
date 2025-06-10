@@ -169,7 +169,7 @@ namespace ArtGallery.ClientApp.Services
             }
         }
 
-        public async Task<UserFavoritePaintingsResponse> GetFavoriteArtistsAsync(string apiVersion = Const.DefaultApiVersion)
+        public async Task<UserFavoriteArtistsResponse> GetFavoriteArtistsAsync(string apiVersion = Const.DefaultApiVersion)
         {
             try
             {
@@ -182,21 +182,21 @@ namespace ArtGallery.ClientApp.Services
                 _logger.LogError(ex,
                     "API error fetching favorite artists. Status: {StatusCode}, Response: {Response}", ex.StatusCode,
                     ex.Response);
-                return new UserFavoritePaintingsResponse
+                return new UserFavoriteArtistsResponse
                 { 
                     Success = false, 
                     Message = "API error occurred.", 
-                    FavoritePaintings = new List<PaintingDto>() 
+                    FavoriteArtists = new List<ArtistDto>()
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Generic error fetching favorite artists.");
-                return new UserFavoritePaintingsResponse
+                return new UserFavoriteArtistsResponse
                 {
                     Success = false, 
                     Message = "An unexpected error occurred.",
-                    FavoritePaintings = new List<PaintingDto>()
+                    FavoriteArtists = new List<ArtistDto>()
                 };
             }
         }

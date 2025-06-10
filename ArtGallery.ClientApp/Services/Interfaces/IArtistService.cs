@@ -22,6 +22,6 @@ namespace ArtGallery.ClientApp.Services.Interfaces
 
         Task<bool> AddArtistToFavoritesAsync(Guid artistId, string apiVersion = Const.DefaultApiVersion);
 
-        Task<UserFavoritePaintingsResponse> GetFavoriteArtistsAsync(string apiVersion = Const.DefaultApiVersion);
+        Task<UserFavoriteArtistsResponse> GetFavoriteArtistsAsync(string apiVersion = Const.DefaultApiVersion);
     }
 }

@@ -130,16 +130,16 @@
         try
         {
             var favorites = await ArtistService.GetFavoriteArtistsAsync();
-            // This is a workaround since the API returns PaintingDto in the favorites
-            // You might need to adjust this depending on your actual API response
-            if (favorites.Success)
+        
+            if (favorites.Success && favorites.FavoriteArtists.Any(p => p.Id == Artist.Id))
             {
-                isAddedToFavorites = true; // Mock response for now
+                isAddedToFavorites = true;
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error checking if artist is in favorites: {ArtistId}", Artist.Id);
+            isAddedToFavorites = false;
         }
     }
 

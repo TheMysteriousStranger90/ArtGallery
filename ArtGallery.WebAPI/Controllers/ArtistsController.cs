@@ -221,7 +221,7 @@ public class ArtistsController : ControllerBase
     /// </summary>
     [HttpGet("artists")]
     [Authorize]
-    [ProducesResponseType(typeof(UserFavoritePaintingsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserFavoriteArtistsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<UserFavoriteArtistsResponse>> GetFavoriteArtists()
     {
