@@ -122,6 +122,58 @@ namespace ArtGallery.ClientApp.Services
                 throw;
             }
         }
+        
+        public async Task<ArtistDto> UpdateArtistAsync(
+            Guid id,
+            string firstName, 
+            string lastName, 
+            DateTimeOffset? birthDate, 
+            DateTimeOffset? deathDate, 
+            string nationality,
+            FileParameter image,
+            bool keepExistingImage,
+            BiographyDto biography,
+            string apiVersion = Const.DefaultApiVersion)
+        {
+            try
+            {
+                _logger.LogInformation("Updating artist: {FirstName} {LastName}, ID: {ArtistId}", 
+                    firstName, lastName, id);
+                
+                var biographyId = biography?.Id;
+                var biographyContent = biography?.Content;
+                var biographyShortDescription = biography?.ShortDescription;
+                var biographyReferences = biography?.References;
+                
+                return await _client.ArtistsPUTAsync(
+                    id,
+                    apiVersion,
+                    id, 
+                    firstName,
+                    lastName,
+                    birthDate,
+                    deathDate,
+                    nationality,
+                    image,
+                    keepExistingImage,
+                    biographyId,
+                    biographyContent,
+                    biographyShortDescription,
+                    biographyReferences
+                );
+            }
+            catch (ApiException ex)
+            {
+                _logger.LogError(ex, "API error updating artist. Status: {StatusCode}, Response: {Response}",
+                    ex.StatusCode, ex.Response);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Generic error updating artist ID {ArtistId}.", id);
+                throw;
+            }
+        }
 
         public async Task<bool> DeleteArtistAsync(Guid id, string apiVersion = Const.DefaultApiVersion)
         {

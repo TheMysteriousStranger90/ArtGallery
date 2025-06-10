@@ -1,7 +1,6 @@
 ﻿using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.DTOs;
-using ArtGallery.Application.Exceptions;
 using ArtGallery.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -40,105 +39,105 @@ namespace ArtGallery.Application.Features.Artists.Commands
 
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
-                
-                var artistToUpdate = await _unitOfWork.Repository<Artist>().GetByIdAsync(request.Id);
-                
-                if (artistToUpdate == null)
+                await _unitOfWork.ExecuteWithTransactionAsync(async () =>
                 {
-                    throw new Exception(nameof(Artist));
-                }
-                
-                var existingMainImage = await _unitOfWork.Repository<ArtistImage>()
-                    .GetByConditionAsync(ai => ai.ArtistId == request.Id && ai.IsMain);
-                
-                if (request.Image != null)
-                {
-                    var imageUploadResult = await _imageService.AddImageAsync(request.Image);
+                    //var artistToUpdate = await _unitOfWork.Repository<Artist>().GetByIdAsync(request.Id);
+                    var artistToUpdate = await _unitOfWork.ArtistRepository.GetArtistWithPaintingsAsync(request.Id);
                     
-                    if (imageUploadResult.Error != null)
+                    if (artistToUpdate == null)
                     {
-                        throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
+                        throw new Exception(nameof(Artist));
                     }
                     
-                    if (existingMainImage != null)
+                    var existingMainImage = await _unitOfWork.Repository<ArtistImage>()
+                        .GetByConditionAsync(ai => ai.ArtistId == request.Id && ai.IsMain);
+                    
+                    if (request.Image != null)
                     {
-
+                        var imageUploadResult = await _imageService.AddImageAsync(request.Image);
+                        
+                        if (imageUploadResult.Error != null)
+                        {
+                            throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
+                        }
+                        
+                        if (existingMainImage != null)
+                        {
+                            if (!string.IsNullOrEmpty(existingMainImage.PublicId))
+                            {
+                                await _imageService.DeleteImageAsync(existingMainImage.PublicId);
+                            }
+                            
+                            existingMainImage.PictureUrl = imageUploadResult.SecureUrl.ToString();
+                            existingMainImage.PublicId = imageUploadResult.PublicId;
+                            await _unitOfWork.Repository<ArtistImage>().UpdateAsync(existingMainImage);
+                        }
+                        else
+                        {
+                            var artistImage = new ArtistImage
+                            {
+                                ArtistId = artistToUpdate.Id,
+                                PictureUrl = imageUploadResult.SecureUrl.ToString(),
+                                PublicId = imageUploadResult.PublicId,
+                                IsMain = true
+                            };
+                            
+                            await _unitOfWork.Repository<ArtistImage>().AddAsync(artistImage);
+                        }
+                    }
+                    else if (!request.KeepExistingImage && existingMainImage != null)
+                    {
                         if (!string.IsNullOrEmpty(existingMainImage.PublicId))
                         {
                             await _imageService.DeleteImageAsync(existingMainImage.PublicId);
                         }
                         
-                        existingMainImage.PictureUrl = imageUploadResult.SecureUrl.ToString();
-                        existingMainImage.PublicId = imageUploadResult.PublicId;
-                        await _unitOfWork.Repository<ArtistImage>().UpdateAsync(existingMainImage);
-                    }
-                    else
-                    {
-                        var artistImage = new ArtistImage
-                        {
-                            ArtistId = artistToUpdate.Id,
-                            PictureUrl = imageUploadResult.SecureUrl.ToString(),
-                            PublicId = imageUploadResult.PublicId,
-                            IsMain = true
-                        };
-                        
-                        await _unitOfWork.Repository<ArtistImage>().AddAsync(artistImage);
-                    }
-                }
-                else if (!request.KeepExistingImage && existingMainImage != null)
-                {
-                    if (!string.IsNullOrEmpty(existingMainImage.PublicId))
-                    {
-                        await _imageService.DeleteImageAsync(existingMainImage.PublicId);
+                        _unitOfWork.ImageRepository.RemoveArtistImage(existingMainImage);
                     }
                     
-                    _unitOfWork.ImageRepository.RemoveArtistImage(existingMainImage);
-                }
-                
-                artistToUpdate.FirstName = request.FirstName;
-                artistToUpdate.LastName = request.LastName;
-                artistToUpdate.BirthDate = request.BirthDate;
-                artistToUpdate.DeathDate = request.DeathDate;
-                artistToUpdate.Nationality = request.Nationality;
-                
-                await _unitOfWork.Repository<Artist>().UpdateAsync(artistToUpdate);
-                
-                if (request.Biography != null)
-                {
-                    var biography = await _unitOfWork.Repository<Biography>()
-                        .GetByConditionAsync(b => b.ArtistId == request.Id);
+                    artistToUpdate.FirstName = request.FirstName;
+                    artistToUpdate.LastName = request.LastName;
+                    artistToUpdate.BirthDate = request.BirthDate;
+                    artistToUpdate.DeathDate = request.DeathDate;
+                    artistToUpdate.Nationality = request.Nationality;
                     
-                    if (biography == null)
+                    await _unitOfWork.Repository<Artist>().UpdateAsync(artistToUpdate);
+                    
+                    if (request.Biography != null)
                     {
-                        biography = new Biography
+                        var biography = await _unitOfWork.Repository<Biography>()
+                            .GetByConditionAsync(b => b.ArtistId == request.Id);
+                        
+                        if (biography == null)
                         {
-                            ArtistId = request.Id,
-                            Content = request.Biography.Content,
-                            ShortDescription = request.Biography.ShortDescription,
-                            References = request.Biography.References
-                        };
-                        
-                        await _unitOfWork.Repository<Biography>().AddAsync(biography);
+                            biography = new Biography
+                            {
+                                ArtistId = request.Id,
+                                Content = request.Biography.Content,
+                                ShortDescription = request.Biography.ShortDescription,
+                                References = request.Biography.References
+                            };
+                            
+                            await _unitOfWork.Repository<Biography>().AddAsync(biography);
+                        }
+                        else
+                        {
+                            biography.Content = request.Biography.Content;
+                            biography.ShortDescription = request.Biography.ShortDescription;
+                            biography.References = request.Biography.References;
+                            
+                            await _unitOfWork.Repository<Biography>().UpdateAsync(biography);
+                        }
                     }
-                    else
-                    {
-                        biography.Content = request.Biography.Content;
-                        biography.ShortDescription = request.Biography.ShortDescription;
-                        biography.References = request.Biography.References;
-                        
-                        await _unitOfWork.Repository<Biography>().UpdateAsync(biography);
-                    }
-                }
-                
-                await _unitOfWork.CommitTransactionAsync();
-                
+                    
+                    await _unitOfWork.Complete();
+                });
+
                 var updatedArtist = await _unitOfWork.ArtistRepository.GetArtistWithPaintingsAsync(request.Id);
                 response.Artist = _mapper.Map<ArtistDto>(updatedArtist);
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackTransactionAsync();
                 response.Success = false;
                 response.Message = $"An error occurred while updating the artist: {ex.Message}";
             }

@@ -18,6 +18,18 @@ namespace ArtGallery.ClientApp.Services.Interfaces
             string biographyShortDescription, string biographyReferences, 
             string apiVersion = Const.DefaultApiVersion);
 
+        Task<ArtistDto> UpdateArtistAsync(
+            Guid id,
+            string firstName, 
+            string lastName, 
+            DateTimeOffset? birthDate, 
+            DateTimeOffset? deathDate, 
+            string nationality,
+            FileParameter image,
+            bool keepExistingImage,
+            BiographyDto biography,
+            string apiVersion = Const.DefaultApiVersion);
+        
         Task<bool> DeleteArtistAsync(Guid id, string apiVersion = Const.DefaultApiVersion);
 
         Task<bool> AddArtistToFavoritesAsync(Guid artistId, string apiVersion = Const.DefaultApiVersion);
