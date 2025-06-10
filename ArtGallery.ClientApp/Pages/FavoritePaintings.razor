@@ -1,0 +1,124 @@
+﻿@page "/favorite-paintings"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using ArtGallery.ClientApp.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IPaintingService PaintingService
+@inject NavigationManager NavigationManager
+@inject ILogger<FavoritePaintings> Logger
+@inject IJSRuntime JSRuntime
+@attribute [Authorize]
+
+<PageTitle>My Favorite Paintings</PageTitle>
+
+<div class="favorites-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title mb-0">My Favorite Paintings</h1>
+        <a href="/gallery" class="btn btn-outline-primary">
+            <i class="bi bi-grid me-2"></i>Browse Gallery
+        </a>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border loading-spinner" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="loading-text">Loading your favorite paintings...</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @errorMessage
+        </div>
+    }
+    else if (favorites?.FavoritePaintings == null || !favorites.FavoritePaintings.Any())
+    {
+        <div class="empty-favorites-container text-center">
+            <div class="empty-favorites-icon mb-3">
+                <i class="bi bi-heart text-muted" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="mb-3">You haven't added any paintings to your favorites yet</h4>
+            <p class="text-muted mb-4">
+                Explore the gallery and click the "Add to Favorites" button on paintings you love!
+            </p>
+            <a href="/gallery" class="btn btn-primary">
+                <i class="bi bi-images me-2"></i>Browse Gallery
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="favorite-stats mb-4">
+            <p class="lead">
+                <i class="bi bi-heart-fill me-2 text-danger"></i>
+                You have @favorites.Count painting@(favorites.Count != 1 ? "s" : "") in your collection
+            </p>
+        </div>
+
+        <div class="painting-grid">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
+                @foreach (var painting in favorites.FavoritePaintings)
+                {
+                    <div class="col">
+                        <div class="painting-card">
+                            <PaintingCard Painting="painting" OnPaintingDeleted="RefreshFavorites" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private UserFavoritePaintingsResponse favorites;
+    private bool isLoading = true;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFavorites();
+    }
+
+    private async Task LoadFavorites()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            favorites = await PaintingService.GetFavoritePaintingsAsync();
+            
+            if (!favorites.Success)
+            {
+                errorMessage = favorites.Message ?? "Failed to load your favorite paintings. Please try again later.";
+                Logger.LogWarning("Failed to load favorites: {Message}", favorites.Message);
+            }
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API Error getting favorite paintings. Status: {StatusCode}, Response: {Response}", 
+                ex.StatusCode, ex.Response);
+            errorMessage = $"Error retrieving your favorites: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading user favorites");
+            errorMessage = "An unexpected error occurred while loading your favorite paintings.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task RefreshFavorites(Guid paintingId)
+    {
+        await LoadFavorites();
+    }
+}
