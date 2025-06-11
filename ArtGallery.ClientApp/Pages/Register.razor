@@ -22,28 +22,7 @@
                             <h2 class="fw-bold mb-1">Create Your Account</h2>
                             <p class="text-muted">Join our Art Gallery community</p>
                         </div>
-
-                        <!-- Debug Info (remove in production) -->
-                        @if (showDebugInfo)
-                        {
-                            <div class="alert alert-info">
-                                <h6>Debug Info:</h6>
-                                <small>
-                                    Form Valid: @IsFormValid()<br/>
-                                    First Name: @(!string.IsNullOrWhiteSpace(registerViewModel.FirstName))<br/>
-                                    Last Name: @(!string.IsNullOrWhiteSpace(registerViewModel.LastName))<br/>
-                                    Email: @(!string.IsNullOrWhiteSpace(registerViewModel.Email))<br/>
-                                    Email Valid: @(new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(registerViewModel.Email))<br/>
-                                    Password: @(!string.IsNullOrWhiteSpace(registerViewModel.Password))<br/>
-                                    Password Length: @(registerViewModel.Password?.Length ?? 0)<br/>
-                                    Passwords Match: @(registerViewModel.Password == registerViewModel.ConfirmPassword)<br/>
-                                    Terms: @registerViewModel.AcceptTerms<br/>
-                                    Loading: @registerViewModel.IsLoading
-                                </small>
-                                <button class="btn btn-sm btn-secondary mt-2" @onclick="() => showDebugInfo = false">Hide Debug</button>
-                            </div>
-                        }
-
+                        
                         <!-- Alert Messages -->
                         @if (!string.IsNullOrEmpty(registerViewModel.ErrorMessage))
                         {
@@ -81,9 +60,6 @@
                                                    id="firstName"
                                                    placeholder="First Name"
                                                    disabled="@registerViewModel.IsLoading"/>
-                                        <label for="firstName">
-                                            <i class="fas fa-user me-2"></i>First Name
-                                        </label>
                                         <ValidationMessage For="() => registerViewModel.FirstName" class="invalid-feedback"/>
                                     </div>
                                 </div>
@@ -95,9 +71,6 @@
                                                    id="lastName"
                                                    placeholder="Last Name"
                                                    disabled="@registerViewModel.IsLoading"/>
-                                        <label for="lastName">
-                                            <i class="fas fa-user me-2"></i>Last Name
-                                        </label>
                                         <ValidationMessage For="() => registerViewModel.LastName" class="invalid-feedback"/>
                                     </div>
                                 </div>
@@ -111,9 +84,6 @@
                                            id="email"
                                            placeholder="name@example.com"
                                            disabled="@registerViewModel.IsLoading"/>
-                                <label for="email">
-                                    <i class="fas fa-envelope me-2"></i>Email Address
-                                </label>
                                 <ValidationMessage For="() => registerViewModel.Email" class="invalid-feedback"/>
                             </div>
 
@@ -126,9 +96,6 @@
                                            id="password"
                                            placeholder="Password"
                                            disabled="@registerViewModel.IsLoading"/>
-                                <label for="password">
-                                    <i class="fas fa-lock me-2"></i>Password
-                                </label>
                                 <button class="password-toggle" type="button"
                                         @onclick="() => registerViewModel.ShowPassword = !registerViewModel.ShowPassword"
                                         disabled="@registerViewModel.IsLoading">
@@ -178,9 +145,6 @@
                                            id="confirmPassword"
                                            placeholder="Confirm Password"
                                            disabled="@registerViewModel.IsLoading"/>
-                                <label for="confirmPassword">
-                                    <i class="fas fa-lock me-2"></i>Confirm Password
-                                </label>
                                 <button class="password-toggle" type="button"
                                         @onclick="() => registerViewModel.ShowConfirmPassword = !registerViewModel.ShowConfirmPassword"
                                         disabled="@registerViewModel.IsLoading">
@@ -211,16 +175,6 @@
                                                    disabled="@registerViewModel.IsLoading"/>
                                     <label class="form-check-label" for="acceptPrivacy">
                                         I agree to the <a href="/privacy" target="_blank" class="text-decoration-none">Privacy Policy</a>
-                                    </label>
-                                </div>
-
-                                <div class="form-check">
-                                    <InputCheckbox @bind-Value="registerViewModel.AcceptMarketing"
-                                                   class="form-check-input"
-                                                   id="acceptMarketing"
-                                                   disabled="@registerViewModel.IsLoading"/>
-                                    <label class="form-check-label" for="acceptMarketing">
-                                        I would like to receive marketing emails and updates
                                     </label>
                                 </div>
                             </div>

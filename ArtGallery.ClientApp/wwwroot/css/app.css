@@ -1035,8 +1035,15 @@ select:-webkit-autofill:focus {
 }
 
 .auth-card .alert-success {
-    background: linear-gradient(135deg, rgba(161, 136, 127, 0.2) 0%, rgba(161, 136, 127, 0.3) 100%) !important;
-    box-shadow: 0 6px 15px rgba(161, 136, 127, 0.2);
+    background: linear-gradient(135deg, rgba(27, 94, 32, 0.9) 0%, rgba(56, 142, 60, 0.8) 100%) !important;
+    color: var(--text-light) !important; 
+    border: 1px solid #1B5E20 !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 6px 15px rgba(27, 94, 32, 0.3) !important;
+    backdrop-filter: blur(10px) !important;
+    font-weight: 500 !important;
+    padding: 1rem 1.25rem !important;
+    margin-bottom: 1.5rem !important;
 }
 
 .auth-card .alert-warning {
@@ -1240,6 +1247,25 @@ select:-webkit-autofill:focus {
         padding: 0.4rem 0.8rem !important;
         border-radius: 1.5rem !important;
     }
+}
+
+.auth-card .text-primary {
+    color: var(--brand-secondary) !important;
+}
+
+.auth-card .fas.fa-palette.text-primary,
+.auth-card .fas.fa-user-plus.text-primary {
+    color: var(--brand-secondary) !important;
+    filter: drop-shadow(0 0 10px rgba(161, 136, 127, 0.3)) !important;
+    animation: glow 3s ease-in-out infinite alternate !important;
+}
+
+
+.auth-card i.fas,
+.auth-card i.fab,
+.auth-card .fas,
+.auth-card .fab {
+    color: var(--brand-secondary) !important;
 }
 
 
@@ -2583,5 +2609,109 @@ select:-webkit-autofill:focus {
 
     .artist-create-form .col-md-6 {
         margin-bottom: 1rem !important;
+    }
+}
+
+
+.empty-favorites-container {
+    background-color: var(--bg-dark-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.75rem !important;
+    padding: 3rem 2rem !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
+    max-width: 700px !important;
+    margin: 2rem auto !important;
+}
+
+
+.empty-favorites-container .empty-favorites-icon i,
+.empty-favorites-container .empty-favorites-icon .bi {
+    color: var(--text-light) !important;
+    opacity: 0.8 !important;
+}
+
+
+.empty-favorites-container h4 {
+    color: var(--text-light) !important;
+    font-weight: 500 !important;
+    margin-bottom: 1rem !important;
+}
+
+
+.empty-favorites-container p {
+    color: var(--text-light) !important;
+    opacity: 0.9 !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+}
+
+
+.empty-favorites-container .text-muted {
+    color: var(--text-light) !important;
+    opacity: 0.9 !important;
+}
+
+
+.empty-favorites-container .btn-primary {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: var(--text-light) !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.empty-favorites-container .btn-primary:hover {
+    background-color: #4E342E !important;
+    border-color: #4E342E !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+
+.empty-favorites-container .btn-primary i,
+.empty-favorites-container .btn-primary .bi {
+    color: var(--text-light) !important;
+}
+
+
+@media (max-width: 768px) {
+    .empty-favorites-container {
+        padding: 2rem 1.5rem !important;
+        margin: 1rem !important;
+    }
+
+    .empty-favorites-container .empty-favorites-icon i,
+    .empty-favorites-container .empty-favorites-icon .bi {
+        font-size: 3rem !important;
+    }
+
+    .empty-favorites-container h4 {
+        font-size: 1.5rem !important;
+    }
+
+    .empty-favorites-container p {
+        font-size: 0.95rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .empty-favorites-container {
+        padding: 1.5rem 1rem !important;
+    }
+
+    .empty-favorites-container .empty-favorites-icon i,
+    .empty-favorites-container .empty-favorites-icon .bi {
+        font-size: 2.5rem !important;
+    }
+
+    .empty-favorites-container h4 {
+        font-size: 1.25rem !important;
+    }
+
+    .empty-favorites-container .btn-primary {
+        padding: 0.6rem 1.25rem !important;
+        font-size: 0.95rem !important;
     }
 }
