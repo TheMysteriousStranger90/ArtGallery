@@ -27,26 +27,138 @@
 
     <!-- Animate.css for animations -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+
+    <!-- Microsoft Authentication Library - Correct CDN URL -->
+    <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.7.1/lib/msal-browser.min.js"></script>
 </head>
 
 <body>
-    <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
-    </div>
+<div id="app">
+    <svg class="loading-progress">
+        <circle r="40%" cx="50%" cy="50%" />
+        <circle r="40%" cx="50%" cy="50%" />
+    </svg>
+    <div class="loading-progress-text"></div>
+</div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+<script src="_framework/blazor.webassembly.js"></script>
+<script>navigator.serviceWorker.register('service-worker.js');</script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    let msalInstance;
+    let msalLoaded = false;
+    let loginRequest = {
+        scopes: ["User.Read"],
+        prompt: "select_account"
+    };
+
+    async function initializeMicrosoftAuth() {
+        if (!msalLoaded) {
+            try {
+                if (typeof msal === 'undefined') {
+                    await loadMSAL();
+                }
+                msalLoaded = true;
+            } catch (error) {
+                console.error('Failed to load MSAL library:', error);
+                throw new Error('Microsoft authentication library could not be loaded');
+            }
+        }
+
+        if (typeof msal === 'undefined') {
+            throw new Error('MSAL library not available');
+        }
+
+        const msalConfig = {
+            auth: {
+                clientId: "a885e2d0-5ae7-45bf-a2e2-ba54faa16c2d",
+                authority: "https://login.microsoftonline.com/common",
+                redirectUri: window.location.origin
+            },
+            cache: {
+                cacheLocation: "sessionStorage",
+                storeAuthStateInCookie: false,
+            }
+        };
+
+        msalInstance = new msal.PublicClientApplication(msalConfig);
+        await msalInstance.initialize();
+    }
+
+    async function signInWithMicrosoft(dotNetHelper) {
+        try {
+            if (!msalInstance) {
+                await initializeMicrosoftAuth();
+            }
+
+            console.log('Starting Microsoft authentication...');
+            const loginResponse = await msalInstance.loginPopup(loginRequest);
+            console.log('Microsoft auth response:', loginResponse);
+
+            if (loginResponse && loginResponse.accessToken) {
+                console.log('Access token received, calling .NET callback...');
+
+                await dotNetHelper.invokeMethodAsync('OnMicrosoftAuthSuccess', loginResponse.accessToken);
+            } else {
+                console.error('No access token in response');
+                await dotNetHelper.invokeMethodAsync('OnMicrosoftAuthError', 'No access token received from Microsoft');
+            }
+        } catch (error) {
+            console.error('Microsoft authentication error:', error);
+
+            let errorMessage = 'Authentication failed';
+
+            if (error.name === 'BrowserAuthError' && error.errorCode === 'user_cancelled') {
+                errorMessage = 'Sign-in was cancelled';
+            } else if (error.name === 'BrowserAuthError' && error.errorCode === 'popup_window_error') {
+                errorMessage = 'Popup was blocked. Please allow popups for this site.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            await dotNetHelper.invokeMethodAsync('OnMicrosoftAuthError', errorMessage);
+        }
+    }
+
+    function loadMSAL() {
+        return new Promise((resolve, reject) => {
+            if (typeof msal !== 'undefined') {
+                console.log('MSAL library already loaded from CDN');
+                resolve();
+                return;
+            }
+
+            const script1 = document.createElement('script');
+            script1.src = 'https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.7.1/lib/msal-browser.min.js';
+            script1.onload = () => {
+                console.log('MSAL library loaded successfully');
+                resolve();
+            };
+            script1.onerror = () => {
+                console.log('Primary CDN failed, trying fallback...');
+                const script2 = document.createElement('script');
+                script2.src = 'https://unpkg.com/@azure/msal-browser@3.7.1/lib/msal-browser.min.js';
+                script2.onload = () => {
+                    console.log('MSAL library loaded from fallback CDN');
+                    resolve();
+                };
+                script2.onerror = () => {
+                    console.error('Failed to load MSAL from both CDNs');
+                    reject(new Error('Failed to load MSAL library'));
+                };
+                document.head.appendChild(script2);
+            };
+            document.head.appendChild(script1);
+        });
+    }
+</script>
 </body>
 
 </html>

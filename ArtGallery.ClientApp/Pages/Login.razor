@@ -10,7 +10,7 @@
 <div class="auth-container">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8">
+            <div class="col-xl-6 col-lg-7 col-md-8 col-sm-10">
                 <div class="auth-card card shadow-lg border-0 animate__animated animate__fadeInUp">
                     <div class="card-body p-4">
                         <!-- Header -->
@@ -51,6 +51,29 @@
                             </div>
                         }
 
+                        <!-- Social Login Buttons -->
+                        <div class="d-grid gap-2 mb-4">
+                            <button type="button" class="btn btn-outline-primary"
+                                    @onclick="HandleMicrosoftLogin"
+                                    disabled="@loginViewModel.IsLoading">
+                                @if (isMicrosoftLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>Signing in with Microsoft...</span>
+                                }
+                                else
+                                {
+                                    <i class="fab fa-microsoft me-2"></i>
+                                    <span>Continue with Microsoft</span>
+                                }
+                            </button>
+                        </div>
+
+                        <div class="position-relative text-center mb-3">
+                            <hr class="my-3">
+                            <span class="px-3 text-muted small">or</span>
+                        </div>
+
                         <!-- Login Form -->
                         <EditForm Model="loginViewModel"
                                   OnValidSubmit="HandleLogin"
@@ -58,30 +81,23 @@
                                   novalidate>
                             <DataAnnotationsValidator/>
 
-                            <!-- Email Field -->
-                            <div class="form-floating mb-3">
+                            <div class="mb-3">
                                 <InputText @bind-Value="loginViewModel.Email"
                                            class="@GetEmailCssClass()"
                                            id="email"
-                                           placeholder="name@example.com"
+                                           placeholder="Email Address"
                                            disabled="@loginViewModel.IsLoading"/>
-                                <label for="email">
-                                    <i class="fas fa-envelope me-2"></i>Email Address
-                                </label>
                                 <ValidationMessage For="() => loginViewModel.Email" class="invalid-feedback"/>
                             </div>
 
                             <!-- Password Field -->
-                            <div class="form-floating mb-3 position-relative">
+                            <div class="mb-3 position-relative">
                                 <InputText @bind-Value="loginViewModel.Password"
                                            type="@(loginViewModel.ShowPassword ? "text" : "password")"
                                            class="@GetPasswordCssClass()"
                                            id="password"
                                            placeholder="Password"
                                            disabled="@loginViewModel.IsLoading"/>
-                                <label for="password">
-                                    <i class="fas fa-lock me-2"></i>Password
-                                </label>
                                 <button class="btn btn-outline-secondary password-toggle" type="button"
                                         @onclick="() => loginViewModel.ShowPassword = !loginViewModel.ShowPassword"
                                         disabled="@loginViewModel.IsLoading">
@@ -90,7 +106,7 @@
                                 <ValidationMessage For="() => loginViewModel.Password" class="invalid-feedback"/>
                             </div>
 
-                            <!-- Remember Me & Forgot Password -->
+                            <!-- Remember Me -->
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div class="form-check">
                                     <InputCheckbox @bind-Value="loginViewModel.RememberMe"
@@ -101,9 +117,6 @@
                                         Remember me
                                     </label>
                                 </div>
-                                <a href="/forgot-password" class="btn btn-link p-0 text-decoration-none">
-                                    Forgot password?
-                                </a>
                             </div>
 
                             <!-- Login Button -->
@@ -121,23 +134,6 @@
                                     <span>Sign In</span>
                                 }
                             </button>
-
-                            <!-- Social Login Buttons -->
-                            <div class="position-relative text-center mb-3">
-                                <hr class="my-3">
-                                <span class="bg-white px-3 text-muted small">or</span>
-                            </div>
-
-                            <div class="d-grid gap-2 mb-4">
-                                <button type="button" class="btn btn-outline-light" disabled="@loginViewModel.IsLoading">
-                                    <i class="fab fa-google me-2 text-danger"></i>
-                                    Continue with Google
-                                </button>
-                                <button type="button" class="btn btn-outline-light" disabled="@loginViewModel.IsLoading">
-                                    <i class="fab fa-microsoft me-2 text-primary"></i>
-                                    Continue with Microsoft
-                                </button>
-                            </div>
 
                             <div class="text-center">
                                 <p class="mb-0 text-muted">
@@ -176,10 +172,10 @@
 </div>
 
 @code {
-    [SupplyParameterFromForm]
-    private LoginViewModel loginViewModel { get; set; } = new();
+    [SupplyParameterFromForm] private LoginViewModel loginViewModel { get; set; } = new();
 
     private bool hasRendered = false;
+    private bool isMicrosoftLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -209,6 +205,7 @@
         if (firstRender)
         {
             hasRendered = true;
+            await JSRuntime.InvokeVoidAsync("initializeMicrosoftAuth");
         }
     }
 
@@ -232,8 +229,8 @@
                 loginViewModel.SetSuccess("Login successful! Redirecting...");
                 StateHasChanged();
 
-                await Task.Delay(1000); // Show success message
-                
+                await Task.Delay(1000);
+
                 var redirectUrl = string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl;
                 Navigation.NavigateTo(redirectUrl);
             }
@@ -253,11 +250,70 @@
         }
     }
 
+    [JSInvokable]
+    public async Task OnMicrosoftAuthSuccess(string accessToken)
+    {
+        try
+        {
+            var success = await AuthService.MicrosoftAuthAsync(accessToken, loginViewModel.ReturnUrl);
+
+            if (success)
+            {
+                loginViewModel.SetSuccess("Microsoft login successful! Redirecting...");
+                StateHasChanged();
+
+                await Task.Delay(1000);
+                var redirectUrl = string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl;
+                Navigation.NavigateTo(redirectUrl);
+            }
+            else
+            {
+                loginViewModel.SetError("Microsoft authentication failed. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            loginViewModel.SetError("Microsoft authentication failed. Please try again.");
+            Console.WriteLine($"Microsoft auth callback error: {ex.Message}");
+        }
+        finally
+        {
+            isMicrosoftLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    [JSInvokable]
+    public void OnMicrosoftAuthError(string error)
+    {
+        loginViewModel.SetError($"Microsoft sign-in failed: {error}");
+        isMicrosoftLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleMicrosoftLogin()
+    {
+        try
+        {
+            isMicrosoftLoading = true;
+            StateHasChanged();
+
+            await JSRuntime.InvokeVoidAsync("signInWithMicrosoft", DotNetObjectReference.Create(this));
+        }
+        catch (Exception ex)
+        {
+            loginViewModel.SetError("Microsoft sign-in failed. Please try again.");
+            Console.WriteLine($"Microsoft login error: {ex.Message}");
+            isMicrosoftLoading = false;
+            StateHasChanged();
+        }
+    }
+
     private string GetEmailCssClass()
     {
         var hasValue = !string.IsNullOrEmpty(loginViewModel.Email);
         var isValid = hasValue && new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(loginViewModel.Email);
-        
+
         return hasValue ? (isValid ? "form-control is-valid" : "form-control is-invalid") : "form-control";
     }
 
@@ -265,7 +321,8 @@
     {
         var hasValue = !string.IsNullOrEmpty(loginViewModel.Password);
         var isValid = hasValue && loginViewModel.Password.Length >= 6;
-        
+
         return hasValue ? (isValid ? "form-control is-valid" : "form-control is-invalid") : "form-control";
     }
+
 }

@@ -9,6 +9,7 @@ public interface IAuthenticationService
     Task<bool> RegisterAsync(RegisterViewModel registerViewModel);
     Task LogoutAsync();
     Task<bool> IsAuthenticatedAsync();
+    Task<bool> MicrosoftAuthAsync(string accessToken, string returnUrl = "/");
     Task<string> GetTokenAsync();
     Task<string> GetUserNameAsync();
     Task<string> GetUserEmailAsync();
