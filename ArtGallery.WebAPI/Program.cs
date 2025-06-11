@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Extensions;
 using ArtGallery.Identity.Context;
@@ -25,7 +26,7 @@ builder.ConfigureTlsCertificates();
 
 // Configure error alerts and monitoring
 builder.ConfigureErrorAlerts();
-builder.ConfigureMonitoring(); 
+builder.ConfigureMonitoring();
 
 // Configure core services
 builder.Services.AddApplicationServices(builder.Configuration);
@@ -63,7 +64,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerDocumentation();
-    
+
     app.Use(async (context, next) =>
     {
         if (context.Request.Path.StartsWithSegments("/swagger"))
@@ -71,6 +72,7 @@ if (app.Environment.IsDevelopment())
             context.Response.Redirect("/docs");
             return;
         }
+
         await next();
     });
 }
@@ -78,9 +80,79 @@ if (app.Environment.IsDevelopment())
 app.UseRequestLogging();
 app.UseMiddleware<ErrorAlertMiddleware>();
 app.UseGlobalExceptionHandling();
-app.UseRateLimiter();
 app.UseHttpsRedirection();
 app.UseCors("Open");
+app.UseRateLimiter();
+app.UseRouting();
+
+// Custom middleware for logging requests and responses
+app.Use(async (context, next) =>
+{
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+    if (context.Request.Path.StartsWithSegments("/api"))
+    {
+        logger.LogInformation("Method: {Method}, Path: {Path}", context.Request.Method, context.Request.Path);
+        logger.LogInformation("Content-Type: {ContentType}", context.Request.ContentType);
+        logger.LogInformation("Content-Length: {ContentLength}", context.Request.ContentLength);
+        logger.LogInformation("Authorization Header: {HasAuth}", context.Request.Headers.ContainsKey("Authorization"));
+
+        if (context.Request.Method == "POST" && context.Request.ContentLength > 0)
+        {
+            context.Request.EnableBuffering();
+            var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+            context.Request.Body.Position = 0;
+            logger.LogInformation("Request Body: {Body}", body);
+        }
+    }
+
+    try
+    {
+        await next();
+
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            logger.LogInformation("=== RESPONSE ===");
+            logger.LogInformation("Status: {StatusCode} for {Method} {Path}",
+                context.Response.StatusCode, context.Request.Method, context.Request.Path);
+        }
+    }
+    catch (JsonException ex)
+    {
+        logger.LogError(ex, "JSON deserialization error for request {Method} {Path}",
+            context.Request.Method, context.Request.Path);
+
+        context.Response.StatusCode = 400;
+        context.Response.ContentType = "application/json";
+
+        var errorResponse = new
+        {
+            errors = new[] { "Invalid JSON format in request body" },
+            details = ex.Message
+        };
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+        return;
+    }
+    catch (InvalidOperationException ex) when (ex.Message.Contains("model binding"))
+    {
+        logger.LogError(ex, "Model binding error for request {Method} {Path}",
+            context.Request.Method, context.Request.Path);
+
+        context.Response.StatusCode = 400;
+        context.Response.ContentType = "application/json";
+
+        var errorResponse = new
+        {
+            errors = new[] { "Invalid request model" },
+            details = ex.Message
+        };
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+        return;
+    }
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -102,13 +174,13 @@ using (var scope = app.Services.CreateScope())
         // Get DbContext instances
         var artGalleryContext = services.GetRequiredService<ArtGalleryDbContext>();
         var identityContext = services.GetRequiredService<ArtGalleryIdentityDbContext>();
-        
+
         /*
         // Ensure databases are created
         await artGalleryContext.Database.EnsureCreatedAsync();
         await identityContext.Database.EnsureCreatedAsync();
         */
-        
+
         // Run migrations
         await artGalleryContext.Database.MigrateAsync();
         await identityContext.Database.MigrateAsync();

@@ -38,7 +38,7 @@ namespace ArtGallery.ClientApp.Services
                 };
 
                 var response = await _client.AuthenticateAsync("1.0", command);
-                
+
                 if (response != null && !string.IsNullOrEmpty(response.Token))
                 {
                     await _authStateProvider.SetUserAuthenticatedAsync(response.Token);
@@ -78,23 +78,24 @@ namespace ArtGallery.ClientApp.Services
                 };
 
                 var response = await _client.RegisterAsync("1.0", command);
-                
+
                 if (response != null && !string.IsNullOrEmpty(response.Token))
                 {
                     _logger.LogInformation("Registration successful for email: {Email}", registerViewModel.Email);
-                    
+
                     await _authStateProvider.SetUserAuthenticatedAsync(response.Token);
                     AuthenticationStateChanged?.Invoke(true);
-                    
+
                     return true;
                 }
 
-                _logger.LogWarning("Registration failed - no token received for email: {Email}", registerViewModel.Email);
+                _logger.LogWarning("Registration failed - no token received for email: {Email}",
+                    registerViewModel.Email);
                 return false;
             }
             catch (ApiException ex) when (ex.StatusCode == 400)
             {
-                _logger.LogWarning("Invalid registration data for email: {Email} - {Error}", 
+                _logger.LogWarning("Invalid registration data for email: {Email} - {Error}",
                     registerViewModel.Email, ex.Message);
                 throw;
             }
@@ -134,6 +135,64 @@ namespace ArtGallery.ClientApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error checking authentication status");
+                return false;
+            }
+        }
+
+        public async Task<bool> MicrosoftAuthAsync(string accessToken, string returnUrl = "/")
+        {
+            try
+            {
+                _logger.LogInformation("Attempting Microsoft authentication with token length: {TokenLength}",
+                    accessToken?.Length ?? 0);
+
+                var request = new ExternalAuthRequest
+                {
+                    Provider = "Microsoft",
+                    AccessToken = accessToken,
+                    ReturnUrl = returnUrl
+                };
+
+                _logger.LogInformation("Sending Microsoft auth request to API");
+
+                var response = await _client.MicrosoftAuthAsync("1.0", request);
+
+                if (response != null && !string.IsNullOrEmpty(response.Token))
+                {
+                    await _authStateProvider.SetUserAuthenticatedAsync(response.Token);
+                    AuthenticationStateChanged?.Invoke(true);
+                    _logger.LogInformation("Microsoft authentication successful");
+                    return true;
+                }
+
+                _logger.LogWarning("Microsoft authentication failed - no token received");
+                return false;
+            }
+            catch (ApiException ex)
+            {
+                _logger.LogError(
+                    "Microsoft authentication API exception - StatusCode: {StatusCode}, Content: {Content}",
+                    ex.StatusCode, ex.Response);
+
+                if (!string.IsNullOrEmpty(ex.Response))
+                {
+                    try
+                    {
+                        var errorDoc = System.Text.Json.JsonDocument.Parse(ex.Response);
+                        var errorText = errorDoc.RootElement.GetRawText();
+                        _logger.LogError("Detailed error response: {ErrorResponse}", errorText);
+                    }
+                    catch (Exception parseEx)
+                    {
+                        _logger.LogWarning(parseEx, "Could not parse error response as JSON");
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during Microsoft authentication");
                 return false;
             }
         }

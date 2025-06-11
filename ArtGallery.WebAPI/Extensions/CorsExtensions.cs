@@ -6,16 +6,34 @@ public static class CorsExtensions
     {
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-            
-            // You can add more policies here for different scenarios
-            // For example:
-            /*
-            options.AddPolicy("Production", builder => builder
-                .WithOrigins("https://example.com")
+            if (builder.Environment.IsDevelopment())
+            {
+                options.AddPolicy("Open", policy => policy
+                    .WithOrigins(
+                        "https://localhost:7179", 
+                        "http://localhost:5181"
+                    )
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            }
+            else
+            {
+                // In production, restrict CORS to specific domains
+                options.AddPolicy("Open", policy => policy
+                    .WithOrigins(
+                        "https://yourdomain.com",
+                        "https://www.yourdomain.com"
+                    )
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            }
+
+            options.AddPolicy("Public", policy => policy
+                .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-            */
         });
     }
 }

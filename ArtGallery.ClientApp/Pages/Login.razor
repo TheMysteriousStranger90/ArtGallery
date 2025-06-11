@@ -51,6 +51,29 @@
                             </div>
                         }
 
+                        <!-- Social Login Buttons - Move to top -->
+                        <div class="d-grid gap-2 mb-4">
+                            <button type="button" class="btn btn-outline-primary"
+                                    @onclick="HandleMicrosoftLogin"
+                                    disabled="@loginViewModel.IsLoading">
+                                @if (isMicrosoftLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>Signing in with Microsoft...</span>
+                                }
+                                else
+                                {
+                                    <i class="fab fa-microsoft me-2"></i>
+                                    <span>Continue with Microsoft</span>
+                                }
+                            </button>
+                        </div>
+
+                        <div class="position-relative text-center mb-3">
+                            <hr class="my-3">
+                            <span class="bg-white px-3 text-muted small">or</span>
+                        </div>
+
                         <!-- Login Form -->
                         <EditForm Model="loginViewModel"
                                   OnValidSubmit="HandleLogin"
@@ -122,23 +145,6 @@
                                 }
                             </button>
 
-                            <!-- Social Login Buttons -->
-                            <div class="position-relative text-center mb-3">
-                                <hr class="my-3">
-                                <span class="bg-white px-3 text-muted small">or</span>
-                            </div>
-
-                            <div class="d-grid gap-2 mb-4">
-                                <button type="button" class="btn btn-outline-light" disabled="@loginViewModel.IsLoading">
-                                    <i class="fab fa-google me-2 text-danger"></i>
-                                    Continue with Google
-                                </button>
-                                <button type="button" class="btn btn-outline-light" disabled="@loginViewModel.IsLoading">
-                                    <i class="fab fa-microsoft me-2 text-primary"></i>
-                                    Continue with Microsoft
-                                </button>
-                            </div>
-
                             <div class="text-center">
                                 <p class="mb-0 text-muted">
                                     Don't have an account?
@@ -176,10 +182,10 @@
 </div>
 
 @code {
-    [SupplyParameterFromForm]
-    private LoginViewModel loginViewModel { get; set; } = new();
+    [SupplyParameterFromForm] private LoginViewModel loginViewModel { get; set; } = new();
 
     private bool hasRendered = false;
+    private bool isMicrosoftLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -209,6 +215,7 @@
         if (firstRender)
         {
             hasRendered = true;
+            await JSRuntime.InvokeVoidAsync("initializeMicrosoftAuth");
         }
     }
 
@@ -232,8 +239,8 @@
                 loginViewModel.SetSuccess("Login successful! Redirecting...");
                 StateHasChanged();
 
-                await Task.Delay(1000); // Show success message
-                
+                await Task.Delay(1000);
+
                 var redirectUrl = string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl;
                 Navigation.NavigateTo(redirectUrl);
             }
@@ -253,11 +260,70 @@
         }
     }
 
+    [JSInvokable]
+    public async Task OnMicrosoftAuthSuccess(string accessToken)
+    {
+        try
+        {
+            var success = await AuthService.MicrosoftAuthAsync(accessToken, loginViewModel.ReturnUrl);
+
+            if (success)
+            {
+                loginViewModel.SetSuccess("Microsoft login successful! Redirecting...");
+                StateHasChanged();
+
+                await Task.Delay(1000);
+                var redirectUrl = string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl;
+                Navigation.NavigateTo(redirectUrl);
+            }
+            else
+            {
+                loginViewModel.SetError("Microsoft authentication failed. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            loginViewModel.SetError("Microsoft authentication failed. Please try again.");
+            Console.WriteLine($"Microsoft auth callback error: {ex.Message}");
+        }
+        finally
+        {
+            isMicrosoftLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    [JSInvokable]
+    public void OnMicrosoftAuthError(string error)
+    {
+        loginViewModel.SetError($"Microsoft sign-in failed: {error}");
+        isMicrosoftLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleMicrosoftLogin()
+    {
+        try
+        {
+            isMicrosoftLoading = true;
+            StateHasChanged();
+
+            await JSRuntime.InvokeVoidAsync("signInWithMicrosoft", DotNetObjectReference.Create(this));
+        }
+        catch (Exception ex)
+        {
+            loginViewModel.SetError("Microsoft sign-in failed. Please try again.");
+            Console.WriteLine($"Microsoft login error: {ex.Message}");
+            isMicrosoftLoading = false;
+            StateHasChanged();
+        }
+    }
+
     private string GetEmailCssClass()
     {
         var hasValue = !string.IsNullOrEmpty(loginViewModel.Email);
         var isValid = hasValue && new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(loginViewModel.Email);
-        
+
         return hasValue ? (isValid ? "form-control is-valid" : "form-control is-invalid") : "form-control";
     }
 
@@ -265,7 +331,8 @@
     {
         var hasValue = !string.IsNullOrEmpty(loginViewModel.Password);
         var isValid = hasValue && loginViewModel.Password.Length >= 6;
-        
+
         return hasValue ? (isValid ? "form-control is-valid" : "form-control is-invalid") : "form-control";
     }
+
 }
