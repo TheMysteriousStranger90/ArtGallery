@@ -92,99 +92,99 @@
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead class="table-dark">
-                    <tr>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Roles</th>
-                        <th>Favorite Paintings</th>
-                        <th>Favorite Artists</th>
-                        <th>Last Login</th>
-                        <th>Actions</th>
-                    </tr>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Roles</th>
+                            <th>Favorite Paintings</th>
+                            <th>Favorite Artists</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    @foreach (var user in users.OrderBy(u => u.LastName).ThenBy(u => u.FirstName))
-                    {
-                        <tr>
-                            <td>
-                                <div class="user-info">
-                                    <div class="user-avatar">
-                                        <i class="bi bi-person-circle text-muted"></i>
+                        @foreach (var user in users.OrderBy(u => u.LastName).ThenBy(u => u.FirstName))
+                        {
+                            <tr>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar">
+                                            <i class="bi bi-person-circle text-muted"></i>
+                                        </div>
+                                        <div class="user-details">
+                                            <div class="user-name">@user.FirstName @user.LastName</div>
+                                            <small class="text-muted">ID: @user.Id</small>
+                                        </div>
                                     </div>
-                                    <div class="user-details">
-                                        <div class="user-name">@user.FirstName @user.LastName</div>
-                                        <small class="text-muted">ID: @user.Id</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="user-email">@user.Email</span>
-                            </td>
-                            <td>
-                                <div class="user-roles">
-                                    @if (user.Roles?.Any() == true)
-                                    {
-                                        @foreach (var role in user.Roles)
+                                </td>
+                                <td>
+                                    <span class="user-email">@user.Email</span>
+                                </td>
+                                <td>
+                                    <div class="user-roles">
+                                        @if (user.Roles?.Any() == true)
                                         {
-                                            <span class="badge @(role == "Administrator" ? "bg-danger" : "bg-secondary") me-1">
-                                                @role
-                                            </span>
+                                            @foreach (var role in user.Roles)
+                                            {
+                                                <span class="badge @(role == "Administrator" ? "bg-danger" : "bg-secondary") me-1">
+                                                    @role
+                                                </span>
+                                            }
                                         }
+                                        else
+                                        {
+                                            <span class="text-muted">No roles</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="favorites-count">
+                                        <i class="bi bi-image-fill text-primary me-1"></i>
+                                        <span class="badge bg-primary">@user.FavoritePaintingsCount</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="favorites-count">
+                                        <i class="bi bi-person-heart text-success me-1"></i>
+                                        <span class="badge bg-success">@user.FavoriteArtistsCount</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (user.LastActive.HasValue)
+                                    {
+                                        <span class="last-login">@user.LastActive.Value.ToString("MMM dd, yyyy")</span>
+                                        <br />
+                                        <small class="text-muted">@user.LastActive.Value.ToString("HH:mm")</small>
                                     }
                                     else
                                     {
-                                        <span class="text-muted">No roles</span>
+                                        <span class="text-muted">Never</span>
                                     }
-                                </div>
-                            </td>
-                            <td>
-                                <div class="favorites-count">
-                                    <i class="bi bi-image-fill text-primary me-1"></i>
-                                    <span class="badge bg-primary">@user.FavoritePaintingsCount</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="favorites-count">
-                                    <i class="bi bi-person-heart text-success me-1"></i>
-                                    <span class="badge bg-success">@user.FavoriteArtistsCount</span>
-                                </div>
-                            </td>
-                            <td>
-                                @if (user.LastActive.HasValue)
-                                {
-                                    <span class="last-login">@user.LastActive.Value.ToString("MMM dd, yyyy")</span>
-                                    <br/>
-                                    <small class="text-muted">@user.LastActive.Value.ToString("HH:mm")</small>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Never</span>
-                                }
-                            </td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <button class="btn btn-outline-primary"
-                                            @onclick="() => ViewUserDetails(user.Id)"
-                                            title="View Details">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button class="btn btn-outline-warning"
-                                            @onclick="() => EditUser(user.Id)"
-                                            title="Edit User">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    @if (!user.Roles?.Contains("Administrator") == true)
-                                    {
-                                        <button class="btn btn-outline-success"
-                                                @onclick="() => PromoteToAdmin(user.Id)"
-                                                title="Make Administrator">
-                                            <i class="bi bi-shield-plus"></i>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-primary" 
+                                                @onclick="() => ViewUserDetails(user.Id)" 
+                                                title="View Details">
+                                            <i class="bi bi-eye"></i>
                                         </button>
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                                        <button class="btn btn-outline-warning" 
+                                                @onclick="() => EditUser(user.Id)" 
+                                                title="Edit User">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        @if (!user.Roles?.Contains("Administrator") == true)
+                                        {
+                                            <button class="btn btn-outline-success" 
+                                                    @onclick="() => PromoteToAdmin(user.Id)" 
+                                                    title="Make Administrator">
+                                                <i class="bi bi-shield-plus"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -198,109 +198,6 @@
         </div>
     }
 </div>
-
-<style>
-    .users-container {
-        padding: 20px;
-    }
-
-    .stat-card {
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .stat-icon {
-        font-size: 2.5rem;
-        margin-right: 15px;
-        opacity: 0.8;
-    }
-
-    .stat-content h3 {
-        margin: 0;
-        font-size: 2rem;
-        font-weight: bold;
-    }
-
-    .stat-content p {
-        margin: 0;
-        font-size: 0.9rem;
-        opacity: 0.9;
-    }
-
-    .users-table-container {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }
-
-    .user-info {
-        display: flex;
-        align-items: center;
-    }
-
-    .user-avatar {
-        margin-right: 10px;
-        font-size: 1.5rem;
-    }
-
-    .user-details {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .user-name {
-        font-weight: 500;
-        color: #333;
-    }
-
-    .user-email {
-        color: #666;
-    }
-
-    .user-roles .badge {
-        font-size: 0.75rem;
-    }
-
-    .favorites-count {
-        display: flex;
-        align-items: center;
-    }
-
-    .last-login {
-        font-weight: 500;
-    }
-
-    .loading-container {
-        text-align: center;
-        padding: 60px 20px;
-    }
-
-    .loading-spinner {
-        width: 3rem;
-        height: 3rem;
-        margin-bottom: 20px;
-    }
-
-    .loading-text {
-        color: #666;
-        font-size: 1.1rem;
-    }
-
-    .admin-badge {
-        display: flex;
-        align-items: center;
-    }
-
-    .page-title {
-        color: #333;
-        font-weight: 600;
-    }
-</style>
 
 @code {
     private ICollection<UserDto> users;
@@ -327,7 +224,7 @@
         try
         {
             users = await UsersService.GetAllUsersAsync();
-
+            
             if (users == null)
             {
                 errorMessage = "Failed to load users. Please try again later.";
@@ -369,7 +266,7 @@
         {
             var request = new AssignRoleRequest { RoleName = "Administrator" };
             var success = await UsersService.AssignRoleToUserAsync(userId, request);
-
+            
             if (success)
             {
                 Logger.LogInformation("Successfully promoted user {UserId} to Administrator", userId);
@@ -387,5 +284,4 @@
             errorMessage = "An error occurred while promoting the user.";
         }
     }
-
 }
