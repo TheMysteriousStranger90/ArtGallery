@@ -166,4 +166,14 @@ public class UserManagerService : IUserManagerService
 
         return await GetUserRolesAsync(user);
     }
+    
+    public async Task UpdateLastActiveAsync(string userId)
+    {
+        var user = await UserManager.FindByIdAsync(userId);
+        if (user != null)
+        {
+            user.LastActive = DateTime.UtcNow;
+            await UserManager.UpdateAsync(user);
+        }
+    }
 }

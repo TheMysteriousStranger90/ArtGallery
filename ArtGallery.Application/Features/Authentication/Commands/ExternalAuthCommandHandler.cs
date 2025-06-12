@@ -75,6 +75,9 @@ namespace ArtGallery.Application.Features.Authentication.Commands
             }
 
             var jwtToken = await GenerateTokenAsync(user);
+            
+            user.LastActive = DateTime.UtcNow;
+            await _userManagerService.UserManager.UpdateAsync(user);
 
             _logger.LogInformation("External authentication successful for: {Email}", request.Email);
 

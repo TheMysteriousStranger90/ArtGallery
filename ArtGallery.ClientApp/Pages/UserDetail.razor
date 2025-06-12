@@ -1,0 +1,425 @@
+﻿@page "/admin/users/{Id}"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IUsersService UsersService
+@inject NavigationManager NavigationManager
+@inject ILogger<UserDetail> Logger
+@inject AuthenticationStateProvider AuthStateProvider
+@attribute [Authorize(Roles = "Administrator")]
+
+<PageTitle>User Details - Art Gallery</PageTitle>
+
+<div class="users-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title mb-0">User Details</h1>
+        <div class="admin-badge">
+            <span class="badge bg-primary">
+                <i class="bi bi-shield-check me-1"></i>Administrator
+            </span>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border loading-spinner" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="loading-text">Loading user details...</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @errorMessage
+        </div>
+    }
+    else if (user != null)
+    {
+        <nav aria-label="breadcrumb" class="my-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="/">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="/admin/users">User Management</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">@user.FirstName @user.LastName</li>
+            </ol>
+        </nav>
+
+        <div class="user-detail-content">
+            <div class="row g-4">
+                <!-- Left side - User information -->
+                <div class="col-lg-5">
+                    <div class="user-primary-info">
+                        <div class="card user-detail-card">
+                            <div class="card-header">
+                                <h4 class="mb-0"><i class="bi bi-person-badge me-2"></i>User Information</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="user-header d-flex align-items-center mb-4">
+                                    <div class="user-avatar-large">
+                                        <i class="bi bi-person-circle"></i>
+                                    </div>
+                                    <div class="user-name-details ms-3">
+                                        <h2 class="user-full-name mb-1">@user.FirstName @user.LastName</h2>
+                                        <p class="user-id mb-0">ID: @user.Id</p>
+                                    </div>
+                                </div>
+
+                                <div class="user-details-grid">
+                                    <div class="detail-item">
+                                        <h5>Email</h5>
+                                        <p>@user.Email</p>
+                                    </div>
+
+                                    <div class="detail-item">
+                                        <h5>Last Active</h5>
+                                        <p>
+                                            @if (user.LastActive.HasValue)
+                                            {
+                                                @user.LastActive.Value.ToString("MMM dd, yyyy HH:mm")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Never</span>
+                                            }
+                                        </p>
+                                    </div>
+
+                                    <div class="detail-item">
+                                        <h5>Email Confirmed</h5>
+                                        <p>
+                                            @if (user.EmailConfirmed)
+                                            {
+                                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Verified</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning"><i class="bi bi-exclamation-circle me-1"></i>Not Verified</span>
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Activity Stats -->
+                    <div class="card user-detail-card mt-4">
+                        <div class="card-header">
+                            <h4 class="mb-0"><i class="bi bi-bar-chart me-2"></i>User Activity</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-grid">
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="bi bi-image-fill"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <h3>@user.FavoritePaintingsCount</h3>
+                                        <p>Favorite Paintings</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="bi bi-person-heart"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <h3>@user.FavoriteArtistsCount</h3>
+                                        <p>Favorite Artists</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="bi bi-calendar-check"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <h3>@(user.LastActive.HasValue ? (DateTime.Now - user.LastActive.Value).Days : 0)</h3>
+                                        <p>Days Since Last Login</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Roles -->
+                    @if (user.Roles?.Any() == true)
+                    {
+                        <div class="card user-detail-card mt-4">
+                            <div class="card-header">
+                                <h4 class="mb-0"><i class="bi bi-person-lock me-2"></i>User Roles</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="roles-list">
+                                    @foreach (var role in user.Roles)
+                                    {
+                                        <div class="role-item">
+                                            <span class="badge @(role == "Administrator" ? "bg-danger" : "bg-secondary") me-2">
+                                                @role
+                                            </span>
+                                            @if (role != "Administrator" || user.Roles.Count > 1)
+                                            {
+                                                <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveRole(role)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+
+                                @if (!user.Roles.Contains("Administrator"))
+                                {
+                                    <div class="mt-3">
+                                        <button class="btn btn-outline-success" @onclick="PromoteToAdmin">
+                                            <i class="bi bi-shield-plus me-1"></i>Make Administrator
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mt-4">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            This user has no assigned roles.
+                            <div class="mt-2">
+                                <button class="btn btn-outline-success" @onclick="PromoteToAdmin">
+                                    <i class="bi bi-shield-plus me-1"></i>Make Administrator
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Right side - Favorites -->
+                <div class="col-lg-7">
+                    <!-- Favorite Paintings -->
+                    <div class="card user-detail-card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="bi bi-image-fill me-2"></i>Favorite Paintings
+                                <span class="favorites-count-badge">@user.FavoritePaintingsCount</span>
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            @if (user.FavoritePaintings?.Any() == true)
+                            {
+                                <div class="favorites-list paintings-list">
+                                    @foreach (var painting in user.FavoritePaintings)
+                                    {
+                                        <div class="favorite-item painting-item">
+                                            <a href="/paintings/@painting.Id" class="favorite-link">
+                                                <div class="favorite-image">
+                                                    <img src="@painting.ImageUrl" alt="@painting.Title" />
+                                                </div>
+                                                <div class="favorite-info">
+                                                    <h5 class="favorite-title">@painting.Title</h5>
+                                                    <p class="favorite-subtitle">
+                                                        @if (painting.Artist != null)
+                                                        {
+                                                            @painting.Artist.FullName
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">Unknown Artist</span>
+                                                        }
+                                                    </p>
+                                                    @if (painting.CreationYear > 0)
+                                                    {
+                                                        <span class="favorite-year">@painting.CreationYear</span>
+                                                    }
+                                                </div>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="empty-favorites">
+                                    <i class="bi bi-image empty-favorites-icon"></i>
+                                    <p>No favorite paintings yet.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Favorite Artists -->
+                    <div class="card user-detail-card mt-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="bi bi-person-heart me-2"></i>Favorite Artists
+                                <span class="favorites-count-badge">@user.FavoriteArtistsCount</span>
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            @if (user.FavoriteArtists?.Any() == true)
+                            {
+                                <div class="favorites-list artists-list">
+                                    @foreach (var artist in user.FavoriteArtists)
+                                    {
+                                        <div class="favorite-item artist-item">
+                                            <a href="/artists/@artist.Id" class="favorite-link">
+                                                <div class="favorite-info">
+                                                    <h5 class="favorite-title">@artist.FullName</h5>
+                                                    @if (!string.IsNullOrEmpty(artist.Nationality))
+                                                    {
+                                                        <p class="favorite-subtitle">@artist.Nationality</p>
+                                                    }
+                                                </div>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="empty-favorites">
+                                    <i class="bi bi-person-heart empty-favorites-icon"></i>
+                                    <p>No favorite artists yet.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons mt-4">
+                <a href="/admin/users" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Users
+                </a>
+                <button class="btn btn-outline-warning ms-2" @onclick="() => EditUser(Id)">
+                    <i class="bi bi-pencil me-1"></i>Edit User
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-question-circle-fill me-2"></i>
+            User not found or has been removed.
+        </div>
+        <a href="/admin/users" class="btn btn-outline-primary mt-3">
+            <i class="bi bi-arrow-left me-1"></i>Return to User Management
+        </a>
+    }
+</div>
+
+@code {
+    [Parameter] public string Id { get; set; }
+
+    private UserDetailDto user;
+    private bool isLoading = true;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (!authState.User.IsInRole("Administrator"))
+        {
+            NavigationManager.NavigateTo("/", forceLoad: true);
+            return;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadUserDetails();
+    }
+
+    private async Task LoadUserDetails()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            user = await UsersService.GetUserByIdAsync(Id);
+
+            if (user == null)
+            {
+                errorMessage = "Failed to load user details. User may not exist.";
+                Logger.LogWarning("UsersService returned null for GetUserByIdAsync with ID: {UserId}", Id);
+            }
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API Error loading user details. Status: {StatusCode}, Response: {Response}",
+                ex.StatusCode, ex.Response);
+            errorMessage = $"Error loading user details: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading user details for ID: {UserId}", Id);
+            errorMessage = "An unexpected error occurred while loading the user details.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void EditUser(string userId)
+    {
+        NavigationManager.NavigateTo($"/admin/users/{userId}/edit");
+    }
+
+    private async Task RemoveRole(string roleName)
+    {
+        try
+        {
+            var success = await UsersService.RemoveRoleFromUserAsync(Id, roleName);
+
+            if (success)
+            {
+                Logger.LogInformation("Successfully removed role {RoleName} from user {UserId}", roleName, Id);
+                await LoadUserDetails();
+            }
+            else
+            {
+                Logger.LogWarning("Failed to remove role {RoleName} from user {UserId}", roleName, Id);
+                errorMessage = $"Failed to remove role {roleName} from user.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error removing role {RoleName} from user {UserId}", roleName, Id);
+            errorMessage = "An error occurred while removing the role.";
+        }
+    }
+
+    private async Task PromoteToAdmin()
+    {
+        try
+        {
+            var request = new AssignRoleRequest { RoleName = "Administrator" };
+            var success = await UsersService.AssignRoleToUserAsync(Id, request);
+
+            if (success)
+            {
+                Logger.LogInformation("Successfully promoted user {UserId} to Administrator", Id);
+                await LoadUserDetails();
+            }
+            else
+            {
+                Logger.LogWarning("Failed to promote user {UserId} to Administrator", Id);
+                errorMessage = "Failed to promote user to Administrator.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error promoting user {UserId} to Administrator", Id);
+            errorMessage = "An error occurred while promoting the user.";
+        }
+    }
+
+}

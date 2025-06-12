@@ -53,12 +53,9 @@ public class ArtistMappingProfile : Profile
         CreateMap<Tag, PaintingTagDto>();
         CreateMap<Exhibition, ExhibitionBriefDto>()
             .ForMember(d => d.MuseumName, o => o.MapFrom(s => s.Museum != null ? s.Museum.Name : s.ExternalVenueAddress));
-            
-        // Command to Entity
+        
         CreateMap<CreatePaintingCommand, Painting>();
         CreateMap<UpdatePaintingCommand, Painting>();
-        
-        
         
         CreateMap<Exhibition, ExhibitionDto>()
             .ForMember(dest => dest.Museum, opt => opt.MapFrom(src => src.Museum));
@@ -72,11 +69,9 @@ public class ArtistMappingProfile : Profile
                 
         CreateMap<Painting, ExhibitionPaintingDto>()
             .ForMember(dest => dest.ArtistName, opt => opt.MapFrom(src => $"{src.Artist.FirstName} {src.Artist.LastName}"));
-                
-        // Command to Entity mappings
+        
         CreateMap<CreateExhibitionCommand, Exhibition>();
         CreateMap<UpdateExhibitionCommand, Exhibition>();
-        
         
         CreateMap<ApplicationUser, UserDto>()
             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => 
@@ -85,5 +80,37 @@ public class ArtistMappingProfile : Profile
                 src.FavoritePaintings != null ? src.FavoritePaintings.Count : 0))
             .ForMember(dest => dest.FavoriteArtistsCount, opt => opt.MapFrom(src => 
                 src.FavoriteArtists != null ? src.FavoriteArtists.Count : 0));
+
+        
+        CreateMap<UserFavoritePainting, PaintingBriefDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Painting.Id))
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Painting.Title))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Painting.Description))
+            .ForMember(dest => dest.CreationYear, opt => opt.MapFrom(src => src.Painting.CreationYear))
+            .ForMember(dest => dest.Medium, opt => opt.MapFrom(src => src.Painting.Medium))
+            .ForMember(dest => dest.Dimensions, opt => opt.MapFrom(src => src.Painting.Dimensions))
+            .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Painting.ImageUrl))
+            .ForMember(dest => dest.PaintType, opt => opt.MapFrom(src => src.Painting.PaintType))
+            .ForMember(dest => dest.Artist, opt => opt.MapFrom(src => src.Painting.Artist))
+            .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Painting.Genre))
+            .ForMember(dest => dest.Museum, opt => opt.MapFrom(src => src.Painting.Museum));
+            
+        CreateMap<UserFavoriteArtist, ArtistBriefDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Artist.Id))
+            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.Artist.FirstName))
+            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.Artist.LastName))
+            .ForMember(dest => dest.Nationality, opt => opt.MapFrom(src => src.Artist.Nationality));
+            
+        CreateMap<ApplicationUser, UserDetailDto>()
+            .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => 
+                src.UserRoles.Select(ur => ur.Role.Name).ToList()))
+            .ForMember(dest => dest.FavoritePaintingsCount, opt => opt.MapFrom(src => 
+                src.FavoritePaintings != null ? src.FavoritePaintings.Count : 0))
+            .ForMember(dest => dest.FavoriteArtistsCount, opt => opt.MapFrom(src => 
+                src.FavoriteArtists != null ? src.FavoriteArtists.Count : 0))
+            .ForMember(dest => dest.FavoritePaintings, opt => opt.MapFrom(src => 
+                src.FavoritePaintings))
+            .ForMember(dest => dest.FavoriteArtists, opt => opt.MapFrom(src => 
+                src.FavoriteArtists));
     }
 }

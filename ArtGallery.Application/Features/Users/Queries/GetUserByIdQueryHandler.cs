@@ -22,22 +22,19 @@ namespace ArtGallery.Application.Features.Users.Queries
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
-
         public async Task<UserDetailDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Retrieving user details for ID: {UserId}", request.Id);
-
             var user = await _userManagerService.GetUserByIdAsync(request.Id);
             if (user == null)
             {
-                throw new NotFoundException($"User with ID '{request.Id}' not found");
+                throw new NotFoundException("User not found");
             }
 
             var roles = await _userManagerService.GetUserRolesAsync(user);
-            var favoritePaintings = await _unitOfWork.UserFavoritesRepository.GetUserFavoritePaintingsAsync(user.Id);
-            var favoriteArtists = await _unitOfWork.UserFavoritesRepository.GetUserFavoriteArtistsAsync(user.Id);
+            var favoritePaintings = await _unitOfWork.UserFavoritesRepository.GetUserFavoritePaintingsAsync(request.Id);
+            var favoriteArtists = await _unitOfWork.UserFavoritesRepository.GetUserFavoriteArtistsAsync(request.Id);
 
-            return new UserDetailDto
+            var userDetail = new UserDetailDto
             {
                 Id = user.Id,
                 UserName = user.UserName,
@@ -51,6 +48,42 @@ namespace ArtGallery.Application.Features.Users.Queries
                 FavoriteArtistsCount = favoriteArtists.Count,
                 FavoritePaintingsCount = favoritePaintings.Count
             };
+
+            foreach (var painting in favoritePaintings)
+            {
+                userDetail.FavoritePaintings.Add(new PaintingBriefDto
+                {
+                    Id = painting.Painting.Id,
+                    Title = painting.Painting.Title,
+                    ImageUrl = painting.Painting.ImageUrl,
+                    Description = painting.Painting.Description,
+                    CreationYear = painting.Painting.CreationYear,
+                    Medium = painting.Painting.Medium,
+                    Dimensions = painting.Painting.Dimensions,
+                    PaintType = painting.Painting.PaintType,
+                    
+                    Artist = painting.Painting.Artist != null ? new ArtistBriefDto 
+                    {
+                        Id = painting.Painting.Artist.Id,
+                        FirstName = painting.Painting.Artist.FirstName,
+                        LastName = painting.Painting.Artist.LastName,
+                        Nationality = painting.Painting.Artist.Nationality
+                    } : null,
+                });
+            }
+            
+            foreach (var artist in favoriteArtists)
+            {
+                userDetail.FavoriteArtists.Add(new ArtistBriefDto
+                {
+                    Id = artist.Artist.Id,
+                    FirstName = artist.Artist.FirstName,
+                    LastName = artist.Artist.LastName,
+                    Nationality = artist.Artist.Nationality
+                });
+            }
+
+            return userDetail;
         }
     }
 }
