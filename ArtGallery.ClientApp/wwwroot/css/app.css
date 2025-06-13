@@ -3523,3 +3523,149 @@ thead.table-dark {
 }
 
 
+
+/* UserEdit Page Specific Styles */
+.user-edit-content {
+    background-color: var(--bg-dark);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+.user-edit-card {
+    background-color: var(--bg-dark-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    height: 100%;
+}
+
+.user-edit-card .card-header {
+    background-color: #3E2723 !important;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+}
+
+.user-edit-card .card-body {
+    padding: 1.5rem;
+}
+
+.user-edit-form .form-control,
+.user-edit-form .form-select {
+    background-color: rgba(93, 64, 55, 0.3);
+    border-color: var(--border-color);
+    color: var(--text-light);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.user-edit-form .form-control:focus,
+.user-edit-form .form-select:focus {
+    background-color: rgba(93, 64, 55, 0.5);
+    border-color: var(--brand-secondary);
+    box-shadow: 0 0 0 0.25rem rgba(161, 136, 127, 0.25);
+}
+
+.user-edit-form .form-label {
+    color: var(--brand-secondary);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.user-edit-form .text-danger {
+    color: #ef5350 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.user-edit-form .btn-outline-primary,
+.user-edit-form .btn-outline-secondary {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.user-edit-form .btn-outline-primary:hover,
+.user-edit-form .btn-outline-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.action-buttons {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Responsive styles */
+@media (max-width: 767.98px) {
+    .user-edit-content {
+        padding: 1rem;
+    }
+
+    .action-buttons {
+        flex-direction: column-reverse;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+        margin-left: 0 !important;
+        margin-top: 0.5rem;
+    }
+}
+
+/* Styling for card header text */
+.user-edit-card .card-header h4 {
+    color: var(--text-light) !important; /* Light color to contrast with dark background */
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+/* Styling for icons in headers */
+.user-edit-card .card-header i {
+    color: var(--brand-secondary); /* Highlight color for icons */
+}
+
+/* Fix for input text color changing to black when editing */
+.user-edit-form .form-control,
+.user-edit-form .form-select,
+.user-edit-form .form-control:focus,
+.user-edit-form .form-select:focus,
+.user-edit-form .form-control:active,
+.user-edit-form .form-select:active {
+    color: var(--text-light) !important;
+}
+
+/* Ensure placeholder text also uses the right color */
+.user-edit-form .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* For webkit browsers */
+.user-edit-form .form-control::-webkit-input-placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* For Firefox */
+.user-edit-form .form-control::-moz-placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+}
+
+/* For Internet Explorer */
+.user-edit-form .form-control:-ms-input-placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* For autocomplete background in Chrome */
+.user-edit-form .form-control:-webkit-autofill,
+.user-edit-form .form-control:-webkit-autofill:hover,
+.user-edit-form .form-control:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-light);
+    -webkit-box-shadow: 0 0 0px 1000px rgba(93, 64, 55, 0.5) inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
