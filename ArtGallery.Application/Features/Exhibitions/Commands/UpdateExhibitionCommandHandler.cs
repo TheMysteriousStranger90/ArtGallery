@@ -1,6 +1,5 @@
 ﻿using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
-using ArtGallery.Application.Exceptions;
 using ArtGallery.Application.Specifications;
 using ArtGallery.Domain.Entities;
 using AutoMapper;
@@ -8,18 +7,20 @@ using MediatR;
 
 namespace ArtGallery.Application.Features.Exhibitions.Commands
 {
-    public class UpdateExhibitionCommandHandler : IRequestHandler<UpdateExhibitionCommand, UpdateExhibitionCommandResponse>
+    public class
+        UpdateExhibitionCommandHandler : IRequestHandler<UpdateExhibitionCommand, UpdateExhibitionCommandResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
         public UpdateExhibitionCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<UpdateExhibitionCommandResponse> Handle(UpdateExhibitionCommand request, CancellationToken cancellationToken)
+        public async Task<UpdateExhibitionCommandResponse> Handle(UpdateExhibitionCommand request,
+            CancellationToken cancellationToken)
         {
             var response = new UpdateExhibitionCommandResponse();
 
@@ -35,60 +36,68 @@ namespace ArtGallery.Application.Features.Exhibitions.Commands
 
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
-                
-                var exhibition = await _unitOfWork.Repository<Exhibition>().GetByIdAsync(request.Id);
-                
-                if (exhibition == null)
+                await _unitOfWork.ExecuteWithTransactionAsync(async () =>
                 {
-                    throw new Exception(nameof(Exhibition));
-                }
-                
-                // Update exhibition properties
-                exhibition.Title = request.Title;
-                exhibition.Description = request.Description;
-                exhibition.StartDate = request.StartDate;
-                exhibition.EndDate = request.EndDate;
-                exhibition.ExternalVenueAddress = request.ExternalVenueAddress;
-                exhibition.MuseumId = request.MuseumId;
-                
-                await _unitOfWork.Repository<Exhibition>().UpdateAsync(exhibition);
-                
-                // Update paintings - remove existing and add new ones
-                var existingPaintings = await _unitOfWork.Repository<PaintingExhibition>()
-                    .ListAsync(new BaseSpecification<PaintingExhibition>(pe => pe.ExhibitionId == request.Id));
-                
-                foreach (var paintingExhibition in existingPaintings)
-                {
-                    await _unitOfWork.Repository<PaintingExhibition>().RemoveAsync(paintingExhibition);
-                }
-                
-                int displayOrder = 1;
-                foreach (var paintingId in request.PaintingIds)
-                {
-                    var paintingExhibition = new PaintingExhibition
+                    var exhibition = await _unitOfWork.Repository<Exhibition>().GetByIdAsync(request.Id);
+
+                    if (exhibition == null)
                     {
-                        ExhibitionId = exhibition.Id,
-                        PaintingId = paintingId
-                    };
-                    
-                    await _unitOfWork.Repository<PaintingExhibition>().AddAsync(paintingExhibition);
-                    displayOrder++;
+                        throw new Exception($"Exhibition with ID {request.Id} not found");
+                    }
+
+                    exhibition.Title = request.Title;
+                    exhibition.Description = request.Description;
+                    exhibition.StartDate = request.StartDate;
+                    exhibition.EndDate = request.EndDate;
+                    exhibition.ExternalVenueAddress = request.ExternalVenueAddress;
+                    exhibition.MuseumId = request.MuseumId;
+
+                    await _unitOfWork.Repository<Exhibition>().UpdateAsync(exhibition);
+
+                    var existingPaintings = await _unitOfWork.Repository<PaintingExhibition>()
+                        .ListAsync(new BaseSpecification<PaintingExhibition>(pe => pe.ExhibitionId == request.Id));
+
+                    foreach (var paintingExhibition in existingPaintings)
+                    {
+                        await _unitOfWork.Repository<PaintingExhibition>().RemoveAsync(paintingExhibition);
+                    }
+
+                    if (request.PaintingIds?.Any() == true)
+                    {
+                        foreach (var paintingId in request.PaintingIds)
+                        {
+                            var paintingExhibition = new PaintingExhibition
+                            {
+                                ExhibitionId = exhibition.Id,
+                                PaintingId = paintingId,
+                            };
+
+                            await _unitOfWork.Repository<PaintingExhibition>().AddAsync(paintingExhibition);
+                        }
+                    }
+
+                    await _unitOfWork.Complete();
+                });
+
+                var updatedExhibition =
+                    await _unitOfWork.ExhibitionRepository.GetExhibitionWithPaintingsAsync(request.Id);
+                if (updatedExhibition != null)
+                {
+                    response.Exhibition = _mapper.Map<ExhibitionDto>(updatedExhibition);
+                    response.Message = "Exhibition updated successfully.";
                 }
-                
-                await _unitOfWork.CommitTransactionAsync();
-                
-                // Get updated exhibition
-                var updatedExhibition = await _unitOfWork.ExhibitionRepository.GetExhibitionWithPaintingsAsync(exhibition.Id);
-                response.Exhibition = _mapper.Map<ExhibitionDto>(updatedExhibition);
+                else
+                {
+                    response.Success = false;
+                    response.Message = "Exhibition was updated but could not be retrieved.";
+                }
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackTransactionAsync();
                 response.Success = false;
                 response.Message = $"An error occurred while updating the exhibition: {ex.Message}";
             }
-            
+
             return response;
         }
     }
