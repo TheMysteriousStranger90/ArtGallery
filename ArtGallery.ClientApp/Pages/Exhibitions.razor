@@ -1,0 +1,465 @@
+﻿@page "/exhibitions"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using ArtGallery.ClientApp.Shared
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IExhibitionsService ExhibitionsService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILogger<Exhibitions> Logger
+@inject IClient ApiClient
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Art Exhibitions</PageTitle>
+
+<div class="gallery-container">
+    <h1 class="gallery-page-title">Art Exhibitions</h1>
+
+    <div class="exhibition-controls mb-4">
+        <div class="row align-items-end">
+            <div class="col-md-9">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search exhibitions..."
+                           @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp"/>
+                    <button class="btn btn-outline-primary" type="button" @onclick="ApplySearch">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    @if (!string.IsNullOrEmpty(ActiveSearch))
+                    {
+                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch">
+                            <i class="bi bi-x-lg"></i> Clear
+                        </button>
+                    }
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="statusFilter" class="form-label-sm">Filter by:</label>
+                <select id="statusFilter" class="form-select" @bind="CurrentStatus" @bind:after="ApplyStatusFilter">
+                    <option value="">All Exhibitions</option>
+                    <option value="current">Current Exhibitions</option>
+                    <option value="upcoming">Upcoming Exhibitions</option>
+                    <option value="past">Past Exhibitions</option>
+                </select>
+            </div>
+        </div>
+        
+        @if (isAdministrator)
+        {
+        <div class="row mt-3">
+            <div class="col-12">
+                <a href="/admin/exhibitions/create" class="btn btn-primary w-100">
+                    <i class="bi bi-plus-circle me-2"></i> Create New Exhibition
+                </a>
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Main Content with Filters on Left and Exhibitions on Right -->
+    <div class="row">
+        <!-- Filter Panel (Left Sidebar) -->
+        <div class="col-md-3 mb-4">
+            <div class="filter-panel">
+                <h5 class="filter-heading">Filter By</h5>
+
+                <!-- Museum Filter -->
+                <div class="filter-group">
+                    <label for="museumFilter" class="form-label-sm">Museum</label>
+                    <select id="museumFilter" class="form-select form-select-sm"
+                            @bind="MuseumId" @bind:after="ApplyFilters">
+                        <option value="">All Museums</option>
+                        @if (museums != null)
+                        {
+                            @foreach (var museum in museums)
+                            {
+                                <option value="@museum.Id">@museum.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Date Range Filters -->
+                <div class="filter-group">
+                    <label class="form-label-sm">Date Range</label>
+                    <div class="mb-2">
+                        <label class="form-label-sm">From</label>
+                        <input type="date" class="form-control form-control-sm" @bind="StartDate" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label-sm">To</label>
+                        <input type="date" class="form-control form-control-sm" @bind="EndDate" />
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary w-100 mt-1" @onclick="ApplyDateFilter">
+                        Apply Date Filter
+                    </button>
+                </div>
+
+                @if (HasActiveFilters)
+                {
+                    <div class="filter-actions mt-3">
+                        <button class="btn btn-sm btn-outline-secondary w-100" @onclick="ClearAllFilters">
+                            <i class="bi bi-x-circle me-1"></i> Clear All Filters
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Exhibitions Content (Right Side) -->
+        <div class="col-md-9">
+            @if (isLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border loading-spinner" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="loading-text">Loading exhibitions...</p>
+                </div>
+            }
+            else if (exhibitions != null && exhibitions.Any())
+            {
+                <div class="exhibition-list">
+                    @foreach (var exhibition in exhibitions)
+                    {
+                        <div class="exhibition-card">
+                            <div class="card mb-4 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h5 class="card-title">@exhibition.Title</h5>
+                                        <span class="badge @GetStatusBadgeClass(exhibition.Status)">@exhibition.Status</span>
+                                    </div>
+                                    <p class="card-text text-muted mb-2">
+                                        <i class="bi bi-calendar-event me-1"></i> @exhibition.FormattedDateRange
+                                    </p>
+                                    <p class="card-text text-muted mb-3">
+                                        <i class="bi bi-building me-1"></i> @(exhibition.Museum?.Name ?? "No museum specified")
+                                    </p>
+                                    <p class="card-text exhibition-description">@exhibition.Description</p>
+                                </div>
+                                <div class="card-footer bg-transparent border-top-0">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="/exhibitions/@exhibition.Id" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-eye me-1"></i> View Details
+                                        </a>
+                                        @if (isAdministrator)
+                                        {
+                                            <div>
+                                                <a href="/admin/exhibitions/edit/@exhibition.Id" class="btn btn-outline-secondary btn-sm me-1">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button @onclick="() => DeleteExhibition(exhibition.Id)" class="btn btn-outline-danger btn-sm">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="gallery-message">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        @errorMessage
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="gallery-message">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        No exhibitions found. Try adjusting your search or filter parameters.
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private ICollection<ExhibitionDto> exhibitions;
+    private bool isLoading = true;
+    private string? errorMessage;
+    private bool _hasCompletedInitialParameterSet = false;
+    private bool isAdministrator = false;
+
+    private List<MuseumBriefDto> museums;
+
+    private bool HasActiveFilters =>
+        MuseumId.HasValue ||
+        StartDate.HasValue ||
+        EndDate.HasValue ||
+        !string.IsNullOrEmpty(CurrentStatus);
+
+    [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
+
+    [Parameter] [SupplyParameterFromQuery] public Guid? MuseumId { get; set; }
+
+    [Parameter] [SupplyParameterFromQuery] public string? CurrentStatus { get; set; }
+    
+    [Parameter] [SupplyParameterFromQuery] public DateTime? StartDate { get; set; }
+    
+    [Parameter] [SupplyParameterFromQuery] public DateTime? EndDate { get; set; }
+
+    public string? CurrentSearch { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAdministrator = authState.User.IsInRole("Administrator");
+
+        if (!string.IsNullOrEmpty(ActiveSearch))
+        {
+            CurrentSearch = ActiveSearch;
+        }
+
+        await LoadMuseums();
+    }
+
+    private async Task LoadMuseums()
+    {
+        try
+        {
+            var paintings = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
+            museums = paintings.Data
+                .Where(p => p.Museum != null)
+                .GroupBy(p => p.Museum.Id)
+                .Select(g => g.First().Museum)
+                .OrderBy(m => m.Name)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading museums for filter");
+            museums = new List<MuseumBriefDto>();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrEmpty(CurrentSearch) && !string.IsNullOrEmpty(ActiveSearch))
+        {
+            CurrentSearch = ActiveSearch;
+        }
+        else if (ActiveSearch == null && CurrentSearch != null)
+        {
+            CurrentSearch = string.Empty;
+        }
+
+        await LoadExhibitions();
+        _hasCompletedInitialParameterSet = true;
+    }
+
+    private async Task LoadExhibitions()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            if (!string.IsNullOrEmpty(CurrentStatus))
+            {
+                switch (CurrentStatus.ToLower())
+                {
+                    case "current":
+                        exhibitions = await ExhibitionsService.GetCurrentExhibitionsAsync();
+                        break;
+                    case "upcoming":
+                        exhibitions = await ExhibitionsService.GetUpcomingExhibitionsAsync();
+                        break;
+                    case "past":
+                        exhibitions = await ExhibitionsService.GetPastExhibitionsAsync();
+                        break;
+                    default:
+                        exhibitions = await ExhibitionsService.GetAllExhibitionsAsync(MuseumId);
+                        break;
+                }
+            }
+            else
+            {
+                exhibitions = await ExhibitionsService.GetAllExhibitionsAsync(MuseumId);
+            }
+
+            // Apply search filter if needed
+            if (!string.IsNullOrEmpty(ActiveSearch))
+            {
+                exhibitions = exhibitions
+                    .Where(e => e.Title.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase) || 
+                               (e.Description != null && e.Description.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+            }
+
+            // Apply date filters if needed
+            if (StartDate.HasValue)
+            {
+                exhibitions = exhibitions.Where(e => e.EndDate >= StartDate).ToList();
+            }
+
+            if (EndDate.HasValue)
+            {
+                exhibitions = exhibitions.Where(e => e.StartDate <= EndDate).ToList();
+            }
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API Error loading exhibitions. Status: {StatusCode}, Response: {Response}", ex.StatusCode, ex.Response);
+            errorMessage = $"API Error: {ex.Message} (Status: {ex.StatusCode})";
+            exhibitions = new List<ExhibitionDto>();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading exhibitions");
+            errorMessage = "An error occurred while loading exhibitions.";
+            exhibitions = new List<ExhibitionDto>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+
+        StateHasChanged();
+    }
+
+    private void ApplySearch()
+    {
+        ActiveSearch = CurrentSearch;
+        NavigateWithFilters();
+    }
+
+    private void ApplyDateFilter()
+    {
+        NavigateWithFilters();
+    }
+
+    private void ApplyStatusFilter()
+    {
+        NavigateWithFilters();
+    }
+
+    private void ClearAllFilters()
+    {
+        MuseumId = null;
+        CurrentStatus = null;
+        StartDate = null;
+        EndDate = null;
+
+        var queryParameters = new Dictionary<string, object?>
+        {
+            ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch
+        };
+
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        var baseUri = NavigationManager.Uri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
+
+        NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+    }
+
+    private void ClearSearch()
+    {
+        CurrentSearch = string.Empty;
+        ActiveSearch = null;
+
+        var queryParameters = new Dictionary<string, object?>
+        {
+            ["museumId"] = MuseumId?.ToString(),
+            ["currentStatus"] = CurrentStatus,
+            ["startDate"] = StartDate?.ToString("yyyy-MM-dd"),
+            ["endDate"] = EndDate?.ToString("yyyy-MM-dd")
+        };
+
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        var baseUri = NavigationManager.Uri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
+
+        NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+    }
+
+    private void ApplyFilters()
+    {
+        NavigateWithFilters();
+    }
+
+    private void NavigateWithFilters()
+    {
+        var queryParameters = new Dictionary<string, object?>
+        {
+            ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
+            ["museumId"] = MuseumId?.ToString(),
+            ["currentStatus"] = CurrentStatus,
+            ["startDate"] = StartDate?.ToString("yyyy-MM-dd"),
+            ["endDate"] = EndDate?.ToString("yyyy-MM-dd")
+        };
+
+        var nonNullQueryParameters = queryParameters
+            .Where(kvp => kvp.Value != null)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        var currentUri = NavigationManager.Uri;
+        var baseUri = currentUri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
+
+        if (currentUri != newUri)
+        {
+            NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+        }
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            ApplySearch();
+        }
+    }
+    
+    private async Task DeleteExhibition(Guid exhibitionId)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this exhibition?");
+        
+        if (confirmed)
+        {
+            try
+            {
+                bool success = await ExhibitionsService.DeleteExhibitionAsync(exhibitionId);
+                
+                if (success)
+                {
+                    await JSRuntime.InvokeVoidAsync("alert", "Exhibition has been successfully deleted");
+                    await LoadExhibitions();
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("alert", "Failed to delete the exhibition");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error deleting exhibition {ExhibitionId}", exhibitionId);
+                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+            }
+        }
+    }
+    
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Current" => "bg-success",
+            "Upcoming" => "bg-primary",
+            "Past" => "bg-secondary",
+            _ => "bg-info"
+        };
+    }
+}
