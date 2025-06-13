@@ -1,4 +1,5 @@
-﻿using ArtGallery.ClientApp.Services;
+﻿using ArtGallery.ClientApp.Constants;
+using ArtGallery.ClientApp.Services;
 
 namespace ArtGallery.ClientApp.Services.Interfaces
 {
@@ -17,7 +18,7 @@ namespace ArtGallery.ClientApp.Services.Interfaces
             string sort = "title",
             string apiVersion = "1.0");
 
-        Task<PaintingDetailDto> GetPaintingAsync(Guid id, string apiVersion = "1.0");
+        Task<PaintingDetailDto> GetPaintingAsync(Guid id, string apiVersion = Const.DefaultApiVersion);
 
         Task<PaintingDto> CreatePaintingAsync(
             string title,
@@ -50,8 +51,8 @@ namespace ArtGallery.ClientApp.Services.Interfaces
             IEnumerable<Guid> tagIds,
             string apiVersion = "1.0");
 
-        Task<bool> DeletePaintingAsync(Guid id, string apiVersion = "1.0");
-        Task<bool> AddPaintingToFavoritesAsync(Guid paintingId, string apiVersion = "1.0");
-        Task<UserFavoritePaintingsResponse> GetFavoritePaintingsAsync(string apiVersion = "1.0");
+        Task<bool> DeletePaintingAsync(Guid id, string apiVersion = Const.DefaultApiVersion);
+        Task<bool> AddPaintingToFavoritesAsync(Guid paintingId, string apiVersion = Const.DefaultApiVersion);
+        Task<UserFavoritePaintingsResponse> GetFavoritePaintingsAsync(string apiVersion = Const.DefaultApiVersion);
     }
 }

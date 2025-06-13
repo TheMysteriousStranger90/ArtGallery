@@ -79,25 +79,6 @@ namespace ArtGallery.ClientApp.Services
         System.Threading.Tasks.Task<AuthenticationResponse> AuthenticateAsync(string api_version, AuthenticateCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
-        /// Authenticates a user using Google OAuth
-        /// </summary>
-        /// <param name="api_version">The requested API version</param>
-        /// <param name="body">Google authentication request</param>
-        /// <returns>Returns the user data with access token</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ExternalAuthResponse> GoogleAuthAsync(string api_version, ExternalAuthRequest body);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Authenticates a user using Google OAuth
-        /// </summary>
-        /// <param name="api_version">The requested API version</param>
-        /// <param name="body">Google authentication request</param>
-        /// <returns>Returns the user data with access token</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ExternalAuthResponse> GoogleAuthAsync(string api_version, ExternalAuthRequest body, System.Threading.CancellationToken cancellationToken);
-
-        /// <summary>
         /// Authenticates a user using Microsoft OAuth
         /// </summary>
         /// <param name="api_version">The requested API version</param>
@@ -1015,124 +996,6 @@ namespace ArtGallery.ClientApp.Services
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             throw new ApiException<ErrorResponse>("If authentication fails", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
-                        }
-                        else
-                        if (status_ == 429)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            throw new ApiException<ProblemDetails>("Too many requests", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// Authenticates a user using Google OAuth
-        /// </summary>
-        /// <param name="api_version">The requested API version</param>
-        /// <param name="body">Google authentication request</param>
-        /// <returns>Returns the user data with access token</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ExternalAuthResponse> GoogleAuthAsync(string api_version, ExternalAuthRequest body)
-        {
-            return GoogleAuthAsync(api_version, body, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Authenticates a user using Google OAuth
-        /// </summary>
-        /// <param name="api_version">The requested API version</param>
-        /// <param name="body">Google authentication request</param>
-        /// <returns>Returns the user data with access token</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ExternalAuthResponse> GoogleAuthAsync(string api_version, ExternalAuthRequest body, System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, _settings.Value);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "api/Account/google-auth"
-                    urlBuilder_.Append("api/Account/google-auth");
-                    urlBuilder_.Append('?');
-                    if (api_version != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("api-version")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ExternalAuthResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 400)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ErrorResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            throw new ApiException<ErrorResponse>("If Google token validation fails", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         if (status_ == 429)
@@ -5665,6 +5528,48 @@ namespace ArtGallery.ClientApp.Services
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.3.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PaintingBriefDto
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("title")]
+        public string Title { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("creationYear")]
+        public int CreationYear { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("medium")]
+        public string Medium { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("dimensions")]
+        public string Dimensions { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("imageUrl")]
+        public string ImageUrl { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("paintType")]
+        public PaintType PaintType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("paintTypeName")]
+        public string PaintTypeName { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("artist")]
+        public ArtistBriefDto Artist { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("genre")]
+        public GenreDto Genre { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("museum")]
+        public MuseumBriefDto Museum { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.3.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class PaintingDetailDto
     {
 
@@ -5841,6 +5746,12 @@ namespace ArtGallery.ClientApp.Services
 
         [System.Text.Json.Serialization.JsonPropertyName("emailConfirmed")]
         public bool EmailConfirmed { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("favoritePaintings")]
+        public System.Collections.Generic.ICollection<PaintingBriefDto> FavoritePaintings { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("favoriteArtists")]
+        public System.Collections.Generic.ICollection<ArtistBriefDto> FavoriteArtists { get; set; }
 
     }
 

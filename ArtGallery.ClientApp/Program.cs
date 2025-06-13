@@ -49,6 +49,7 @@ builder.Services.AddScoped<IClient>(sp =>
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IPaintingService, PaintingService>();
 builder.Services.AddScoped<IArtistService, ArtistService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
 
 // Default HttpClient for other purposes
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });

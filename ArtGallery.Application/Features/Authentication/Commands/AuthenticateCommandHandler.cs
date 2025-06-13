@@ -50,7 +50,10 @@ namespace ArtGallery.Application.Features.Authentication.Commands
             }
 
             var jwtToken = await GenerateTokenAsync(user);
-
+            
+            user.LastActive = DateTime.UtcNow;
+            await _userManagerService.UserManager.UpdateAsync(user);
+            
             _logger.LogInformation("User authenticated successfully: {Email}", request.Email);
 
             return new AuthenticationResponse

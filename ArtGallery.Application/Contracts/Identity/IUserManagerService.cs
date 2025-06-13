@@ -22,4 +22,5 @@ public interface IUserManagerService
     Task<bool> RoleExistsAsync(string roleName);
     Task UpdateUserAsync(string userId, string firstName, string lastName, string email, string userName);
     Task<IList<string>> RemoveUserFromRoleAsync(string userId, string roleName);
+    Task UpdateLastActiveAsync(string userId);
 }

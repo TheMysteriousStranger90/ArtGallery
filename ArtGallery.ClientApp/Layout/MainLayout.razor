@@ -41,6 +41,15 @@
                                         <i class="bi bi-person-heart me-2"></i> My Favorite Artists
                                     </a>
                                 </li>
+                                <AuthorizeView Roles="Administrator">
+                                    <Authorized Context="adminContext">
+                                        <li>
+                                            <a class="dropdown-item" href="/admin/users">
+                                                <i class="bi bi-people-fill me-2"></i> User Management
+                                            </a>
+                                        </li>
+                                    </Authorized>
+                                </AuthorizeView>
                                 <li>
                                     <a class="dropdown-item" href="/profile">
                                         <i class="bi bi-person me-2"></i> My Profile
