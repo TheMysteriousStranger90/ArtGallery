@@ -77,31 +77,6 @@
                         }
                     </select>
                 </div>
-
-                <!-- Date Range Filters -->
-                <div class="filter-group">
-                    <label class="form-label-sm">Date Range</label>
-                    <div class="mb-2">
-                        <label class="form-label-sm">From</label>
-                        <input type="date" class="form-control form-control-sm" @bind="StartDate" />
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label-sm">To</label>
-                        <input type="date" class="form-control form-control-sm" @bind="EndDate" />
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary w-100 mt-1" @onclick="ApplyDateFilter">
-                        Apply Date Filter
-                    </button>
-                </div>
-
-                @if (HasActiveFilters)
-                {
-                    <div class="filter-actions mt-3">
-                        <button class="btn btn-sm btn-outline-secondary w-100" @onclick="ClearAllFilters">
-                            <i class="bi bi-x-circle me-1"></i> Clear All Filters
-                        </button>
-                    </div>
-                }
             </div>
         </div>
 
@@ -189,13 +164,7 @@
     private bool isAdministrator = false;
 
     private List<MuseumBriefDto> museums;
-
-    private bool HasActiveFilters =>
-        MuseumId.HasValue ||
-        StartDate.HasValue ||
-        EndDate.HasValue ||
-        !string.IsNullOrEmpty(CurrentStatus);
-
+    
     [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
 
     [Parameter] [SupplyParameterFromQuery] public Guid? MuseumId { get; set; }
@@ -284,25 +253,12 @@
             {
                 exhibitions = await ExhibitionsService.GetAllExhibitionsAsync(MuseumId);
             }
-
-            // Apply search filter if needed
             if (!string.IsNullOrEmpty(ActiveSearch))
             {
                 exhibitions = exhibitions
                     .Where(e => e.Title.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase) || 
                                (e.Description != null && e.Description.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase)))
                     .ToList();
-            }
-
-            // Apply date filters if needed
-            if (StartDate.HasValue)
-            {
-                exhibitions = exhibitions.Where(e => e.EndDate >= StartDate).ToList();
-            }
-
-            if (EndDate.HasValue)
-            {
-                exhibitions = exhibitions.Where(e => e.StartDate <= EndDate).ToList();
             }
         }
         catch (ApiException ex)
