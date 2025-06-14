@@ -310,14 +310,12 @@
 
     private PaintingDto GetPaintingById(Guid paintingId)
     {
-        // Сначала ищем в основном списке
         var painting = availablePaintings.FirstOrDefault(p => p.Id == paintingId);
         if (painting != null)
         {
             return painting;
         }
 
-        // Потом в кэше
         paintingCache.TryGetValue(paintingId, out painting);
         return painting;
     }
@@ -326,7 +324,7 @@
     {
         if (paintingCache.ContainsKey(paintingId) || availablePaintings.Any(p => p.Id == paintingId))
         {
-            return; // Уже загружена
+            return;
         }
 
         try
@@ -369,7 +367,7 @@
         if (model.PaintingIds != null && model.PaintingIds.Any())
         {
             Logger.LogInformation("Ensuring {Count} paintings are loaded", model.PaintingIds.Count);
-            
+
             var loadTasks = new List<Task>();
             foreach (var paintingId in model.PaintingIds)
             {
@@ -447,7 +445,7 @@
         {
             var paintingsResponse = await ApiClient.PaintingsGET2Async(1, 1000, "", null, null, null, null, null, null, "title", "1.0");
             availablePaintings = paintingsResponse.Data.ToList();
-            
+
             Logger.LogInformation("Loaded {Count} available paintings", availablePaintings.Count);
         }
         catch (Exception ex)
@@ -498,7 +496,6 @@
         {
             if (Id == Guid.Empty)
             {
-                // Creating new exhibition
                 var createCommand = new CreateExhibitionCommand
                 {
                     Title = model.Title,
@@ -516,7 +513,6 @@
             }
             else
             {
-                // Updating existing exhibition
                 var updateCommand = new UpdateExhibitionCommand
                 {
                     Id = model.Id,
