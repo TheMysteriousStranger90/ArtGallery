@@ -1,0 +1,554 @@
+﻿@page "/admin/exhibitions/edit/{Id:guid}"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Authorization
+@using ArtGallery.ClientApp.ViewModels
+@inject IExhibitionsService ExhibitionsService
+@inject NavigationManager NavigationManager
+@inject ILogger<ExhibitionEdit> Logger
+@inject IJSRuntime JSRuntime
+@inject IClient ApiClient
+@attribute [Authorize(Roles = "Administrator")]
+
+<div class="container my-4 exhibition-edit-page">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb" class="my-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/exhibitions">Exhibitions</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">@(Id == Guid.Empty ? "Create Exhibition" : "Edit Exhibition")</li>
+                </ol>
+            </nav>
+            <h1 class="mb-4" style="color: var(--brand-secondary); font-weight: 300; font-size: 2.5rem; 
+                        border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+                @(Id == Guid.Empty ? "Create New Exhibition" : "Edit Exhibition")
+            </h1>
+
+            @if (isLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border loading-spinner" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="loading-text">Loading exhibition data...</p>
+                </div>
+            }
+            else if (errorMessage != null)
+            {
+                <div class="alert alert-danger">
+                    <h4 class="alert-heading">Error</h4>
+                    <p>@errorMessage</p>
+                    <hr>
+                    <div>
+                        <button class="btn btn-primary" @onclick="LoadData">Try Again</button>
+                        <a href="/exhibitions" class="btn btn-outline-secondary ms-2">Return to Exhibitions</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <EditForm Model="model" OnValidSubmit="HandleValidSubmit" class="exhibition-edit-form">
+                    <DataAnnotationsValidator/>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Exhibition Details</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="title" class="form-label">Title</label>
+                                        <InputText id="title" class="form-control" @bind-Value="model.Title"/>
+                                        <ValidationMessage For="@(() => model.Title)" class="text-danger"/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description</label>
+                                        <InputTextArea id="description" class="form-control" rows="5" @bind-Value="model.Description"/>
+                                        <ValidationMessage For="@(() => model.Description)" class="text-danger"/>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="startDate" class="form-label">Start Date</label>
+                                            <InputDate id="startDate" class="form-control" @bind-Value="model.StartDate"/>
+                                            <ValidationMessage For="@(() => model.StartDate)" class="text-danger"/>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="endDate" class="form-label">End Date</label>
+                                            <InputDate id="endDate" class="form-control" @bind-Value="model.EndDate"/>
+                                            <ValidationMessage For="@(() => model.EndDate)" class="text-danger"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="externalVenueAddress" class="form-label">External Venue Address (optional)</label>
+                                        <InputText id="externalVenueAddress" class="form-control" @bind-Value="model.ExternalVenueAddress"/>
+                                        <small class="form-text text-light">Leave blank if exhibition is held at the museum</small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="museumId" class="form-label">Museum</label>
+                                        <InputSelect id="museumId" class="form-select" @bind-Value="model.MuseumId">
+                                            <option value="">-- Select Museum --</option>
+                                            @if (museums != null)
+                                            {
+                                                @foreach (var museum in museums)
+                                                {
+                                                    <option value="@museum.Id">@museum.Name</option>
+                                                }
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => model.MuseumId)" class="text-danger"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Add Paintings</h4>
+                                </div>
+                                <div class="card-body">
+                                    @if (availablePaintings == null || !availablePaintings.Any())
+                                    {
+                                        <p>Loading available paintings...</p>
+                                    }
+                                    else
+                                    {
+                                        <div class="mb-3">
+                                            <label class="form-label">Search and Add Paintings</label>
+                                            <div class="mb-2">
+                                                <div class="input-group search-input-container">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-search"></i>
+                                                    </span>
+                                                    <input type="text" class="form-control" placeholder="Search paintings by title or artist..."
+                                                           @bind-value="paintingSearchTerm" @bind-value:event="oninput"/>
+                                                    @if (!string.IsNullOrWhiteSpace(paintingSearchTerm))
+                                                    {
+                                                        <button class="btn btn-outline-secondary" type="button" @onclick="() => paintingSearchTerm = string.Empty">
+                                                            <i class="bi bi-x"></i>
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <div class="input-group">
+                                                <select class="form-select" @bind="selectedPaintingId">
+                                                    <option value="">-- Select a painting to add --</option>
+                                                    @foreach (var painting in filteredPaintings)
+                                                    {
+                                                        <option value="@painting.Id">@painting.Title - @painting.Artist?.FullName (@painting.CreationYear)</option>
+                                                    }
+                                                </select>
+                                                <button class="btn btn-outline-primary" type="button" @onclick="AddSelectedPainting"
+                                                        disabled="@string.IsNullOrEmpty(selectedPaintingId.ToString())">
+                                                    <i class="bi bi-plus"></i> Add
+                                                </button>
+                                            </div>
+
+                                            @if (filteredPaintings?.Any() == true)
+                                            {
+                                                <small class="form-text text-muted mt-1">
+                                                    Showing @filteredPaintings.Count available painting(s)
+                                                    @if (!string.IsNullOrWhiteSpace(paintingSearchTerm))
+                                                    {
+                                                        <span> matching "@paintingSearchTerm"</span>
+                                                    }
+                                                </small>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-outline-secondary flex-grow-1" disabled="@isSaving">
+                                    @if (isSaving)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span>Saving...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Save Exhibition</span>
+                                    }
+                                </button>
+                                <a href="/exhibitions" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+
+                @* Selected Paintings Section - Full Width Below Form *@
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm selected-paintings-section">
+                            <div class="card-header">
+                                <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">
+                                    <i class="bi bi-images me-2"></i>
+                                    Selected Paintings (@(model.PaintingIds?.Count ?? 0))
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                @if (model.PaintingIds != null && model.PaintingIds.Any())
+                                {
+                                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                                        @foreach (var paintingId in model.PaintingIds)
+                                        {
+                                            var painting = availablePaintings.FirstOrDefault(p => p.Id == paintingId);
+                                            if (painting != null)
+                                            {
+                                                <div class="col">
+                                                    <div class="card h-100 painting-selection-card">
+                                                        <div class="position-relative">
+                                                            <img src="@painting.ImageUrl" alt="@painting.Title" class="card-img-top painting-thumb"/>
+                                                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 remove-painting-btn"
+                                                                    @onclick="() => RemovePainting(paintingId)" title="Remove from exhibition">
+                                                                <i class="bi bi-x-lg"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="card-body p-2">
+                                                            <h6 class="card-title mb-1 painting-card-title">@painting.Title</h6>
+                                                            <p class="card-text mb-1">
+                                                                <small class="painting-artist">@painting.Artist?.FullName</small>
+                                                            </p>
+                                                            <p class="card-text mb-0">
+                                                                <small class="painting-year">@painting.CreationYear</small>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col">
+                                                    <div class="card h-100 painting-selection-card painting-not-found">
+                                                        <div class="card-body p-2 text-center">
+                                                            <i class="bi bi-exclamation-triangle text-warning mb-2" style="font-size: 2rem;"></i>
+                                                            <p class="card-text">
+                                                                <small class="text-muted">Painting not found</small>
+                                                            </p>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                                                    @onclick="() => RemovePainting(paintingId)">
+                                                                <i class="bi bi-trash"></i> Remove
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-center py-5 empty-paintings-state">
+                                        <i class="bi bi-images text-muted mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                                        <h5 class="text-muted mb-2">No paintings selected for this exhibition</h5>
+                                        <p class="text-muted mb-0">Use the search and add functionality above to include paintings in this exhibition.</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private ExhibitionEditModel model = new ExhibitionEditModel();
+    private ExhibitionDetailDto exhibition;
+    private List<PaintingDto> availablePaintings = new List<PaintingDto>();
+    private Dictionary<Guid, PaintingDto> paintingCache = new Dictionary<Guid, PaintingDto>();
+    private Guid selectedPaintingId;
+    private bool isLoading = true;
+    private bool isSaving = false;
+    private string errorMessage;
+    private List<MuseumBriefDto> museums;
+    private string paintingSearchTerm = "";
+
+    private List<PaintingDto> filteredPaintings => string.IsNullOrWhiteSpace(paintingSearchTerm)
+        ? availablePaintings?.Where(p => model.PaintingIds == null || !model.PaintingIds.Contains(p.Id)).ToList() ?? new List<PaintingDto>()
+        : availablePaintings?.Where(p => (model.PaintingIds == null || !model.PaintingIds.Contains(p.Id)) &&
+                                         (p.Title?.Contains(paintingSearchTerm, StringComparison.OrdinalIgnoreCase) == true ||
+                                          p.Artist?.FullName?.Contains(paintingSearchTerm, StringComparison.OrdinalIgnoreCase) == true))
+            .ToList() ?? new List<PaintingDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMuseums();
+        await LoadAvailablePaintings();
+
+        if (Id != Guid.Empty)
+        {
+            await LoadData();
+        }
+        else
+        {
+            model = new ExhibitionEditModel
+            {
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddDays(30),
+                PaintingIds = new List<Guid>()
+            };
+            isLoading = false;
+        }
+    }
+
+    private PaintingDto GetPaintingById(Guid paintingId)
+    {
+        // Сначала ищем в основном списке
+        var painting = availablePaintings.FirstOrDefault(p => p.Id == paintingId);
+        if (painting != null)
+        {
+            return painting;
+        }
+
+        // Потом в кэше
+        paintingCache.TryGetValue(paintingId, out painting);
+        return painting;
+    }
+
+    private async Task LoadPaintingById(Guid paintingId)
+    {
+        if (paintingCache.ContainsKey(paintingId) || availablePaintings.Any(p => p.Id == paintingId))
+        {
+            return; // Уже загружена
+        }
+
+        try
+        {
+            Logger.LogInformation("Loading painting details for ID: {PaintingId}", paintingId);
+            var paintingDetail = await ApiClient.PaintingsGETAsync(paintingId, "1.0");
+            if (paintingDetail != null)
+            {
+                var paintingDto = new PaintingDto
+                {
+                    Id = paintingDetail.Id,
+                    Title = paintingDetail.Title,
+                    Description = paintingDetail.Description,
+                    CreationYear = paintingDetail.CreationYear,
+                    Medium = paintingDetail.Medium,
+                    Dimensions = paintingDetail.Dimensions,
+                    ImageUrl = paintingDetail.ImageUrl,
+                    PaintType = paintingDetail.PaintType,
+                    Artist = paintingDetail.Artist,
+                    Genre = paintingDetail.Genre,
+                    Museum = paintingDetail.Museum
+                };
+
+                paintingCache[paintingId] = paintingDto;
+                Logger.LogInformation("Successfully loaded painting: {Title}", paintingDetail.Title);
+            }
+            else
+            {
+                Logger.LogWarning("Painting with ID {PaintingId} returned null", paintingId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading painting {PaintingId}", paintingId);
+        }
+    }
+
+    private async Task EnsurePaintingsLoaded()
+    {
+        if (model.PaintingIds != null && model.PaintingIds.Any())
+        {
+            Logger.LogInformation("Ensuring {Count} paintings are loaded", model.PaintingIds.Count);
+            
+            var loadTasks = new List<Task>();
+            foreach (var paintingId in model.PaintingIds)
+            {
+                loadTasks.Add(LoadPaintingById(paintingId));
+            }
+
+            await Task.WhenAll(loadTasks);
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            exhibition = await ExhibitionsService.GetExhibitionByIdAsync(Id);
+
+            if (exhibition == null)
+            {
+                errorMessage = "Exhibition not found. It may have been deleted or you don't have permission to edit it.";
+                return;
+            }
+
+            model = new ExhibitionEditModel
+            {
+                Id = exhibition.Id,
+                Title = exhibition.Title,
+                Description = exhibition.Description,
+                StartDate = exhibition.StartDate.Date,
+                EndDate = exhibition.EndDate.Date,
+                ExternalVenueAddress = exhibition.ExternalVenueAddress,
+                MuseumId = exhibition.Museum?.Id,
+                PaintingIds = exhibition.Paintings?.Select(p => p.PaintingId).ToList() ?? new List<Guid>()
+            };
+
+            Logger.LogInformation("Loaded exhibition with {Count} paintings", model.PaintingIds.Count);
+            await EnsurePaintingsLoaded();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading exhibition data for editing. ID: {ExhibitionId}", Id);
+            errorMessage = "Failed to load exhibition data. Please try again later.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadMuseums()
+    {
+        try
+        {
+            var paintingsResponse = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
+            museums = paintingsResponse.Data
+                .Where(p => p.Museum != null)
+                .GroupBy(p => p.Museum.Id)
+                .Select(g => g.First().Museum)
+                .OrderBy(m => m.Name)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading museums for selection");
+            museums = new List<MuseumBriefDto>();
+        }
+    }
+
+    private async Task LoadAvailablePaintings()
+    {
+        try
+        {
+            var paintingsResponse = await ApiClient.PaintingsGET2Async(1, 1000, "", null, null, null, null, null, null, "title", "1.0");
+            availablePaintings = paintingsResponse.Data.ToList();
+            
+            Logger.LogInformation("Loaded {Count} available paintings", availablePaintings.Count);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading available paintings");
+            availablePaintings = new List<PaintingDto>();
+        }
+    }
+
+    private void AddSelectedPainting()
+    {
+        if (selectedPaintingId != Guid.Empty)
+        {
+            if (model.PaintingIds == null)
+            {
+                model.PaintingIds = new List<Guid>();
+            }
+
+            if (!model.PaintingIds.Contains(selectedPaintingId))
+            {
+                model.PaintingIds.Add(selectedPaintingId);
+            }
+
+            selectedPaintingId = Guid.Empty;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RemovePainting(Guid paintingId)
+    {
+        var painting = GetPaintingById(paintingId);
+        string paintingName = painting?.Title ?? "this painting";
+
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to remove '{paintingName}' from this exhibition?");
+
+        if (confirmed && model.PaintingIds != null)
+        {
+            model.PaintingIds.Remove(paintingId);
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSaving = true;
+
+        try
+        {
+            if (Id == Guid.Empty)
+            {
+                // Creating new exhibition
+                var createCommand = new CreateExhibitionCommand
+                {
+                    Title = model.Title,
+                    Description = model.Description,
+                    StartDate = model.StartDate,
+                    EndDate = model.EndDate,
+                    ExternalVenueAddress = model.ExternalVenueAddress,
+                    MuseumId = model.MuseumId,
+                    PaintingIds = model.PaintingIds
+                };
+
+                var result = await ExhibitionsService.CreateExhibitionAsync(createCommand);
+                await JSRuntime.InvokeVoidAsync("alert", "Exhibition successfully created!");
+                NavigationManager.NavigateTo($"/exhibitions/{result.Id}");
+            }
+            else
+            {
+                // Updating existing exhibition
+                var updateCommand = new UpdateExhibitionCommand
+                {
+                    Id = model.Id,
+                    Title = model.Title,
+                    Description = model.Description,
+                    StartDate = model.StartDate,
+                    EndDate = model.EndDate,
+                    ExternalVenueAddress = model.ExternalVenueAddress,
+                    MuseumId = model.MuseumId,
+                    PaintingIds = model.PaintingIds
+                };
+
+                var result = await ExhibitionsService.UpdateExhibitionAsync(Id, updateCommand);
+                await JSRuntime.InvokeVoidAsync("alert", "Exhibition successfully updated!");
+                NavigationManager.NavigateTo($"/exhibitions/{result.Id}");
+            }
+        }
+        catch (ApiException ex)
+        {
+            Logger.LogError(ex, "API error saving exhibition. Status: {StatusCode}, Response: {Response}",
+                ex.StatusCode, ex.Response);
+            await JSRuntime.InvokeVoidAsync("alert", $"Error saving exhibition: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error saving exhibition");
+            await JSRuntime.InvokeVoidAsync("alert", "An unexpected error occurred while saving the exhibition. Please try again later.");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+}
