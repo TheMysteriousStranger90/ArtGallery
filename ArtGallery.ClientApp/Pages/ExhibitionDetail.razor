@@ -9,11 +9,9 @@
 @inject ILogger<ExhibitionDetail> Logger
 @inject IJSRuntime JSRuntime
 
-
-
 <PageTitle>@(exhibition?.Title ?? "Exhibition Details")</PageTitle>
 
-<div class="container exhibition-detail-container mt-4">
+<div class="exhibition-detail-page">
     @if (isLoading)
     {
         <div class="loading-container">
@@ -62,35 +60,12 @@
                     <p>@exhibition.Description</p>
                 </div>
             </div>
-            
-            <div class="col-md-4">
-                <div class="exhibition-actions card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Actions</h5>
-                        <div class="d-grid gap-2">
-                            <a href="/exhibitions" class="btn btn-outline-primary">
-                                <i class="bi bi-arrow-left me-2"></i>Back to Exhibitions
-                            </a>
-                            @if (isAdministrator)
-                            {
-                                <a href="/admin/exhibitions/edit/@Id" class="btn btn-outline-secondary">
-                                    <i class="bi bi-pencil me-2"></i>Edit Exhibition
-                                </a>
-                                <button @onclick="DeleteExhibition" class="btn btn-outline-danger">
-                                    <i class="bi bi-trash me-2"></i>Delete Exhibition
-                                </button>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         
         @if (exhibition.Paintings != null && exhibition.Paintings.Any())
         {
             <div class="row mb-5">
                 <div class="col-12">
-                    <h3 class="mb-4">Featured Artworks</h3>
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
                         @foreach (var painting in exhibition.Paintings)
                         {
@@ -104,15 +79,6 @@
                                         <p class="card-text text-muted">@painting.ArtistName</p>
                                         <p class="card-text"><small class="text-muted">@painting.CreationYear</small></p>
                                     </div>
-                                    <div class="card-footer bg-transparent border-top-0">
-                                        <a href="/paintings/@painting.PaintingId" class="btn btn-outline-primary btn-sm">View Details</a>
-                                        @if (isAdministrator)
-                                        {
-                                            <button @onclick="() => RemovePaintingFromExhibition(painting.PaintingId)" class="btn btn-outline-danger btn-sm float-end">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                        }
-                                    </div>
                                 </div>
                             </div>
                         }
@@ -124,7 +90,7 @@
             {
                 <div class="row mt-4 mb-5">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card add-painting-card">
                             <div class="card-body">
                                 <h5 class="card-title">Add Painting to Exhibition</h5>
                                 <div class="input-group">
@@ -257,7 +223,6 @@
     {
         try
         {
-            // Using the correct parameter order: pageIndex, pageSize, search, artistId, genreId, museumId, paintType, fromYear, toYear, sort, apiVersion
             var paginatedResult = await PaintingService.GetPaintingsAsync(
                 pageIndex: 1, 
                 pageSize: 100, 
@@ -279,35 +244,6 @@
         }
     }
     
-    private async Task DeleteExhibition()
-    {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this exhibition?");
-    
-        if (confirmed)
-        {
-            try
-            {
-                // Use Id directly instead of parsing
-                bool success = await ExhibitionsService.DeleteExhibitionAsync(Id);
-            
-                if (success)
-                {
-                    await JSRuntime.InvokeVoidAsync("alert", "Exhibition has been successfully deleted");
-                    NavigationManager.NavigateTo("/exhibitions");
-                }
-                else
-                {
-                    await JSRuntime.InvokeVoidAsync("alert", "Failed to delete the exhibition");
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Error deleting exhibition {ExhibitionId}", Id);
-                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
-            }
-        }
-    }
-    
     private async Task AddPaintingToExhibition()
     {
         if (!selectedPaintingId.HasValue)
@@ -315,7 +251,6 @@
         
         try
         {
-            // Use Id directly instead of parsing
             bool success = await ExhibitionsService.AddPaintingToExhibitionAsync(Id, selectedPaintingId.Value);
         
             if (success)
@@ -324,7 +259,6 @@
                 selectedPaintingId = null;
                 await LoadExhibition();
             
-                // Remove the added painting from available paintings
                 if (availablePaintings != null)
                 {
                     availablePaintings.RemoveAll(p => p.Id == selectedPaintingId);
@@ -339,36 +273,6 @@
         {
             Logger.LogError(ex, "Error adding painting {PaintingId} to exhibition {ExhibitionId}", selectedPaintingId, Id);
             await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
-        }
-    }
-
-    
-    private async Task RemovePaintingFromExhibition(Guid paintingId)
-    {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to remove this painting from the exhibition?");
-    
-        if (confirmed)
-        {
-            try
-            {
-                // Use Id directly instead of parsing
-                bool success = await ExhibitionsService.RemovePaintingFromExhibitionAsync(Id, paintingId);
-            
-                if (success)
-                {
-                    await JSRuntime.InvokeVoidAsync("alert", "Painting removed from exhibition successfully");
-                    await LoadExhibition();
-                }
-                else
-                {
-                    await JSRuntime.InvokeVoidAsync("alert", "Failed to remove painting from exhibition");
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Error removing painting {PaintingId} from exhibition {ExhibitionId}", paintingId, Id);
-                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
-            }
         }
     }
     
