@@ -302,7 +302,7 @@
 
             var result = await ExhibitionsService.CreateExhibitionAsync(command);
 
-            NavigationManager.NavigateTo($"/exhibitions/{result.Id}?created=true");
+            NavigationManager.NavigateTo($"/exhibitions/");
         }
         catch (ApiException ex)
         {

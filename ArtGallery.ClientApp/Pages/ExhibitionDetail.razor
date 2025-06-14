@@ -9,6 +9,8 @@
 @inject ILogger<ExhibitionDetail> Logger
 @inject IJSRuntime JSRuntime
 
+
+
 <PageTitle>@(exhibition?.Title ?? "Exhibition Details")</PageTitle>
 
 <div class="container exhibition-detail-container mt-4">
@@ -197,8 +199,7 @@
 </div>
 
 @code {
-    [Parameter] public string Id { get; set; }
-    
+    [Parameter] public Guid Id { get; set; }
     private ExhibitionDetailDto exhibition;
     private List<PaintingDto> availablePaintings;
     private Guid? selectedPaintingId;
@@ -229,18 +230,11 @@
 
         try
         {
-            if (Guid.TryParse(Id, out Guid exhibitionId))
+            exhibition = await ExhibitionsService.GetExhibitionByIdAsync(Id);
+        
+            if (exhibition == null)
             {
-                exhibition = await ExhibitionsService.GetExhibitionByIdAsync(exhibitionId);
-                
-                if (exhibition == null)
-                {
-                    errorMessage = "Exhibition not found";
-                }
-            }
-            else
-            {
-                errorMessage = "Invalid exhibition ID";
+                errorMessage = "Exhibition not found";
             }
         }
         catch (ApiException ex)
@@ -288,13 +282,14 @@
     private async Task DeleteExhibition()
     {
         bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this exhibition?");
-        
+    
         if (confirmed)
         {
             try
             {
-                bool success = await ExhibitionsService.DeleteExhibitionAsync(Guid.Parse(Id));
-                
+                // Use Id directly instead of parsing
+                bool success = await ExhibitionsService.DeleteExhibitionAsync(Id);
+            
                 if (success)
                 {
                     await JSRuntime.InvokeVoidAsync("alert", "Exhibition has been successfully deleted");
@@ -317,17 +312,18 @@
     {
         if (!selectedPaintingId.HasValue)
             return;
-            
+        
         try
         {
-            bool success = await ExhibitionsService.AddPaintingToExhibitionAsync(Guid.Parse(Id), selectedPaintingId.Value);
-            
+            // Use Id directly instead of parsing
+            bool success = await ExhibitionsService.AddPaintingToExhibitionAsync(Id, selectedPaintingId.Value);
+        
             if (success)
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Painting added to exhibition successfully");
                 selectedPaintingId = null;
                 await LoadExhibition();
-                
+            
                 // Remove the added painting from available paintings
                 if (availablePaintings != null)
                 {
@@ -345,22 +341,23 @@
             await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
         }
     }
+
     
     private async Task RemovePaintingFromExhibition(Guid paintingId)
     {
         bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to remove this painting from the exhibition?");
-        
+    
         if (confirmed)
         {
             try
             {
-                bool success = await ExhibitionsService.RemovePaintingFromExhibitionAsync(Guid.Parse(Id), paintingId);
-                
+                // Use Id directly instead of parsing
+                bool success = await ExhibitionsService.RemovePaintingFromExhibitionAsync(Id, paintingId);
+            
                 if (success)
                 {
                     await JSRuntime.InvokeVoidAsync("alert", "Painting removed from exhibition successfully");
                     await LoadExhibition();
-                    
                 }
                 else
                 {

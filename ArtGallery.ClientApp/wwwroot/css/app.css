@@ -3828,3 +3828,37 @@ thead.table-dark {
         height: 40px;
     }
 }
+
+
+/* Exhibition Details and Featured Paintings headers */
+.painting-edit-form .card-header h4,
+.artist-create-form .card-header h4 {
+    color: #A1887F !important;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Painting card titles and text in the featured paintings section */
+.painting-edit-form .card-body .card-title,
+.artist-create-form .card-body .card-title {
+    color: #A1887F !important;
+    font-weight: 500;
+}
+
+.painting-edit-form .card-body .card-text,
+.artist-create-form .card-body .card-text {
+    color: #A1887F !important;
+    opacity: 0.8;
+}
+
+/* Specific targeting for the painting selection cards */
+.painting-edit-form .selected-paintings .card-body h6,
+.artist-create-form .selected-paintings .card-body h6 {
+    color: #A1887F !important;
+}
+
+.painting-edit-form .selected-paintings .card-body p,
+.artist-create-form .selected-paintings .card-body p {
+    color: #A1887F !important;
+    opacity: 0.8;
+}
