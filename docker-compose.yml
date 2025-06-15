@@ -12,6 +12,8 @@ services:
     environment:
       - CERTIFICATE_PATH=/certificates
       - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__ArtGalleryDbConnection=Server=sqlserver;Database=ArtGalleryDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;Encrypt=False;
       - ConnectionStrings__ArtGalleryIdentityDbConnection=Server=sqlserver;Database=ArtGalleryIdentityDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;Encrypt=False;
       - JWT_KEY=${JWT_KEY}
@@ -28,11 +30,11 @@ services:
         condition: service_started
     volumes:
       - data_protection_keys:/root/.aspnet/DataProtection-Keys
-      - ./certificates:/certificates
+      - ./certificates:/certificates:ro
     networks:
       - art-gallery-network
     restart: unless-stopped
-      
+  
   artgallery.clientapp:
     image: artgallery.clientapp
     build:
