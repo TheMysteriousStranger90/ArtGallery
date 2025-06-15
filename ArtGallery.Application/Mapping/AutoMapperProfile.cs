@@ -61,7 +61,22 @@ public class ArtistMappingProfile : Profile
             .ForMember(dest => dest.Museum, opt => opt.MapFrom(src => src.Museum));
                 
         CreateMap<Exhibition, ExhibitionDetailDto>()
-            .ForMember(dest => dest.Paintings, opt => opt.MapFrom(src => src.Paintings.Select(p => p.Painting)));
+            .ForMember(dest => dest.Paintings, opt => opt.Ignore())
+            .AfterMap((src, dest) => {
+                if (src.Paintings != null)
+                {
+                    dest.Paintings = src.Paintings.Select(pe => new ExhibitionPaintingDto
+                    {
+                        PaintingId = pe.PaintingId,
+                        Title = pe.Painting?.Title,
+                        ArtistName = pe.Painting?.Artist != null 
+                            ? $"{pe.Painting.Artist.FirstName} {pe.Painting.Artist.LastName}" 
+                            : "Unknown Artist",
+                        CreationYear = pe.Painting?.CreationYear ?? 0,
+                        ImageUrl = pe.Painting?.ImageUrl
+                    }).ToList();
+                }
+            });
                 
         CreateMap<Museum, MuseumBriefDto>()
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City.Name))
@@ -112,5 +127,13 @@ public class ArtistMappingProfile : Profile
                 src.FavoritePaintings))
             .ForMember(dest => dest.FavoriteArtists, opt => opt.MapFrom(src => 
                 src.FavoriteArtists));
+        
+        
+        CreateMap<PaintingExhibition, ExhibitionPaintingDto>()
+            .ForMember(dest => dest.PaintingId, opt => opt.MapFrom(src => src.PaintingId))
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Painting.Title))
+            .ForMember(dest => dest.ArtistName, opt => opt.MapFrom(src => $"{src.Painting.Artist.FirstName} {src.Painting.Artist.LastName}"))
+            .ForMember(dest => dest.CreationYear, opt => opt.MapFrom(src => src.Painting.CreationYear))
+            .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Painting.ImageUrl));
     }
 }

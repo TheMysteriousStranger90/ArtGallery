@@ -1,24 +1,29 @@
-﻿
-using ArtGallery.Application.Contracts;
+﻿using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Domain.Entities;
 using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ArtGallery.Application.Features.Exhibitions.Commands
 {
-    public class CreateExhibitionCommandHandler : IRequestHandler<CreateExhibitionCommand, CreateExhibitionCommandResponse>
+    public class
+        CreateExhibitionCommandHandler : IRequestHandler<CreateExhibitionCommand, CreateExhibitionCommandResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public CreateExhibitionCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public CreateExhibitionCommandHandler(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            ILogger<CreateExhibitionCommandHandler> logger)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<CreateExhibitionCommandResponse> Handle(CreateExhibitionCommand request, CancellationToken cancellationToken)
+        public async Task<CreateExhibitionCommandResponse> Handle(CreateExhibitionCommand request,
+            CancellationToken cancellationToken)
         {
             var response = new CreateExhibitionCommandResponse();
 
@@ -34,47 +39,56 @@ namespace ArtGallery.Application.Features.Exhibitions.Commands
 
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
-                
-                var exhibition = new Exhibition
+                Exhibition createdExhibition = null;
+
+                await _unitOfWork.ExecuteWithTransactionAsync(async () =>
                 {
-                    Title = request.Title,
-                    Description = request.Description,
-                    StartDate = request.StartDate,
-                    EndDate = request.EndDate,
-                    ExternalVenueAddress = request.ExternalVenueAddress,
-                    MuseumId = request.MuseumId
-                };
-                
-                await _unitOfWork.Repository<Exhibition>().AddAsync(exhibition);
-                
-                // Add paintings if any
-                int displayOrder = 1;
-                foreach (var paintingId in request.PaintingIds)
-                {
-                    var paintingExhibition = new PaintingExhibition
+                    var exhibition = new Exhibition
                     {
-                        ExhibitionId = exhibition.Id,
-                        PaintingId = paintingId
+                        Title = request.Title,
+                        Description = request.Description,
+                        StartDate = request.StartDate,
+                        EndDate = request.EndDate,
+                        ExternalVenueAddress = request.ExternalVenueAddress,
+                        MuseumId = request.MuseumId
                     };
-                    
-                    await _unitOfWork.Repository<PaintingExhibition>().AddAsync(paintingExhibition);
-                    displayOrder++;
+
+                    await _unitOfWork.Repository<Exhibition>().AddAsync(exhibition);
+                    await _unitOfWork.Complete();
+
+                    if (request.PaintingIds?.Any() == true)
+                    {
+                        foreach (var paintingId in request.PaintingIds)
+                        {
+                            var paintingExhibition = new PaintingExhibition
+                            {
+                                ExhibitionId = exhibition.Id,
+                                PaintingId = paintingId,
+                            };
+
+                            await _unitOfWork.Repository<PaintingExhibition>().AddAsync(paintingExhibition);
+                        }
+
+                        await _unitOfWork.Complete();
+                    }
+
+                    createdExhibition = exhibition;
+                });
+
+                if (createdExhibition != null)
+                {
+                    var exhibitionWithDetails = await _unitOfWork.ExhibitionRepository
+                        .GetExhibitionWithPaintingsAsync(createdExhibition.Id);
+
+                    response.Exhibition = _mapper.Map<ExhibitionDto>(exhibitionWithDetails);
                 }
-                
-                await _unitOfWork.CommitTransactionAsync();
-                
-                // Return the newly created exhibition
-                var createdExhibition = await _unitOfWork.ExhibitionRepository.GetExhibitionWithPaintingsAsync(exhibition.Id);
-                response.Exhibition = _mapper.Map<ExhibitionDto>(createdExhibition);
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackTransactionAsync();
                 response.Success = false;
                 response.Message = $"An error occurred while creating the exhibition: {ex.Message}";
             }
-            
+
             return response;
         }
     }

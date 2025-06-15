@@ -19,29 +19,30 @@ namespace ArtGallery.Application.Features.Exhibitions.Commands
 
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
-                
                 var exhibition = await _unitOfWork.Repository<Exhibition>().GetByIdAsync(request.Id);
-                
+
                 if (exhibition == null)
                 {
-                    throw new Exception(nameof(Exhibition));
+                    response.Success = false;
+                    response.Message = $"Exhibition with ID {request.Id} was not found.";
+                    return response;
                 }
-                
-                // Delete exhibition (related PaintingExhibition entries should be deleted by cascade)
-                await _unitOfWork.Repository<Exhibition>().RemoveAsync(exhibition);
-                
-                await _unitOfWork.CommitTransactionAsync();
-                
-                response.Message = $"Exhibition {exhibition.Title} was successfully deleted.";
+
+                await _unitOfWork.ExecuteWithTransactionAsync(async () =>
+                {
+                    await _unitOfWork.Repository<Exhibition>().RemoveAsync(exhibition);
+                    
+                    await _unitOfWork.Complete();
+                });
+
+                response.Message = $"Exhibition '{exhibition.Title}' was successfully deleted.";
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackTransactionAsync();
                 response.Success = false;
                 response.Message = $"An error occurred while deleting the exhibition: {ex.Message}";
             }
-            
+
             return response;
         }
     }

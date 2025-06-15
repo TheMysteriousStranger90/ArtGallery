@@ -1,49 +1,74 @@
 ﻿using ArtGallery.Application.Contracts;
-using ArtGallery.Application.Exceptions;
 using ArtGallery.Domain.Entities;
 using MediatR;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ArtGallery.Application.Features.Exhibitions.Commands;
-
-public class RemovePaintingFromExhibitionCommandHandler : IRequestHandler<RemovePaintingFromExhibitionCommand, ManagePaintingCommandResponse>
+namespace ArtGallery.Application.Features.Exhibitions.Commands
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public RemovePaintingFromExhibitionCommandHandler(IUnitOfWork unitOfWork)
+    public class RemovePaintingFromExhibitionCommandHandler : IRequestHandler<RemovePaintingFromExhibitionCommand, ManagePaintingCommandResponse>
     {
-        _unitOfWork = unitOfWork;
-    }
+        private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<ManagePaintingCommandResponse> Handle(RemovePaintingFromExhibitionCommand request, CancellationToken cancellationToken)
-    {
-        var response = new ManagePaintingCommandResponse();
-
-        try
+        public RemovePaintingFromExhibitionCommandHandler(IUnitOfWork unitOfWork)
         {
-            // Find the relation
-            var existingRelation = await _unitOfWork.Repository<PaintingExhibition>()
-                .GetByConditionAsync(pe => 
-                    pe.ExhibitionId == request.ExhibitionId && 
-                    pe.PaintingId == request.PaintingId);
-                
-            if (existingRelation == null)
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        }
+
+        public async Task<ManagePaintingCommandResponse> Handle(RemovePaintingFromExhibitionCommand request, CancellationToken cancellationToken)
+        {
+            var response = new ManagePaintingCommandResponse();
+
+            try
             {
-                throw new Exception(
-                    $"Relation between Exhibition (ID: {request.ExhibitionId}) and Painting (ID: {request.PaintingId})");
+                // Validate exhibition exists
+                var exhibition = await _unitOfWork.Repository<Exhibition>().GetByIdAsync(request.ExhibitionId);
+                if (exhibition == null)
+                {
+                    response.Success = false;
+                    response.Message = $"Exhibition with ID {request.ExhibitionId} not found";
+                    return response;
+                }
+
+                // Validate painting exists
+                var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.PaintingId);
+                if (painting == null)
+                {
+                    response.Success = false;
+                    response.Message = $"Painting with ID {request.PaintingId} not found";
+                    return response;
+                }
+
+                // Find the relation
+                var existingRelation = await _unitOfWork.Repository<PaintingExhibition>()
+                    .GetByConditionAsync(pe => 
+                        pe.ExhibitionId == request.ExhibitionId && 
+                        pe.PaintingId == request.PaintingId);
+                    
+                if (existingRelation == null)
+                {
+                    response.Success = false;
+                    response.Message = $"Painting with ID {request.PaintingId} is not part of exhibition with ID {request.ExhibitionId}";
+                    return response;
+                }
+                    
+                await _unitOfWork.ExecuteWithTransactionAsync(async () =>
+                {
+                    await _unitOfWork.Repository<PaintingExhibition>().RemoveAsync(existingRelation);
+                    await _unitOfWork.Complete();
+                });
+                    
+                response.Success = true;
+                response.Message = $"Painting '{painting.Title}' was successfully removed from exhibition '{exhibition.Title}'.";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"An error occurred while removing painting from exhibition: {ex.Message}";
             }
                 
-            // Remove the relation
-            await _unitOfWork.Repository<PaintingExhibition>().RemoveAsync(existingRelation);
-            await _unitOfWork.Complete();
-                
-            response.Message = "Painting successfully removed from the exhibition.";
+            return response;
         }
-        catch (Exception ex)
-        {
-            response.Success = false;
-            response.Message = $"An error occurred while removing painting from exhibition: {ex.Message}";
-        }
-            
-        return response;
     }
 }
