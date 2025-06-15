@@ -10,11 +10,10 @@ A comprehensive, modern art gallery management system built with ASP.NET, Blazor
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
-- [Development](#development)
 - [API Documentation](#api-documentation)
 - [Monitoring & Observability](#monitoring--observability)
 - [Authentication](#authentication)
-- [Deployment](#deployment)
+- [Screenshots](#screenshots)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -382,49 +381,6 @@ Tokens include:
 - **Refresh**: Automatic refresh mechanism
 - **Claims**: User ID, email, roles
 - **Encryption**: HS256 algorithm
-
-## 🚀 Deployment
-
-### Docker Deployment (Recommended)
-
-1. **Production environment file**:
-```bash
-cp .env.example .env.production
-# Edit with production values
-```
-
-2. **Generate production certificates**:
-```bash
-# Use Let's Encrypt or your certificate provider
-```
-
-3. **Deploy with Docker Compose**:
-```bash
-docker-compose -f docker-compose.yml up -d
-```
-
-### Cloud Deployment
-
-The application is cloud-ready and can be deployed to:
-- **Azure Container Instances**
-- **AWS ECS/Fargate**
-- **Google Cloud Run**
-- **Kubernetes clusters**
-
-### Environment Considerations
-
-#### Development
-- Self-signed certificates
-- In-memory caching
-- Debug logging
-- Hot reload enabled
-
-#### Production
-- Valid SSL certificates
-- Redis caching (recommended)
-- Error-level logging
-- Health checks enabled
-- Performance monitoring
 
 ## Screenshots
 ![Image 1](Screenshots/Screen1.png)

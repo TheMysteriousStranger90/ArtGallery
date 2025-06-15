@@ -68,7 +68,7 @@
                     <select id="museumFilter" class="form-select form-select-sm"
                             @bind="MuseumId" @bind:after="ApplyFilters">
                         <option value="">All Museums</option>
-                        @if (museums != null)
+                        @if (museums != null && museums.Any())
                         {
                             @foreach (var museum in museums)
                             {
@@ -77,6 +77,15 @@
                         }
                     </select>
                 </div>
+
+                @if (HasActiveFilters)
+                {
+                    <div class="filter-actions mt-3">
+                        <button class="btn btn-sm btn-outline-secondary w-100" @onclick="ClearAllFilters">
+                            <i class="bi bi-x-circle me-1"></i> Clear All Filters
+                        </button>
+                    </div>
+                }
             </div>
         </div>
 
@@ -157,13 +166,19 @@
 </div>
 
 @code {
-    private ICollection<ExhibitionDto> exhibitions;
+    private ICollection<ExhibitionDto> exhibitions = new List<ExhibitionDto>();
+    private ICollection<ExhibitionDto> allExhibitions = new List<ExhibitionDto>();
     private bool isLoading = true;
     private string? errorMessage;
     private bool _hasCompletedInitialParameterSet = false;
     private bool isAdministrator = false;
 
-    private List<MuseumBriefDto> museums;
+    private List<MuseumBriefDto> museums = new();
+    
+    private bool HasActiveFilters =>
+        MuseumId.HasValue || 
+        !string.IsNullOrEmpty(CurrentStatus) ||
+        !string.IsNullOrEmpty(ActiveSearch);
     
     [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
 
@@ -187,24 +202,29 @@
             CurrentSearch = ActiveSearch;
         }
 
-        await LoadMuseums();
+        await LoadMuseumsFromExhibitions();
     }
 
-    private async Task LoadMuseums()
+    private async Task LoadMuseumsFromExhibitions()
     {
         try
         {
-            var paintings = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
-            museums = paintings.Data
-                .Where(p => p.Museum != null)
-                .GroupBy(p => p.Museum.Id)
+            Logger.LogInformation("Loading museums from exhibitions...");
+            
+            var allExhibitionsForMuseums = await ExhibitionsService.GetAllExhibitionsAsync(null);
+            
+            museums = allExhibitionsForMuseums
+                .Where(e => e.Museum != null)
+                .GroupBy(e => e.Museum.Id)
                 .Select(g => g.First().Museum)
                 .OrderBy(m => m.Name)
                 .ToList();
+                
+            Logger.LogInformation("Loaded {MuseumCount} museums from exhibitions", museums.Count);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error loading museums for filter");
+            Logger.LogError(ex, "Error loading museums from exhibitions");
             museums = new List<MuseumBriefDto>();
         }
     }
@@ -231,35 +251,56 @@
 
         try
         {
+            Logger.LogInformation("Loading exhibitions with filters - Museum: {MuseumId}, Status: {Status}, Search: {Search}", 
+                MuseumId, CurrentStatus, ActiveSearch);
+
             if (!string.IsNullOrEmpty(CurrentStatus))
             {
                 switch (CurrentStatus.ToLower())
                 {
                     case "current":
-                        exhibitions = await ExhibitionsService.GetCurrentExhibitionsAsync();
+                        allExhibitions = await ExhibitionsService.GetCurrentExhibitionsAsync();
                         break;
                     case "upcoming":
-                        exhibitions = await ExhibitionsService.GetUpcomingExhibitionsAsync();
+                        allExhibitions = await ExhibitionsService.GetUpcomingExhibitionsAsync();
                         break;
                     case "past":
-                        exhibitions = await ExhibitionsService.GetPastExhibitionsAsync();
+                        allExhibitions = await ExhibitionsService.GetPastExhibitionsAsync();
                         break;
                     default:
-                        exhibitions = await ExhibitionsService.GetAllExhibitionsAsync(MuseumId);
+                        allExhibitions = await ExhibitionsService.GetAllExhibitionsAsync(null);
                         break;
                 }
             }
             else
             {
-                exhibitions = await ExhibitionsService.GetAllExhibitionsAsync(MuseumId);
+                allExhibitions = await ExhibitionsService.GetAllExhibitionsAsync(null);
             }
+
+            exhibitions = allExhibitions;
+
+            if (MuseumId.HasValue)
+            {
+                exhibitions = exhibitions
+                    .Where(e => e.Museum?.Id == MuseumId.Value)
+                    .ToList();
+                    
+                Logger.LogInformation("After museum filter: {Count} exhibitions", exhibitions.Count);
+            }
+
             if (!string.IsNullOrEmpty(ActiveSearch))
             {
                 exhibitions = exhibitions
-                    .Where(e => e.Title.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase) || 
-                               (e.Description != null && e.Description.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase)))
+                    .Where(e => 
+                        e.Title.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase) || 
+                        (e.Description != null && e.Description.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase)) ||
+                        (e.Museum?.Name != null && e.Museum.Name.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase)))
                     .ToList();
+                    
+                Logger.LogInformation("After search filter: {Count} exhibitions", exhibitions.Count);
             }
+
+            Logger.LogInformation("Final exhibition count: {Count}", exhibitions.Count);
         }
         catch (ApiException ex)
         {
@@ -303,47 +344,22 @@
         CurrentStatus = null;
         StartDate = null;
         EndDate = null;
+        ActiveSearch = null;
+        CurrentSearch = string.Empty;
 
-        var queryParameters = new Dictionary<string, object?>
-        {
-            ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch
-        };
-
-        var nonNullQueryParameters = queryParameters
-            .Where(kvp => kvp.Value != null)
-            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-        var baseUri = NavigationManager.Uri.Split('?')[0];
-        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
-
-        NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+        NavigateWithFilters();
     }
 
     private void ClearSearch()
     {
         CurrentSearch = string.Empty;
         ActiveSearch = null;
-
-        var queryParameters = new Dictionary<string, object?>
-        {
-            ["museumId"] = MuseumId?.ToString(),
-            ["currentStatus"] = CurrentStatus,
-            ["startDate"] = StartDate?.ToString("yyyy-MM-dd"),
-            ["endDate"] = EndDate?.ToString("yyyy-MM-dd")
-        };
-
-        var nonNullQueryParameters = queryParameters
-            .Where(kvp => kvp.Value != null)
-            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-        var baseUri = NavigationManager.Uri.Split('?')[0];
-        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
-
-        NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
+        NavigateWithFilters();
     }
 
     private void ApplyFilters()
     {
+        Logger.LogInformation("Applying filters - Museum: {MuseumId}", MuseumId);
         NavigateWithFilters();
     }
 
@@ -353,7 +369,7 @@
         {
             ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
             ["museumId"] = MuseumId?.ToString(),
-            ["currentStatus"] = CurrentStatus,
+            ["currentStatus"] = string.IsNullOrWhiteSpace(CurrentStatus) ? null : CurrentStatus,
             ["startDate"] = StartDate?.ToString("yyyy-MM-dd"),
             ["endDate"] = EndDate?.ToString("yyyy-MM-dd")
         };
@@ -365,6 +381,8 @@
         var currentUri = NavigationManager.Uri;
         var baseUri = currentUri.Split('?')[0];
         var newUri = NavigationManager.GetUriWithQueryParameters(baseUri, nonNullQueryParameters!);
+
+        Logger.LogInformation("Navigating to: {Uri}", newUri);
 
         if (currentUri != newUri)
         {
