@@ -422,13 +422,13 @@ namespace ArtGallery.Persistence.SeedData
 
             modelBuilder.Entity<Biography>().HasData(biographies);
 
-            // Seed Artist Images (Russian + Italian) - Fixed URLs
+            // Seed Artist Images
             var artistImages = new List<ArtistImage>
             {
                 new ArtistImage
                 {
                     Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21130"),
-                    PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Viktor_Vasnetsov_-_Self-portrait_-_Google_Art_Project.jpg/256px-Viktor_Vasnetsov_-_Self-portrait_-_Google_Art_Project.jpg",
+                    PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/4/4e/Wiktor_Michajlowitsch_Wassnezow_003.jpg",
                     IsMain = true,
                     PublicId = "artist_vasnetsov",
                     ArtistId = vasnetsov.Id,
@@ -437,7 +437,7 @@ namespace ArtGallery.Persistence.SeedData
                 new ArtistImage
                 {
                     Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21131"),
-                    PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Vrubel_Self-Portrait_1882.jpg/256px-Vrubel_Self-Portrait_1882.jpg",
+                    PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/f/fb/Mikhail_Vrubel_-_self-portrait_%281904%2C_GTG%29.jpg",
                     IsMain = true,
                     PublicId = "artist_vrubel",
                     ArtistId = vrubel.Id,
@@ -446,7 +446,7 @@ namespace ArtGallery.Persistence.SeedData
                 new ArtistImage
                 {
                     Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21132"),
-                    PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Aivazovsky_-_Self-portrait_1874.jpg/256px-Aivazovsky_-_Self-portrait_1874.jpg",
+                    PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c6/Aivazovsky_-_Self-portrait_1874.jpg",
                     IsMain = true,
                     PublicId = "artist_aivazovsky",
                     ArtistId = aivazovsky.Id,
@@ -455,7 +455,7 @@ namespace ArtGallery.Persistence.SeedData
                 new ArtistImage
                 {
                     Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21133"),
-                    PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Alexey_Savrasov.jpg/256px-Alexey_Savrasov.jpg",
+                    PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7a/Savrasov_photo.JPG",
                     IsMain = true,
                     PublicId = "artist_savrasov",
                     ArtistId = savrasov.Id,
@@ -515,7 +515,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1898,
                     Medium = "Oil on canvas",
                     Dimensions = "295.3 cm × 446 cm (116.3 in × 175.6 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Viktor_Vasnetsov_-_Bogatyrs_-_Google_Art_Project.jpg/800px-Viktor_Vasnetsov_-_Bogatyrs_-_Google_Art_Project.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/d/d3/Viktor_Vasnetsov_-_Богатыри_-_Google_Art_Project.jpg",
                     PaintType = PaintType.Oil,
                     ArtistId = vasnetsov.Id,
                     GenreId = mythological.Id,
@@ -531,7 +531,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1881,
                     Medium = "Oil on canvas",
                     Dimensions = "177 cm × 121 cm (69.7 in × 47.6 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Vasnetsov_Alionushka.jpg/600px-Vasnetsov_Alionushka.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/3/33/Vasnetsov_Alenushka.jpg",
                     PaintType = PaintType.Oil,
                     ArtistId = vasnetsov.Id,
                     GenreId = mythological.Id,
@@ -547,7 +547,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1890,
                     Medium = "Oil on canvas",
                     Dimensions = "114 cm × 211 cm (44.9 in × 83.1 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Vrubel_Demon.jpg/800px-Vrubel_Demon.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/9/9f/Vrubel_Demon.jpg",
                     PaintType = PaintType.Oil,
                     ArtistId = vrubel.Id,
                     GenreId = symbolism.Id,
@@ -563,7 +563,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1902,
                     Medium = "Oil on canvas",
                     Dimensions = "139 cm × 387 cm (54.7 in × 152.4 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Vrubel_Fallen_Demon.jpg/800px-Vrubel_Fallen_Demon.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/1/17/Vrubel_Fallen_Demon.jpg",
                     PaintType = PaintType.Oil,
                     ArtistId = vrubel.Id,
                     GenreId = symbolism.Id,
@@ -579,7 +579,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1850,
                     Medium = "Oil on canvas",
                     Dimensions = "221 cm × 332 cm (87.0 in × 130.7 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/4a/Hovhannes_Aivazovsky_-_The_Ninth_Wave_-_Google_Art_Project.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/54/Aivazovsky%2C_Ivan_-_The_Ninth_Wave.jpg",
                     PaintType = PaintType.Oil,
                     ArtistId = aivazovsky.Id,
                     GenreId = seascape.Id,
@@ -595,7 +595,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1849,
                     Medium = "Oil on canvas",
                     Dimensions = "100 cm × 141 cm (39.4 in × 55.5 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Aivazovsky%2C_Ivan_-_Storm_on_the_Sea_at_Night.jpg/800px-Aivazovsky%2C_Ivan_-_Storm_on_the_Sea_at_Night.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/70/Ivan_Aivazovsky_-_Ship_in_the_Stormy_Sea.jpg",
                     PaintType = PaintType.Oil,
                     ArtistId = aivazovsky.Id,
                     GenreId = seascape.Id,
@@ -611,7 +611,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1871,
                     Medium = "Oil on canvas",
                     Dimensions = "62 cm × 48.5 cm (24.4 in × 19.1 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Alexei_Savrasov_-_The_Rooks_Have_Returned.jpg/600px-Alexei_Savrasov_-_The_Rooks_Have_Returned.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/1/12/RooksBackOfSavrasov.jpg",
                     PaintType = PaintType.Oil,
                     ArtistId = savrasov.Id,
                     GenreId = landscape.Id,
@@ -627,7 +627,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1873,
                     Medium = "Oil on canvas",
                     Dimensions = "58.8 cm × 80.5 cm (23.1 in × 31.7 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Alexei_Savrasov_-_Country_Road_-_Google_Art_Project.jpg/800px-Alexei_Savrasov_-_Country_Road_-_Google_Art_Project.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7a/Алексей_К._Саврасов_-_Проселок_%281873%29.jpg",
                     PaintType = PaintType.Oil,
                     ArtistId = savrasov.Id,
                     GenreId = landscape.Id,
@@ -680,7 +680,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1512,
                     Medium = "Fresco",
                     Dimensions = "280 cm × 570 cm (110 in × 224 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Creaci%C3%B3n_de_Ad%C3%A1m.jpg/800px-Creaci%C3%B3n_de_Ad%C3%A1m.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/0c/Creation_of_Adam_Michelangelo.jpg",
                     PaintType = PaintType.Fresco,
                     ArtistId = michelangelo.Id,
                     GenreId = religious.Id,
@@ -764,7 +764,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreationYear = 1602,
                     Medium = "Oil on canvas",
                     Dimensions = "144 cm × 195 cm (57 in × 77 in)",
-                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Caravaggio_Judith_Beheading_Holofernes.jpg/800px-Caravaggio_Judith_Beheading_Holofernes.jpg",
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/d/df/Caravaggio_-_Giuditta_e_Oloferne_%28ca._1599%29.jpg",
                     PaintType = PaintType.Oil,
                     ArtistId = caravaggio.Id,
                     GenreId = religious.Id,
