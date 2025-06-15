@@ -10,8 +10,9 @@ public static class CorsExtensions
             {
                 options.AddPolicy("Open", policy => policy
                     .WithOrigins(
-                        "https://localhost:7179", 
-                        "http://localhost:5181"
+                        "https://localhost:7179",
+                        "http://localhost:5181",
+                        "https://localhost:8083"
                     )
                     .AllowAnyMethod()
                     .AllowAnyHeader()
@@ -19,11 +20,11 @@ public static class CorsExtensions
             }
             else
             {
-                // In production, restrict CORS to specific domains
                 options.AddPolicy("Open", policy => policy
                     .WithOrigins(
-                        "https://yourdomain.com",
-                        "https://www.yourdomain.com"
+                        // "https://yourdomain.com", // Add your actual production domain here
+                        // "https://www.yourdomain.com", // Add your actual production domain here
+                        "https://localhost:8083"
                     )
                     .AllowAnyMethod()
                     .AllowAnyHeader()

@@ -7,6 +7,7 @@ using ArtGallery.ClientApp.Services.Interfaces;
 using ArtGallery.ClientApp.Auth;
 using ArtGallery.ClientApp.Constants;
 using Blazored.LocalStorage;
+using Microsoft.JSInterop;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -55,4 +56,8 @@ builder.Services.AddScoped<IExhibitionsService, ExhibitionsService>();
 // Default HttpClient for other purposes
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-await builder.Build().RunAsync();
+var app = builder.Build();
+var jsRuntime = app.Services.GetRequiredService<IJSRuntime>();
+await Const.InitializeFromJsAsync(jsRuntime);
+
+await app.RunAsync();

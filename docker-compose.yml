@@ -29,6 +29,24 @@ services:
     networks:
       - art-gallery-network
     restart: unless-stopped
+      
+  artgallery.clientapp:
+    image: artgallery.clientapp
+    build:
+      context: .
+      dockerfile: ArtGallery.ClientApp/Dockerfile
+    ports:
+      - "8082:80"
+      - "8083:443"
+    volumes:
+      - ./certificates:/etc/nginx/certs:ro
+    environment:
+      - API_URL=https://localhost:8081
+    depends_on:
+      - artgallery.webapi
+    networks:
+      - art-gallery-network
+    restart: unless-stopped
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
