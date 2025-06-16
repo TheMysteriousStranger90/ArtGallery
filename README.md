@@ -15,7 +15,10 @@ A comprehensive, modern art gallery management system built with ASP.NET, Blazor
 - [Authentication](#authentication)
 - [Screenshots](#screenshots)
 - [Contributing](#contributing)
+- [Author](#author)
 - [License](#license)
+- [YouTube Review](#youtube-review)
+
 
 ## ✨ Features
 
@@ -390,6 +393,14 @@ Tokens include:
 ![Image 5](Screenshots/Screen5.png)
 ![Image 6](Screenshots/Screen6.png)
 ![Image 7](Screenshots/Screen7.png)
+![Image 8](Screenshots/Screen8.png)
+![Image 9](Screenshots/Screen9.png)
+![Image 10](Screenshots/Screen10.png)
+![Image 11](Screenshots/Screen11.png)
+![Image 12](Screenshots/Screen12.png)
+![Image 13](Screenshots/Screen13.png)
+![Image 14](Screenshots/Screen14.png)
+![Image 15](Screenshots/Screen15.png)
 
 ## Contributing
 
@@ -402,3 +413,10 @@ Contributions are welcome. Please fork the repository and create a pull request 
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## YouTube Review
+<details>
+<summary>📺 Watch Video Review</summary>
+
+[![YouTube](https://img.youtube.com/vi/wLmx1pw73I0/maxresdefault.jpg)](https://youtu.be/wLmx1pw73I0)
+</details>
