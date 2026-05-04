@@ -40,10 +40,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ArtGallery.Application\ArtGallery.Application.csproj" />
-      <ProjectReference Include="..\ArtGallery.Identity\ArtGallery.Identity.csproj" />
-      <ProjectReference Include="..\ArtGallery.Infrastructure\ArtGallery.Infrastructure.csproj" />
-      <ProjectReference Include="..\ArtGallery.Persistence\ArtGallery.Persistence.csproj" />
+      <ProjectReference Include="..\..\Core\ArtGallery.Application\ArtGallery.Application.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\ArtGallery.Identity\ArtGallery.Identity.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\ArtGallery.Infrastructure\ArtGallery.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\ArtGallery.Persistence\ArtGallery.Persistence.csproj" />
     </ItemGroup>
 
     <ItemGroup>

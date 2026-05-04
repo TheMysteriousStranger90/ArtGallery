@@ -6,8 +6,8 @@ riderModule.iml
 
 
 
-ArtGallery.WebAPI/appsettings.json
-ArtGallery.WebAPI/appsettings.Production.json
+src/API/ArtGallery.WebAPI/appsettings.json
+src/API/ArtGallery.WebAPI/appsettings.Production.json
 .idea/
 certificates/
 
@@ -17,10 +17,10 @@ certificates/
 .env.development
 .env.test
 .env.production
-ArtGallery.WebAPI/.env
-ArtGallery.WebAPI/.env.production
+src/API/ArtGallery.WebAPI/.env
+src/API/ArtGallery.WebAPI/.env.production
 
 # Log files
 *.log
 logs/
-ArtGallery.WebAPI/logs/
+src/API/ArtGallery.WebAPI/logs/

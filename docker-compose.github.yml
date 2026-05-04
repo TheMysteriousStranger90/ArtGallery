@@ -1,11 +1,11 @@
-﻿version: '3.8'
+version: '3.8'
 
 services:
   artgallery.webapi:
     image: ${DOCKERHUB_USERNAME}/artgallery.webapi:${GITHUB_SHA}
     build:
       context: .
-      dockerfile: ArtGallery.WebAPI/Dockerfile
+      dockerfile: src/API/ArtGallery.WebAPI/Dockerfile
     ports:
       - "8080:8080"
       - "8081:8081"

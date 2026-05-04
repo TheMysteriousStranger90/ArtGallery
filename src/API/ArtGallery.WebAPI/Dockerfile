@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 
 RUN mkdir -p /home/app/.aspnet/DataProtection-Keys \
     && mkdir -p /tmp/serilog-buffer \
@@ -18,15 +18,16 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ArtGallery.WebAPI/ArtGallery.WebAPI.csproj", "ArtGallery.WebAPI/"]
-COPY ["ArtGallery.Persistence/ArtGallery.Persistence.csproj", "ArtGallery.Persistence/"]
-COPY ["ArtGallery.Application/ArtGallery.Application.csproj", "ArtGallery.Application/"]
-COPY ["ArtGallery.Domain/ArtGallery.Domain.csproj", "ArtGallery.Domain/"]
-COPY ["ArtGallery.Infrastructure/ArtGallery.Infrastructure.csproj", "ArtGallery.Infrastructure/"]
-COPY ["ArtGallery.Identity/ArtGallery.Identity.csproj", "ArtGallery.Identity/"]
-RUN dotnet restore "ArtGallery.WebAPI/ArtGallery.WebAPI.csproj"
+COPY ["src/API/ArtGallery.WebAPI/ArtGallery.WebAPI.csproj", "src/API/ArtGallery.WebAPI/"]
+COPY ["src/Infrastructure/ArtGallery.Persistence/ArtGallery.Persistence.csproj", "src/Infrastructure/ArtGallery.Persistence/"]
+COPY ["src/Core/ArtGallery.Application/ArtGallery.Application.csproj", "src/Core/ArtGallery.Application/"]
+COPY ["src/Core/ArtGallery.Domain/ArtGallery.Domain.csproj", "src/Core/ArtGallery.Domain/"]
+COPY ["src/Infrastructure/ArtGallery.Infrastructure/ArtGallery.Infrastructure.csproj", "src/Infrastructure/ArtGallery.Infrastructure/"]
+COPY ["src/Infrastructure/ArtGallery.Identity/ArtGallery.Identity.csproj", "src/Infrastructure/ArtGallery.Identity/"]
+COPY ["Directory.Packages.props", "./"]
+RUN dotnet restore "src/API/ArtGallery.WebAPI/ArtGallery.WebAPI.csproj"
 COPY . .
-WORKDIR "/src/ArtGallery.WebAPI"
+WORKDIR "/src/src/API/ArtGallery.WebAPI"
 RUN dotnet build "ArtGallery.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
@@ -36,5 +37,5 @@ RUN dotnet publish "ArtGallery.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/pu
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY ../.env.production /app/.env.production
+COPY .env.production /app/.env.production
 ENTRYPOINT ["dotnet", "ArtGallery.WebAPI.dll"]
