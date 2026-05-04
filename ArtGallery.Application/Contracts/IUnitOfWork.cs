@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts.Persistence;
+using ArtGallery.Application.Contracts.Persistence;
 using ArtGallery.Domain.Common;
 
 namespace ArtGallery.Application.Contracts
@@ -13,12 +13,7 @@ namespace ArtGallery.Application.Contracts
         IImageRepository ImageRepository { get; }
         IUserFavoritesRepository UserFavoritesRepository { get; }
         Task<int> Complete();
-        Task<int> CompleteWithTransaction();
-        Task BeginTransactionAsync();
-        Task CommitTransactionAsync();
-        Task RollbackTransactionAsync();
         Task ExecuteWithTransactionAsync(Func<Task> operation);
         Task<T> ExecuteWithTransactionAsync<T>(Func<Task<T>> operation);
-        bool HasChanges();
     }
 }
