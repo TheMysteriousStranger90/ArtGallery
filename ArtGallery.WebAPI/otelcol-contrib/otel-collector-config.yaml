@@ -17,17 +17,13 @@ exporters:
     namespace: artgallery
   logging:
     loglevel: info
-  otlp/elastic:
-    endpoint: elasticsearch:9200
-    tls:
-      insecure: true
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/elastic]
+      exporters: [logging]
     metrics:
       receivers: [otlp]
       processors: [batch]

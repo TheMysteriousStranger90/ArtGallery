@@ -1,4 +1,4 @@
-﻿version: '3.8'
+version: '3.8'
 
 services:
   artgallery.webapi:
@@ -133,6 +133,7 @@ services:
     command: ["--config=/etc/otel-collector-config.yaml"]
     ports:
       - "4317:4317"
+      - "8889:8889"
     networks:
       - art-gallery-network
     restart: unless-stopped

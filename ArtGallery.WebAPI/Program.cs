@@ -80,6 +80,7 @@ if (app.Environment.IsDevelopment())
 app.UseRequestLogging();
 app.UseMiddleware<ErrorAlertMiddleware>();
 app.UseGlobalExceptionHandling();
+app.UseMetricServer(9091);
 app.UseHttpsRedirection();
 app.UseCors("Open");
 app.UseRateLimiter();
@@ -156,7 +157,6 @@ app.Use(async (context, next) =>
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseMetricServer();
 app.UseHttpMetrics();
 app.MapMetrics();
 app.MapHealthChecks("/health");
