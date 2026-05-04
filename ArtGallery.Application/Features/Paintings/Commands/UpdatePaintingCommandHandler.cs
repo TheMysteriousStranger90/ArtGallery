@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Specifications;
@@ -110,7 +110,7 @@ namespace ArtGallery.Application.Features.Paintings.Commands
                     painting.GenreId = request.GenreId;
                     painting.MuseumId = request.MuseumId;
 
-                    await _unitOfWork.Repository<Painting>().UpdateAsync(painting);
+                    await _unitOfWork.PaintingRepository.UpdateAsync(painting);
 
                     var existingTags = await _unitOfWork.Repository<PaintingTag>()
                         .ListAsync(new BaseSpecification<PaintingTag>(pt => pt.PaintingId == request.Id));

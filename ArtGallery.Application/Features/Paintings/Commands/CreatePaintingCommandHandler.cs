@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Domain.Entities;
@@ -74,7 +74,7 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
                     painting.ImageUrl = imageUrl;
                 }
                 
-                await _unitOfWork.Repository<Painting>().AddAsync(painting);
+                await _unitOfWork.PaintingRepository.AddAsync(painting);
                 
                 await _unitOfWork.Complete();
                 

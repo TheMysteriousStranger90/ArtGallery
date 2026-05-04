@@ -1,8 +1,6 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Exceptions;
-using ArtGallery.Application.Specifications;
-using ArtGallery.Domain.Entities;
 using AutoMapper;
 using MediatR;
 
@@ -21,15 +19,13 @@ public class GetPaintingDetailQueryHandler : IRequestHandler<GetPaintingDetailQu
 
     public async Task<PaintingDetailDto> Handle(GetPaintingDetailQuery request, CancellationToken cancellationToken)
     {
-        var spec = new PaintingSpecification(request.Id);
-            
-        var painting = await _unitOfWork.Repository<Painting>().GetEntityWithSpec(spec);
-            
+        var painting = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(request.Id);
+
         if (painting == null)
         {
-            throw new Exception(nameof(Painting));
+            throw new NotFoundException("Painting not found");
         }
-            
+
         return _mapper.Map<PaintingDetailDto>(painting);
     }
 }

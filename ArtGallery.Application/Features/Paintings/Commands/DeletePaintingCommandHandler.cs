@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.Exceptions;
 using ArtGallery.Application.Specifications;
@@ -26,7 +26,7 @@ public class DeletePaintingCommandHandler : IRequestHandler<DeletePaintingComman
 
         try
         {
-            var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.Id);
+            var painting = await _unitOfWork.PaintingRepository.GetByIdAsync(request.Id);
 
             if (painting == null)
             {

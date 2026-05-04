@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Domain.Entities;
@@ -101,7 +101,7 @@ namespace ArtGallery.Application.Features.Artists.Commands
                     artistToUpdate.DeathDate = request.DeathDate;
                     artistToUpdate.Nationality = request.Nationality;
                     
-                    await _unitOfWork.Repository<Artist>().UpdateAsync(artistToUpdate);
+                    await _unitOfWork.ArtistRepository.UpdateAsync(artistToUpdate);
                     
                     if (request.Biography != null)
                     {

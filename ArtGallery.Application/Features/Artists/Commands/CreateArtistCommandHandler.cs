@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Domain.Entities;
@@ -14,7 +14,7 @@ namespace ArtGallery.Application.Features.Artists.Commands
         private readonly IImageService _imageService;
 
         public CreateArtistCommandHandler(
-            IUnitOfWork unitOfWork, 
+            IUnitOfWork unitOfWork,
             IMapper mapper,
             IImageService imageService)
         {
@@ -40,7 +40,7 @@ namespace ArtGallery.Application.Features.Artists.Commands
             try
             {
                 Artist createdArtist = null;
-                
+
                 await _unitOfWork.ExecuteWithTransactionAsync(async () =>
                 {
                     var artist = new Artist
@@ -51,9 +51,9 @@ namespace ArtGallery.Application.Features.Artists.Commands
                         DeathDate = request.DeathDate,
                         Nationality = request.Nationality
                     };
-                    
-                    await _unitOfWork.Repository<Artist>().AddAsync(artist);
-                    
+
+                    await _unitOfWork.ArtistRepository.AddAsync(artist);
+
                     if (request.Biography != null)
                     {
                         var biography = new Biography
@@ -63,19 +63,19 @@ namespace ArtGallery.Application.Features.Artists.Commands
                             ShortDescription = request.Biography.ShortDescription,
                             References = request.Biography.References
                         };
-                        
+
                         await _unitOfWork.Repository<Biography>().AddAsync(biography);
                     }
 
                     if (request.Image != null)
                     {
                         var imageUploadResult = await _imageService.AddImageAsync(request.Image);
-                        
+
                         if (imageUploadResult.Error != null)
                         {
                             throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
                         }
-                        
+
                         var artistImage = new ArtistImage
                         {
                             ArtistId = artist.Id,
@@ -83,12 +83,12 @@ namespace ArtGallery.Application.Features.Artists.Commands
                             PublicId = imageUploadResult.PublicId,
                             IsMain = true
                         };
-                        
+
                         await _unitOfWork.Repository<ArtistImage>().AddAsync(artistImage);
                     }
-                    
+
                     await _unitOfWork.Complete();
-                    
+
                     createdArtist = artist;
                 });
 
@@ -103,7 +103,7 @@ namespace ArtGallery.Application.Features.Artists.Commands
                 response.Success = false;
                 response.Message = $"An error occurred while creating the artist: {ex.Message}";
             }
-            
+
             return response;
         }
     }

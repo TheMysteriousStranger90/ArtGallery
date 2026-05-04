@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.Specifications;
 using ArtGallery.Domain.Entities;
@@ -24,7 +24,7 @@ public class DeleteArtistCommandHandler : IRequestHandler<DeleteArtistCommand, D
 
         try
         {
-            var artist = await _unitOfWork.Repository<Artist>().GetByIdAsync(request.Id);
+            var artist = await _unitOfWork.ArtistRepository.GetByIdAsync(request.Id);
 
             if (artist == null)
             {

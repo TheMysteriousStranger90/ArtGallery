@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts.Persistence;
+using ArtGallery.Application.Contracts.Persistence;
 using ArtGallery.Domain.Entities;
 using ArtGallery.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -11,19 +11,13 @@ public class ArtistRepository : GenericRepository<Artist>, IArtistRepository
     {
     }
 
-    public async Task<IReadOnlyList<Artist>> GetArtistsByNationalityAsync(string nationality)
-    {
-        return await _context.Artists
-            .Where(a => a.Nationality == nationality)
-            .ToListAsync();
-    }
-
     public async Task<Artist> GetArtistWithPaintingsAsync(Guid artistId)
     {
         return await _context.Artists
             .Include(a => a.Biography)
-            .Include(a => a.ArtistImage.Where(ai => ai.IsMain))
+            .Include(a => a.ArtistImage)
             .Include(a => a.Paintings)
+                .ThenInclude(p => p.Genre)
             .FirstOrDefaultAsync(a => a.Id == artistId);
     }
 
