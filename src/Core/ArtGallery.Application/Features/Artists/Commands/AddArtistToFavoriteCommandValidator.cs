@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ArtGallery.Application.Features.Artists.Commands;
 

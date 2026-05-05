@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ArtGallery.ClientApp.ViewModels
 {
@@ -72,7 +72,8 @@ namespace ArtGallery.ClientApp.ViewModels
 
         public bool CanAttemptLogin()
         {
-            if (!IsAccountLocked) return true;
+            if (!IsAccountLocked)
+                return true;
             if (LastAttempt.HasValue && DateTime.Now.Subtract(LastAttempt.Value).TotalMinutes >= 15)
             {
                 IsAccountLocked = false;

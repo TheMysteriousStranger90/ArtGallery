@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Domain.Entities;
 using AutoMapper;

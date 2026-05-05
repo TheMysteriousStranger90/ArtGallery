@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Text.Json;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Exceptions;
@@ -285,7 +285,7 @@ namespace ArtGallery.WebAPI.Tests
 
             var okResult = (OkObjectResult)result;
             var propertyInfo = okResult.Value.GetType().GetProperties()
-                .FirstOrDefault(p => p.Name.ToLowerInvariant().Contains("message"));
+                .FirstOrDefault(p => p.Name.Contains("message", StringComparison.OrdinalIgnoreCase));
 
             propertyInfo.Should().NotBeNull("Response should have a message property");
             var propertyValue = propertyInfo.GetValue(okResult.Value)?.ToString();

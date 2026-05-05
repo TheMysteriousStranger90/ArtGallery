@@ -1,5 +1,3 @@
-﻿using Serilog;
-
 namespace ArtGallery.WebAPI.Logging;
 
 public class BusinessEventLogger : IBusinessEventLogger

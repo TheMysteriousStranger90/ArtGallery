@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Entities;
+using ArtGallery.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,12 +9,12 @@ public class UserFavoriteArtistConfiguration : IEntityTypeConfiguration<UserFavo
     public void Configure(EntityTypeBuilder<UserFavoriteArtist> builder)
     {
         builder.HasKey(ufa => new { ufa.UserId, ufa.ArtistId });
-            
+
         builder.HasOne(ufa => ufa.User)
             .WithMany(u => u.FavoriteArtists)
             .HasForeignKey(ufa => ufa.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-            
+
         builder.HasOne(ufa => ufa.Artist)
             .WithMany(a => a.UserFavoriteArtists)
             .HasForeignKey(ufa => ufa.ArtistId)

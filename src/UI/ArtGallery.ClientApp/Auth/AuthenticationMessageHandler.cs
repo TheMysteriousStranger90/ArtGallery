@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using ArtGallery.ClientApp.Services.Interfaces;
 
 namespace ArtGallery.ClientApp.Auth
@@ -17,13 +17,13 @@ namespace ArtGallery.ClientApp.Auth
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request, 
+            HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
             try
             {
                 var token = await _tokenService.GetTokenAsync();
-                
+
                 if (!string.IsNullOrEmpty(token))
                 {
                     var isValid = await _tokenService.IsTokenValidAsync();

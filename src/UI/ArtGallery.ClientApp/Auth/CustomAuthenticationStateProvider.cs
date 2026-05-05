@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using ArtGallery.ClientApp.Services.Interfaces;
 using System.Security.Claims;
 using System.Text.Json;
+using ArtGallery.ClientApp.Services.Interfaces;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace ArtGallery.ClientApp.Auth
 {
@@ -84,14 +84,15 @@ namespace ArtGallery.ClientApp.Auth
         private IEnumerable<Claim> ParseTokenClaims(string jwt)
         {
             var claims = new List<Claim>();
-            
+
             try
             {
                 var payload = jwt.Split('.')[1];
                 var jsonBytes = ParseBase64WithoutPadding(payload);
                 var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
 
-                if (keyValuePairs == null) return claims;
+                if (keyValuePairs == null)
+                    return claims;
 
                 // Handle roles
                 if (keyValuePairs.TryGetValue(ClaimTypes.Role, out object? roles))
@@ -154,8 +155,12 @@ namespace ArtGallery.ClientApp.Auth
         {
             switch (base64.Length % 4)
             {
-                case 2: base64 += "=="; break;
-                case 3: base64 += "="; break;
+                case 2:
+                    base64 += "==";
+                    break;
+                case 3:
+                    base64 += "=";
+                    break;
             }
             return Convert.FromBase64String(base64);
         }

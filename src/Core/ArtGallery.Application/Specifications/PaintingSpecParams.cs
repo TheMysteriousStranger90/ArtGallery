@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Entities.Enums;
+using ArtGallery.Domain.Entities.Enums;
 
 namespace ArtGallery.Application.Specifications;
 
@@ -13,20 +13,20 @@ public class PaintingSpecParams
         get => _pageSize;
         set => _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
     }
-    
+
     public Guid? ArtistId { get; set; }
     public Guid? GenreId { get; set; }
     public Guid? MuseumId { get; set; }
     public PaintType? PaintType { get; set; }
     public int? FromYear { get; set; }
     public int? ToYear { get; set; }
-    
+
     public string Sort { get; set; } = "title";
-        
+
     private string _search = "";
     public string Search
     {
         get => _search;
-        set => _search = value.ToLower();
+        set => _search = value.ToLowerInvariant();
     }
 }

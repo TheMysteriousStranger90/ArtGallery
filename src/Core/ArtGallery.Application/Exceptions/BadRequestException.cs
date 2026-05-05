@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 
 namespace ArtGallery.Application.Exceptions;
 
@@ -8,7 +8,7 @@ public class BadRequestException : CustomException
         : base(message, null, HttpStatusCode.BadRequest)
     {
     }
-        
+
     public BadRequestException(string message, List<string> errors)
         : base(message, errors, HttpStatusCode.BadRequest)
     {

@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Application.DTOs;
+namespace ArtGallery.Application.DTOs;
 
 public class ExhibitionDto
 {
@@ -10,14 +10,16 @@ public class ExhibitionDto
     public string FormattedDateRange => $"{StartDate.ToShortDateString()} - {EndDate.ToShortDateString()}";
     public string ExternalVenueAddress { get; set; }
     public string Status => GetExhibitionStatus();
-        
+
     public MuseumBriefDto Museum { get; set; }
-        
+
     private string GetExhibitionStatus()
     {
         var today = DateTime.Today;
-        if (today < StartDate) return "Upcoming";
-        if (today > EndDate) return "Past";
+        if (today < StartDate)
+            return "Upcoming";
+        if (today > EndDate)
+            return "Past";
         return "Current";
     }
 }

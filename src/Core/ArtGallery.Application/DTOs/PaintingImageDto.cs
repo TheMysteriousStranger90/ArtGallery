@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Application.DTOs;
+namespace ArtGallery.Application.DTOs;
 
 public class PaintingImageDto
 {

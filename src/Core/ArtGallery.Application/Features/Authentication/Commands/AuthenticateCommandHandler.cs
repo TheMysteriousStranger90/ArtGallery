@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ArtGallery.Application.Contracts.Identity;
@@ -34,7 +34,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
             _logger.LogInformation("Attempting to authenticate user: {Email}", request.Email);
 
             var user = await _userManagerService.UserManager.FindByEmailAsync(request.Email);
-            
+
             if (user == null)
             {
                 _logger.LogWarning("Authentication failed - user not found: {Email}", request.Email);
@@ -42,7 +42,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
             }
 
             var isPasswordValid = await _userManagerService.UserManager.CheckPasswordAsync(user, request.Password);
-            
+
             if (!isPasswordValid)
             {
                 _logger.LogWarning("Authentication failed - invalid password for user: {Email}", request.Email);
@@ -50,10 +50,10 @@ namespace ArtGallery.Application.Features.Authentication.Commands
             }
 
             var jwtToken = await GenerateTokenAsync(user);
-            
+
             user.LastActive = DateTime.UtcNow;
             await _userManagerService.UserManager.UpdateAsync(user);
-            
+
             _logger.LogInformation("User authenticated successfully: {Email}", request.Email);
 
             return new AuthenticationResponse
@@ -69,7 +69,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
         {
             var userClaims = await _userManagerService.UserManager.GetClaimsAsync(user);
             var roles = await _userManagerService.GetUserRolesAsync(user);
-            
+
             var roleClaims = new List<Claim>();
             foreach (var role in roles)
             {
@@ -88,7 +88,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
                 }
                 .Union(userClaims)
                 .Union(roleClaims);
-            
+
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
 
@@ -98,7 +98,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
                 signingCredentials: signingCredentials);
-            
+
             return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
         }
     }

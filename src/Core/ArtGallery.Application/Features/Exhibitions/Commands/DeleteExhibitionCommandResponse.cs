@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Responses;
+using ArtGallery.Application.Responses;
 
 namespace ArtGallery.Application.Features.Exhibitions.Commands;
 

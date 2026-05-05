@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ArtGallery.ClientApp.ViewModels
 {
@@ -89,8 +89,9 @@ namespace ArtGallery.ClientApp.ViewModels
 
         public string GetPasswordStrengthText()
         {
-            if (string.IsNullOrEmpty(Password)) return "None";
-            
+            if (string.IsNullOrEmpty(Password))
+                return "None";
+
             var score = GetPasswordScore();
             return score switch
             {
@@ -104,8 +105,9 @@ namespace ArtGallery.ClientApp.ViewModels
 
         public string GetPasswordStrengthClass()
         {
-            if (string.IsNullOrEmpty(Password)) return "text-muted";
-            
+            if (string.IsNullOrEmpty(Password))
+                return "text-muted";
+
             var score = GetPasswordScore();
             return score switch
             {
@@ -119,8 +121,9 @@ namespace ArtGallery.ClientApp.ViewModels
 
         public string GetPasswordStrengthCssClass()
         {
-            if (string.IsNullOrEmpty(Password)) return "";
-            
+            if (string.IsNullOrEmpty(Password))
+                return "";
+
             var score = GetPasswordScore();
             return score switch
             {
@@ -134,8 +137,9 @@ namespace ArtGallery.ClientApp.ViewModels
 
         public string GetPasswordStrengthColor()
         {
-            if (string.IsNullOrEmpty(Password)) return "#424242";
-            
+            if (string.IsNullOrEmpty(Password))
+                return "#424242";
+
             var score = GetPasswordScore();
             return score switch
             {
@@ -149,8 +153,9 @@ namespace ArtGallery.ClientApp.ViewModels
 
         public int GetPasswordStrengthPercentage()
         {
-            if (string.IsNullOrEmpty(Password)) return 0;
-            
+            if (string.IsNullOrEmpty(Password))
+                return 0;
+
             var score = GetPasswordScore();
             return score switch
             {
@@ -164,15 +169,21 @@ namespace ArtGallery.ClientApp.ViewModels
 
         private int GetPasswordScore()
         {
-            if (string.IsNullOrEmpty(Password)) return 0;
+            if (string.IsNullOrEmpty(Password))
+                return 0;
 
             int score = 0;
 
-            if (Password.Length >= 6) score++;
-            if (System.Text.RegularExpressions.Regex.IsMatch(Password, @"[a-z]")) score++;
-            if (System.Text.RegularExpressions.Regex.IsMatch(Password, @"[A-Z]")) score++;
-            if (System.Text.RegularExpressions.Regex.IsMatch(Password, @"\d")) score++;
-            if (System.Text.RegularExpressions.Regex.IsMatch(Password, @"[^\w\s]")) score++;
+            if (Password.Length >= 6)
+                score++;
+            if (System.Text.RegularExpressions.Regex.IsMatch(Password, @"[a-z]"))
+                score++;
+            if (System.Text.RegularExpressions.Regex.IsMatch(Password, @"[A-Z]"))
+                score++;
+            if (System.Text.RegularExpressions.Regex.IsMatch(Password, @"\d"))
+                score++;
+            if (System.Text.RegularExpressions.Regex.IsMatch(Password, @"[^\w\s]"))
+                score++;
 
             return score;
         }

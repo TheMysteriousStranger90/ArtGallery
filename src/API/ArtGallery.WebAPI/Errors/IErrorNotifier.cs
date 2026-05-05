@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.WebAPI.Errors;
+namespace ArtGallery.WebAPI.Errors;
 
 public interface IErrorNotifier
 {

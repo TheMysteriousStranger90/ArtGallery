@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Models.Authentication;
+using ArtGallery.Application.Models.Authentication;
 using MediatR;
 
 namespace ArtGallery.Application.Features.Authentication.Commands

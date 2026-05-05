@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Application.Models.Users;
+namespace ArtGallery.Application.Models.Users;
 
 public class UpdateProfileRequest
 {

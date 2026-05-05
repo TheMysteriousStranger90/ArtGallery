@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ArtGallery.Application.Contracts.Persistence;
 using ArtGallery.Application.Specifications.Interfaces;
 using ArtGallery.Domain.Common;
@@ -55,9 +55,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         _dbSet.Update(entity);
         await _context.SaveChangesAsync();
         */
-        
+
         var existingEntity = await _dbSet.FindAsync(entity.Id);
-    
+
         if (existingEntity != null)
         {
             _context.Entry(existingEntity).State = EntityState.Detached;
@@ -77,7 +77,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         return await _dbSet.FirstOrDefaultAsync(predicate);
     }
-    
+
     private IQueryable<T> ApplySpecification(ISpecification<T> spec)
     {
         if (spec == null)
@@ -86,24 +86,24 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         }
 
         var query = _context.Set<T>().AsQueryable();
-        
+
         if (spec.Criteria != null)
         {
             query = query.Where(spec.Criteria);
         }
-        
+
         if (spec.Includes != null)
         {
-            query = spec.Includes.Aggregate(query, 
+            query = spec.Includes.Aggregate(query,
                 (current, include) => include != null ? current.Include(include) : current);
         }
-        
+
         // Add this section to handle complex includes
         if (spec.IncludeQueryBuilder != null)
         {
             query = spec.IncludeQueryBuilder(query);
         }
-    
+
         if (spec.OrderBy != null)
         {
             query = query.OrderBy(spec.OrderBy);
@@ -112,7 +112,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         {
             query = query.OrderByDescending(spec.OrderByDescending);
         }
-    
+
         if (spec.IsPagingEnabled)
         {
             query = query.Skip(spec.Skip).Take(spec.Take);

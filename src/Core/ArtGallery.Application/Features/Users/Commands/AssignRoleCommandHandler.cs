@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts.Identity;
+using ArtGallery.Application.Contracts.Identity;
 using ArtGallery.Application.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;

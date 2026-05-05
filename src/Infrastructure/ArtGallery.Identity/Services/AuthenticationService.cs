@@ -1,20 +1,17 @@
-﻿using ArtGallery.Application.Contracts.Identity;
+using ArtGallery.Application.Contracts.Identity;
 using ArtGallery.Application.Features.Authentication.Commands;
 using ArtGallery.Application.Models.Authentication;
-using ArtGallery.Domain.Entities;
 using MediatR;
 
 namespace ArtGallery.Identity.Services
 {
-    public class AuthenticationService : IAuthenticationService 
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly IMediator _mediator;
-        private readonly IUserManagerService _userManagerService;
 
-        public AuthenticationService(IMediator mediator, IUserManagerService userManagerService)
+        public AuthenticationService(IMediator mediator)
         {
             _mediator = mediator;
-            _userManagerService = userManagerService;
         }
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)

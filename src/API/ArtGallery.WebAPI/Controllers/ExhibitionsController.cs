@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.DTOs;
+using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Exceptions;
 using ArtGallery.Application.Features.Exhibitions.Commands;
 using ArtGallery.Application.Features.Exhibitions.Queries;
@@ -24,7 +24,7 @@ public class ExhibitionsController : ControllerBase
         _mediator = mediator;
         _logger = logger;
     }
-    
+
     /// <summary>
     /// Get all exhibitions with optional museum filter
     /// </summary>
@@ -35,13 +35,13 @@ public class ExhibitionsController : ControllerBase
     public async Task<ActionResult<List<ExhibitionDto>>> GetExhibitions([FromQuery] Guid? museumId = null)
     {
         _logger.LogInformation("Getting all exhibitions with museumId filter: {MuseumId}", museumId);
-        
+
         var query = new GetExhibitionsListQuery { MuseumId = museumId };
         var result = await _mediator.Send(query);
-        
+
         return Ok(result);
     }
-    
+
     /// <summary>
     /// Get current ongoing exhibitions
     /// </summary>
@@ -51,13 +51,13 @@ public class ExhibitionsController : ControllerBase
     public async Task<ActionResult<List<ExhibitionDto>>> GetCurrentExhibitions()
     {
         _logger.LogInformation("Getting current exhibitions");
-        
+
         var query = new GetCurrentExhibitionsQuery();
         var result = await _mediator.Send(query);
-        
+
         return Ok(result);
     }
-    
+
     /// <summary>
     /// Get past exhibitions that have already ended
     /// </summary>
@@ -67,13 +67,13 @@ public class ExhibitionsController : ControllerBase
     public async Task<ActionResult<List<ExhibitionDto>>> GetPastExhibitions()
     {
         _logger.LogInformation("Getting past exhibitions");
-        
+
         var query = new GetPastExhibitionsQuery();
         var result = await _mediator.Send(query);
-        
+
         return Ok(result);
     }
-    
+
     /// <summary>
     /// Get upcoming exhibitions that haven't started yet
     /// </summary>
@@ -83,13 +83,13 @@ public class ExhibitionsController : ControllerBase
     public async Task<ActionResult<List<ExhibitionDto>>> GetUpcomingExhibitions()
     {
         _logger.LogInformation("Getting upcoming exhibitions");
-        
+
         var query = new GetUpcomingExhibitionsQuery();
         var result = await _mediator.Send(query);
-        
+
         return Ok(result);
     }
-    
+
     /// <summary>
     /// Get details of a specific exhibition
     /// </summary>
@@ -101,7 +101,7 @@ public class ExhibitionsController : ControllerBase
     public async Task<ActionResult<ExhibitionDetailDto>> GetExhibitionById(Guid id)
     {
         _logger.LogInformation("Getting exhibition details for ID: {ExhibitionId}", id);
-        
+
         try
         {
             var query = new GetExhibitionDetailQuery { Id = id };
@@ -113,7 +113,7 @@ public class ExhibitionsController : ControllerBase
             throw new NotFoundException($"Exhibition with ID {id} not found");
         }
     }
-    
+
     /// <summary>
     /// Create a new exhibition
     /// </summary>
@@ -128,9 +128,9 @@ public class ExhibitionsController : ControllerBase
     public async Task<ActionResult<ExhibitionDto>> CreateExhibition([FromBody] CreateExhibitionCommand command)
     {
         _logger.LogInformation("Creating new exhibition: {Title}", command.Title);
-        
+
         var response = await _mediator.Send(command);
-        
+
         if (!response.Success)
         {
             if (response.ValidationErrors?.Count > 0)
@@ -142,13 +142,13 @@ public class ExhibitionsController : ControllerBase
                 }
                 return BadRequest(problemDetails);
             }
-            
+
             throw new BadRequestException(response.Message ?? "Failed to create exhibition");
         }
-        
+
         return CreatedAtAction(nameof(GetExhibitionById), new { id = response.Exhibition.Id }, response.Exhibition);
     }
-    
+
     /// <summary>
     /// Update an existing exhibition
     /// </summary>
@@ -168,11 +168,11 @@ public class ExhibitionsController : ControllerBase
         {
             return BadRequest("The ID in the URL must match the ID in the request body");
         }
-        
+
         _logger.LogInformation("Updating exhibition with ID: {ExhibitionId}", id);
-        
+
         var response = await _mediator.Send(command);
-        
+
         if (!response.Success)
         {
             if (response.ValidationErrors?.Count > 0)
@@ -184,18 +184,18 @@ public class ExhibitionsController : ControllerBase
                 }
                 return BadRequest(problemDetails);
             }
-            
+
             if (response.Message?.Contains(nameof(Exhibition)) == true)
             {
                 throw new NotFoundException($"Exhibition with ID {id} not found");
             }
-            
+
             throw new BadRequestException(response.Message ?? "Failed to update exhibition");
         }
-        
+
         return Ok(response.Exhibition);
     }
-    
+
     /// <summary>
     /// Delete an exhibition
     /// </summary>
@@ -210,23 +210,23 @@ public class ExhibitionsController : ControllerBase
     public async Task<IActionResult> DeleteExhibition(Guid id)
     {
         _logger.LogInformation("Deleting exhibition with ID: {ExhibitionId}", id);
-        
+
         var command = new DeleteExhibitionCommand { Id = id };
         var response = await _mediator.Send(command);
-        
+
         if (!response.Success)
         {
             if (response.Message?.Contains(nameof(Exhibition)) == true)
             {
                 throw new NotFoundException($"Exhibition with ID {id} not found");
             }
-            
+
             throw new BadRequestException(response.Message ?? "Failed to delete exhibition");
         }
-        
+
         return Ok(new { message = response.Message });
     }
-    
+
     /// <summary>
     /// Add a painting to an exhibition
     /// </summary>
@@ -243,33 +243,33 @@ public class ExhibitionsController : ControllerBase
     public async Task<IActionResult> AddPaintingToExhibition(Guid exhibitionId, Guid paintingId)
     {
         _logger.LogInformation("Adding painting {PaintingId} to exhibition {ExhibitionId}", paintingId, exhibitionId);
-        
+
         var command = new AddPaintingToExhibitionCommand
         {
             ExhibitionId = exhibitionId,
             PaintingId = paintingId
         };
-        
+
         var response = await _mediator.Send(command);
-        
+
         if (!response.Success)
         {
             if (response.Message?.Contains(nameof(Exhibition)) == true)
             {
                 throw new NotFoundException($"Exhibition with ID {exhibitionId} not found");
             }
-            
+
             if (response.Message?.Contains(nameof(Painting)) == true)
             {
                 throw new NotFoundException($"Painting with ID {paintingId} not found");
             }
-            
+
             throw new BadRequestException(response.Message ?? "Failed to add painting to exhibition");
         }
-        
+
         return Ok(new { message = response.Message });
     }
-    
+
     /// <summary>
     /// Remove a painting from an exhibition
     /// </summary>
@@ -285,25 +285,25 @@ public class ExhibitionsController : ControllerBase
     public async Task<IActionResult> RemovePaintingFromExhibition(Guid exhibitionId, Guid paintingId)
     {
         _logger.LogInformation("Removing painting {PaintingId} from exhibition {ExhibitionId}", paintingId, exhibitionId);
-        
+
         var command = new RemovePaintingFromExhibitionCommand
         {
             ExhibitionId = exhibitionId,
             PaintingId = paintingId
         };
-        
+
         var response = await _mediator.Send(command);
-        
+
         if (!response.Success)
         {
             if (response.Message?.Contains("Relation") == true)
             {
                 throw new NotFoundException($"Painting {paintingId} is not part of exhibition {exhibitionId}");
             }
-            
+
             throw new BadRequestException(response.Message ?? "Failed to remove painting from exhibition");
         }
-        
+
         return Ok(new { message = response.Message });
     }
 }

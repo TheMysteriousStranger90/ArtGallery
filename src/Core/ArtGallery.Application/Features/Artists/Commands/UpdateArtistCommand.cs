@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 
 namespace ArtGallery.Application.Features.Artists.Commands;
@@ -14,7 +14,7 @@ public class UpdateArtistCommand : IRequest<UpdateArtistCommandResponse>
     public IFormFile Image { get; set; }
     public bool KeepExistingImage { get; set; } = true;
     public BiographyUpdateDto Biography { get; set; }
-        
+
     public class BiographyUpdateDto
     {
         public Guid? Id { get; set; }

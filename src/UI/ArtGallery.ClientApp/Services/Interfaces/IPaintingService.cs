@@ -1,5 +1,4 @@
-﻿using ArtGallery.ClientApp.Constants;
-using ArtGallery.ClientApp.Services;
+using ArtGallery.ClientApp.Constants;
 
 namespace ArtGallery.ClientApp.Services.Interfaces
 {

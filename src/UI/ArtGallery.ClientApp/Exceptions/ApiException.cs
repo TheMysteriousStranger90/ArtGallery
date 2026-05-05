@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.ClientApp.Exceptions;
+namespace ArtGallery.ClientApp.Exceptions;
 
 
 public class ApiException : Exception

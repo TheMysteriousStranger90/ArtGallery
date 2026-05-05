@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
 using AutoMapper;
 using MediatR;
@@ -19,12 +19,12 @@ public class GetUserFavoritePaintingsQueryHandler : IRequestHandler<GetUserFavor
     public async Task<UserFavoritePaintingsResponse> Handle(GetUserFavoritePaintingsQuery request, CancellationToken cancellationToken)
     {
         var response = new UserFavoritePaintingsResponse();
-        
+
         var favorites = await _unitOfWork.UserFavoritesRepository.GetUserFavoritePaintingsAsync(request.UserId);
-        
+
         response.FavoritePaintings = _mapper.Map<List<PaintingDto>>(favorites.Select(f => f.Painting));
         response.Count = favorites.Count;
-        
+
         return response;
     }
 }

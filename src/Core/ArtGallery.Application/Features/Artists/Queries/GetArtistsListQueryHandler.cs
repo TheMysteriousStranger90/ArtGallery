@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Helpers;
 using ArtGallery.Application.Specifications;
@@ -29,15 +29,15 @@ public class GetArtistsListQueryHandler : IRequestHandler<GetArtistsListQuery, P
             Sort = request.Sort,
             Nationality = request.Nationality
         };
-        
+
         var spec = new ArtistSpecification(artistParams);
         var countSpec = new ArtistWithFiltersForCountSpecification(artistParams);
-            
+
         var artists = await _unitOfWork.Repository<Artist>().ListAsync(spec);
         var totalItems = await _unitOfWork.Repository<Artist>().CountAsync(countSpec);
-            
+
         var artistDtos = _mapper.Map<IReadOnlyList<ArtistDto>>(artists);
-            
+
         return new Pagination<ArtistDto>(
             artistParams.PageIndex,
             artistParams.PageSize,

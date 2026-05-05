@@ -43,10 +43,10 @@ public class DeleteArtistCommandHandler : IRequestHandler<DeleteArtistCommand, D
                         await _imageService.DeleteImageAsync(image.PublicId);
                     }
                 }
-                
+
                 //await _unitOfWork.Repository<Artist>().RemoveAsync(artist);
                 await _unitOfWork.ArtistRepository.RemoveAsync(artist);
-                
+
                 await _unitOfWork.Complete();
             });
 

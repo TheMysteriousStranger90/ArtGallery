@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Features.Users.Commands;
 using ArtGallery.Application.Features.Users.Queries;

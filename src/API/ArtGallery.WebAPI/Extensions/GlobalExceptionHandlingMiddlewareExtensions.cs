@@ -1,4 +1,4 @@
-﻿using ArtGallery.WebAPI.Middleware;
+using ArtGallery.WebAPI.Middleware;
 
 namespace ArtGallery.WebAPI.Extensions;
 

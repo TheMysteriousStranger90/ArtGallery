@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 
 namespace ArtGallery.Application.Features.Artists.Commands;
@@ -12,7 +12,7 @@ public class CreateArtistCommand : IRequest<CreateArtistCommandResponse>
     public string Nationality { get; set; }
     public IFormFile Image { get; set; }
     public BiographyCreateDto Biography { get; set; }
-        
+
     public class BiographyCreateDto
     {
         public string Content { get; set; }

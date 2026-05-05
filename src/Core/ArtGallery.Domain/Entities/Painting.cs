@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Common;
+using ArtGallery.Domain.Common;
 using ArtGallery.Domain.Entities.Enums;
 
 namespace ArtGallery.Domain.Entities;
@@ -16,7 +16,7 @@ public class Painting : BaseEntity
     public Guid ArtistId { get; set; }
     public Guid? GenreId { get; set; }
     public Guid? MuseumId { get; set; }
-    
+
     public virtual Artist Artist { get; set; }
     public virtual Genre Genre { get; set; }
     public virtual Museum Museum { get; set; }

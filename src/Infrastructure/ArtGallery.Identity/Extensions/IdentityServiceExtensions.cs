@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using ArtGallery.Application.Contracts.Identity;
 using ArtGallery.Application.Helpers;
@@ -31,8 +31,8 @@ public static class IdentityServiceExtensions
                     maxRetryDelay: TimeSpan.FromSeconds(30),
                     errorNumbersToAdd: null);
             }));
-        
-        
+
+
         services.AddIdentityCore<ApplicationUser>(opt =>
             {
                 opt.Password.RequireNonAlphanumeric = false;
@@ -42,7 +42,7 @@ public static class IdentityServiceExtensions
             .AddSignInManager<SignInManager<ApplicationUser>>()
             .AddEntityFrameworkStores<ArtGalleryIdentityDbContext>()
             .AddDefaultTokenProviders();
-        
+
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IUserManagerService, UserManagerService>();
         services.AddAuthorization(opt =>

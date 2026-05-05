@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.WebAPI.Extensions;
+namespace ArtGallery.WebAPI.Extensions;
 
 public static class CorsExtensions
 {

@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Entities.Enums;
+using ArtGallery.Domain.Entities.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 

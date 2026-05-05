@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using MediatR;
 
 namespace ArtGallery.Application.Features.Artists.Queries;

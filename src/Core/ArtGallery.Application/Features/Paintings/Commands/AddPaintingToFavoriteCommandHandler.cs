@@ -1,5 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
-using ArtGallery.Domain.Entities;
+using ArtGallery.Application.Contracts;
 using MediatR;
 
 namespace ArtGallery.Application.Features.Paintings.Commands;
@@ -22,7 +21,7 @@ public class
 
         try
         {
-           //var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.PaintingId);
+            //var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.PaintingId);
             var painting = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(request.PaintingId);
             if (painting == null)
             {

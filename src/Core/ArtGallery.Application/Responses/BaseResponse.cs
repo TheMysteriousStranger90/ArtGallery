@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Application.Responses
+namespace ArtGallery.Application.Responses
 {
     public class BaseResponse
     {

@@ -41,7 +41,7 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
         try
         {
             Painting createdPainting = null;
-            
+
             await _unitOfWork.ExecuteWithTransactionAsync(async () =>
             {
                 var painting = new Painting
@@ -56,7 +56,7 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
                     GenreId = request.GenreId,
                     MuseumId = request.MuseumId
                 };
-                
+
                 string imageUrl = null;
                 string publicId = null;
 
@@ -73,11 +73,11 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
                     publicId = imageUploadResult.PublicId;
                     painting.ImageUrl = imageUrl;
                 }
-                
+
                 await _unitOfWork.PaintingRepository.AddAsync(painting);
-                
+
                 await _unitOfWork.Complete();
-                
+
                 if (request.Image != null && !string.IsNullOrEmpty(imageUrl))
                 {
                     var paintingImage = new PaintingImage
@@ -90,7 +90,7 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
 
                     await _unitOfWork.Repository<PaintingImage>().AddAsync(paintingImage);
                 }
-                
+
                 if (request.TagIds?.Any() == true)
                 {
                     foreach (var tagId in request.TagIds)
@@ -103,9 +103,9 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
                         await _unitOfWork.Repository<PaintingTag>().AddAsync(paintingTag);
                     }
                 }
-                
+
                 await _unitOfWork.Complete();
-                
+
                 createdPainting = painting;
             });
 

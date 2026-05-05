@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ArtGallery.WebAPI.Extensions;
 
@@ -9,14 +9,14 @@ public static class RateLimitingExtensions
         builder.Services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            
+
             options.AddFixedWindowLimiter("registration", opt =>
             {
                 opt.Window = TimeSpan.FromMinutes(1);
                 opt.PermitLimit = 3;
                 opt.QueueLimit = 0;
             });
-            
+
             options.AddFixedWindowLimiter("authentication", opt =>
             {
                 opt.Window = TimeSpan.FromMinutes(1);

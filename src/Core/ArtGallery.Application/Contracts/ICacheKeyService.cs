@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Application.Contracts;
+namespace ArtGallery.Application.Contracts;
 
 public interface ICacheKeyService
 {

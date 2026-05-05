@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Application.Helpers;
+namespace ArtGallery.Application.Helpers;
 
 public class Pagination<T> where T : class
 {

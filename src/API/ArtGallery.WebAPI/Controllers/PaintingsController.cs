@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Exceptions;
@@ -361,8 +361,8 @@ public class PaintingsController : ControllerBase
             message = result.Message
         });
     }
-    
-        
+
+
     /// <summary>
     /// Get current user's favorite paintings
     /// </summary>

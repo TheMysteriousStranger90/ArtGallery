@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+using System.Reflection;
+using ArtGallery.WebAPI.Logging;
 using Elastic.Channels;
 using Elastic.Ingest.Elasticsearch;
 using Elastic.Ingest.Elasticsearch.DataStreams;
@@ -6,7 +7,6 @@ using Elastic.Serilog.Sinks;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Exceptions;
-using ArtGallery.WebAPI.Logging;
 
 namespace ArtGallery.WebAPI.Extensions;
 
@@ -67,7 +67,7 @@ public static class LoggingExtensions
                     opts.DataStream = new DataStreamName(
                         "logs",
                         "dotnet",
-                        assemblyName.ToLower().Replace(".", "-"));
+                        assemblyName.ToLowerInvariant().Replace(".", "-"));
 
                     opts.BootstrapMethod = enableResiliency
                         ? BootstrapMethod.Silent

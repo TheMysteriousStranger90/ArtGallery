@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Entities.Enums;
+using ArtGallery.Domain.Entities.Enums;
 
 namespace ArtGallery.Application.DTOs;
 
@@ -13,7 +13,7 @@ public class PaintingDto
     public string ImageUrl { get; set; }
     public PaintType PaintType { get; set; }
     public string PaintTypeName => PaintType.ToString();
-    
+
     public ArtistBriefDto Artist { get; set; }
     public GenreDto Genre { get; set; }
     public MuseumBriefDto Museum { get; set; }

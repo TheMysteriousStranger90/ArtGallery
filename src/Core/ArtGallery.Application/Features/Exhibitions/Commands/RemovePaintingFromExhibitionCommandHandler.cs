@@ -1,9 +1,6 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Domain.Entities;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ArtGallery.Application.Features.Exhibitions.Commands
 {
@@ -42,23 +39,23 @@ namespace ArtGallery.Application.Features.Exhibitions.Commands
 
                 // Find the relation
                 var existingRelation = await _unitOfWork.Repository<PaintingExhibition>()
-                    .GetByConditionAsync(pe => 
-                        pe.ExhibitionId == request.ExhibitionId && 
+                    .GetByConditionAsync(pe =>
+                        pe.ExhibitionId == request.ExhibitionId &&
                         pe.PaintingId == request.PaintingId);
-                    
+
                 if (existingRelation == null)
                 {
                     response.Success = false;
                     response.Message = $"Painting with ID {request.PaintingId} is not part of exhibition with ID {request.ExhibitionId}";
                     return response;
                 }
-                    
+
                 await _unitOfWork.ExecuteWithTransactionAsync(async () =>
                 {
                     await _unitOfWork.Repository<PaintingExhibition>().RemoveAsync(existingRelation);
                     await _unitOfWork.Complete();
                 });
-                    
+
                 response.Success = true;
                 response.Message = $"Painting '{painting.Title}' was successfully removed from exhibition '{exhibition.Title}'.";
             }
@@ -67,7 +64,7 @@ namespace ArtGallery.Application.Features.Exhibitions.Commands
                 response.Success = false;
                 response.Message = $"An error occurred while removing painting from exhibition: {ex.Message}";
             }
-                
+
             return response;
         }
     }

@@ -1,5 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
-using ArtGallery.Domain.Entities;
+using ArtGallery.Application.Contracts;
 using MediatR;
 
 namespace ArtGallery.Application.Features.Artists.Commands;
@@ -28,7 +27,7 @@ public class AddArtistToFavoriteCommandHandler : IRequestHandler<AddArtistToFavo
                 response.Message = $"Artist with ID {request.ArtistId} not found";
                 return response;
             }
-            
+
             var result = await _unitOfWork.UserFavoritesRepository.AddFavoriteArtistAsync(
                 request.UserId, request.ArtistId);
 

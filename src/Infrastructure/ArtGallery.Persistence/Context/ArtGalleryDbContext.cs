@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using ArtGallery.Application.Contracts;
 using ArtGallery.Domain.Common;
@@ -36,7 +36,7 @@ public class ArtGalleryDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Ignore<ApplicationUser>();
         modelBuilder.Ignore<AppRole>();
         modelBuilder.Ignore<AppUserRole>();
@@ -44,8 +44,8 @@ public class ArtGalleryDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         SeedDataInitializer.ContextSeed(modelBuilder);
-        
-        
+
+
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))

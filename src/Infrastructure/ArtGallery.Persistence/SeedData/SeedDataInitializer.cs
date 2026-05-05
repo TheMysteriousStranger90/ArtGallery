@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Entities;
+using ArtGallery.Domain.Entities;
 using ArtGallery.Domain.Entities.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +25,7 @@ namespace ArtGallery.Persistence.SeedData
             };
 
             modelBuilder.Entity<Country>().HasData(russia, italy);
-            
+
             var moscow = new City
             {
                 Id = Guid.Parse("9c6aeae0-5c40-4085-8993-7d7b5db21107"),
@@ -59,7 +59,7 @@ namespace ArtGallery.Persistence.SeedData
             };
 
             modelBuilder.Entity<City>().HasData(moscow, stPetersburg, florence, rome);
-            
+
             var tretyakovGallery = new Museum
             {
                 Id = Guid.Parse("bc6aeae0-5c40-4085-8993-7d7b5db21109"),
@@ -109,7 +109,7 @@ namespace ArtGallery.Persistence.SeedData
             };
 
             modelBuilder.Entity<Museum>().HasData(tretyakovGallery, russianMuseum, uffizi, vaticanMuseum);
-            
+
             var mythological = new Genre
             {
                 Id = Guid.Parse("cc6aeae0-5c40-4085-8993-7d7b5db21111"),
@@ -857,7 +857,7 @@ namespace ArtGallery.Persistence.SeedData
                     CreatedDate = DateTime.UtcNow
                 }
             };
-            
+
             modelBuilder.Entity<PaintingTag>().HasData(paintingTags);
         }
     }

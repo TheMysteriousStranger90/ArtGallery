@@ -1,6 +1,5 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
-using ArtGallery.Application.Exceptions;
 using ArtGallery.Domain.Entities;
 using AutoMapper;
 using MediatR;
@@ -21,12 +20,12 @@ public class GetExhibitionDetailQueryHandler : IRequestHandler<GetExhibitionDeta
     public async Task<ExhibitionDetailDto> Handle(GetExhibitionDetailQuery request, CancellationToken cancellationToken)
     {
         var exhibition = await _unitOfWork.ExhibitionRepository.GetExhibitionWithPaintingsAsync(request.Id);
-            
+
         if (exhibition == null)
         {
             throw new Exception(nameof(Exhibition));
         }
-            
+
         return _mapper.Map<ExhibitionDetailDto>(exhibition);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Application.Models.Authentication
+namespace ArtGallery.Application.Models.Authentication
 {
     public class AuthenticationRequest
     {

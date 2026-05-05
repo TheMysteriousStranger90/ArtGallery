@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Entities;
+using ArtGallery.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Persistence;
 using ArtGallery.Persistence.Context;
 using ArtGallery.Persistence.Repositories;
@@ -33,7 +33,7 @@ public static class PersistenceServiceExtensions
         services.AddScoped<IMuseumRepository, MuseumRepository>();
         services.AddScoped<IUserFavoritesRepository, UserFavoritesRepository>();
         services.AddScoped<IImageRepository, ImageRepository>();
-        
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

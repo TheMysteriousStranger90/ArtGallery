@@ -1,9 +1,5 @@
-﻿using ArtGallery.ClientApp.Services.Interfaces;
 using ArtGallery.ClientApp.Constants;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using ArtGallery.ClientApp.Services.Interfaces;
 
 namespace ArtGallery.ClientApp.Services
 {
@@ -27,7 +23,7 @@ namespace ArtGallery.ClientApp.Services
                 _logger.LogInformation(
                     "Fetching artists with params: pageIndex={PageIndex}, pageSize={PageSize}, search={Search}, nationality={Nationality}, sort={Sort}",
                     pageIndex, pageSize, search, nationality, sort);
-                
+
                 return await _client.ArtistsGET2Async(pageIndex, pageSize, search, nationality, sort, apiVersion);
             }
             catch (ApiException ex)
@@ -122,13 +118,13 @@ namespace ArtGallery.ClientApp.Services
                 throw;
             }
         }
-        
+
         public async Task<ArtistDto> UpdateArtistAsync(
             Guid id,
-            string firstName, 
-            string lastName, 
-            DateTimeOffset? birthDate, 
-            DateTimeOffset? deathDate, 
+            string firstName,
+            string lastName,
+            DateTimeOffset? birthDate,
+            DateTimeOffset? deathDate,
             string nationality,
             FileParameter? image,
             bool keepExistingImage,
@@ -137,18 +133,18 @@ namespace ArtGallery.ClientApp.Services
         {
             try
             {
-                _logger.LogInformation("Updating artist: {FirstName} {LastName}, ID: {ArtistId}", 
+                _logger.LogInformation("Updating artist: {FirstName} {LastName}, ID: {ArtistId}",
                     firstName, lastName, id);
-                
+
                 var biographyId = biography?.Id;
                 var biographyContent = biography?.Content;
                 var biographyShortDescription = biography?.ShortDescription;
                 var biographyReferences = biography?.References;
-                
+
                 return await _client.ArtistsPUTAsync(
                     id,
                     apiVersion,
-                    id, 
+                    id,
                     firstName,
                     lastName,
                     birthDate,
@@ -235,9 +231,9 @@ namespace ArtGallery.ClientApp.Services
                     "API error fetching favorite artists. Status: {StatusCode}, Response: {Response}", ex.StatusCode,
                     ex.Response);
                 return new UserFavoriteArtistsResponse
-                { 
-                    Success = false, 
-                    Message = "API error occurred.", 
+                {
+                    Success = false,
+                    Message = "API error occurred.",
                     FavoriteArtists = new List<ArtistDto>()
                 };
             }
@@ -246,7 +242,7 @@ namespace ArtGallery.ClientApp.Services
                 _logger.LogError(ex, "Generic error fetching favorite artists.");
                 return new UserFavoriteArtistsResponse
                 {
-                    Success = false, 
+                    Success = false,
                     Message = "An unexpected error occurred.",
                     FavoriteArtists = new List<ArtistDto>()
                 };

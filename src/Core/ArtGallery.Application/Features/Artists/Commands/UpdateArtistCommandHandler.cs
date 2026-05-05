@@ -14,7 +14,7 @@ namespace ArtGallery.Application.Features.Artists.Commands
         private readonly IImageService _imageService;
 
         public UpdateArtistCommandHandler(
-            IUnitOfWork unitOfWork, 
+            IUnitOfWork unitOfWork,
             IMapper mapper,
             IImageService imageService)
         {
@@ -43,31 +43,31 @@ namespace ArtGallery.Application.Features.Artists.Commands
                 {
                     //var artistToUpdate = await _unitOfWork.Repository<Artist>().GetByIdAsync(request.Id);
                     var artistToUpdate = await _unitOfWork.ArtistRepository.GetArtistWithPaintingsAsync(request.Id);
-                    
+
                     if (artistToUpdate == null)
                     {
                         throw new Exception(nameof(Artist));
                     }
-                    
+
                     var existingMainImage = await _unitOfWork.Repository<ArtistImage>()
                         .GetByConditionAsync(ai => ai.ArtistId == request.Id && ai.IsMain);
-                    
+
                     if (request.Image != null)
                     {
                         var imageUploadResult = await _imageService.AddImageAsync(request.Image);
-                        
+
                         if (imageUploadResult.Error != null)
                         {
                             throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
                         }
-                        
+
                         if (existingMainImage != null)
                         {
                             if (!string.IsNullOrEmpty(existingMainImage.PublicId))
                             {
                                 await _imageService.DeleteImageAsync(existingMainImage.PublicId);
                             }
-                            
+
                             existingMainImage.PictureUrl = imageUploadResult.SecureUrl.ToString();
                             existingMainImage.PublicId = imageUploadResult.PublicId;
                             await _unitOfWork.Repository<ArtistImage>().UpdateAsync(existingMainImage);
@@ -81,7 +81,7 @@ namespace ArtGallery.Application.Features.Artists.Commands
                                 PublicId = imageUploadResult.PublicId,
                                 IsMain = true
                             };
-                            
+
                             await _unitOfWork.Repository<ArtistImage>().AddAsync(artistImage);
                         }
                     }
@@ -91,23 +91,23 @@ namespace ArtGallery.Application.Features.Artists.Commands
                         {
                             await _imageService.DeleteImageAsync(existingMainImage.PublicId);
                         }
-                        
+
                         _unitOfWork.ImageRepository.RemoveArtistImage(existingMainImage);
                     }
-                    
+
                     artistToUpdate.FirstName = request.FirstName;
                     artistToUpdate.LastName = request.LastName;
                     artistToUpdate.BirthDate = request.BirthDate;
                     artistToUpdate.DeathDate = request.DeathDate;
                     artistToUpdate.Nationality = request.Nationality;
-                    
+
                     await _unitOfWork.ArtistRepository.UpdateAsync(artistToUpdate);
-                    
+
                     if (request.Biography != null)
                     {
                         var biography = await _unitOfWork.Repository<Biography>()
                             .GetByConditionAsync(b => b.ArtistId == request.Id);
-                        
+
                         if (biography == null)
                         {
                             biography = new Biography
@@ -117,7 +117,7 @@ namespace ArtGallery.Application.Features.Artists.Commands
                                 ShortDescription = request.Biography.ShortDescription,
                                 References = request.Biography.References
                             };
-                            
+
                             await _unitOfWork.Repository<Biography>().AddAsync(biography);
                         }
                         else
@@ -125,11 +125,11 @@ namespace ArtGallery.Application.Features.Artists.Commands
                             biography.Content = request.Biography.Content;
                             biography.ShortDescription = request.Biography.ShortDescription;
                             biography.References = request.Biography.References;
-                            
+
                             await _unitOfWork.Repository<Biography>().UpdateAsync(biography);
                         }
                     }
-                    
+
                     await _unitOfWork.Complete();
                 });
 
@@ -141,7 +141,7 @@ namespace ArtGallery.Application.Features.Artists.Commands
                 response.Success = false;
                 response.Message = $"An error occurred while updating the artist: {ex.Message}";
             }
-            
+
             return response;
         }
     }

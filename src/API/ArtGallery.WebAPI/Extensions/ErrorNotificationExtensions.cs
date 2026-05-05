@@ -1,4 +1,4 @@
-﻿using ArtGallery.WebAPI.Errors;
+using ArtGallery.WebAPI.Errors;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;

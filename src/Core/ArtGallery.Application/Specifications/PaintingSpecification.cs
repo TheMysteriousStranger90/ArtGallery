@@ -1,14 +1,17 @@
-﻿using ArtGallery.Domain.Entities;
+using ArtGallery.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ArtGallery.Application.Specifications;
+
+// EF Core SQL translation: ToLowerInvariant() maps to LOWER() in SQL Server; Contains(StringComparison) is not supported
+#pragma warning disable CA1862
 
 public class PaintingSpecification : BaseSpecification<Painting>
 {
     public PaintingSpecification(PaintingSpecParams paintingParams)
         : base(x =>
-            (string.IsNullOrEmpty(paintingParams.Search) || x.Title.ToLower().Contains(paintingParams.Search) ||
-             x.Description.ToLower().Contains(paintingParams.Search)) &&
+            (string.IsNullOrEmpty(paintingParams.Search) || x.Title.ToLowerInvariant().Contains(paintingParams.Search) ||
+             x.Description.ToLowerInvariant().Contains(paintingParams.Search)) &&
             (!paintingParams.ArtistId.HasValue || x.ArtistId == paintingParams.ArtistId) &&
             (!paintingParams.GenreId.HasValue || x.GenreId == paintingParams.GenreId) &&
             (!paintingParams.MuseumId.HasValue || x.MuseumId == paintingParams.MuseumId) &&
@@ -23,7 +26,7 @@ public class PaintingSpecification : BaseSpecification<Painting>
         AddInclude(p => p.Museum.City);
         AddInclude(p => p.Museum.City.Country);
 
-        switch (paintingParams.Sort?.ToLower())
+        switch (paintingParams.Sort?.ToLowerInvariant())
         {
             case "title_desc":
                 AddOrderByDescending(p => p.Title);

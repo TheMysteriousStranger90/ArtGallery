@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Domain.Entities.Enums;
+namespace ArtGallery.Domain.Entities.Enums;
 
 public enum PaintType
 {

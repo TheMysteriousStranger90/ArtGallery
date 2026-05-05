@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Identity;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Exceptions;

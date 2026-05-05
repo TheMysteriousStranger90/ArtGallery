@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using ArtGallery.ClientApp.Services;
 
 namespace ArtGallery.ClientApp.ViewModels;

@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.WebAPI.Middleware;
+namespace ArtGallery.WebAPI.Middleware;
 
 public class RequestLoggingMiddleware
 {

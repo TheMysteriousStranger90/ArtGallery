@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Application.Contracts.Cache;
+namespace ArtGallery.Application.Contracts.Cache;
 
 public class CacheKeyService : ICacheKeyService
 {
@@ -16,6 +16,6 @@ public class CacheKeyService : ICacheKeyService
 
     public IEnumerable<string> GetKeysStartingWith(string prefix)
     {
-        return _cacheKeys.Where(key => key.StartsWith(prefix)).ToList();
+        return _cacheKeys.Where(key => key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 }

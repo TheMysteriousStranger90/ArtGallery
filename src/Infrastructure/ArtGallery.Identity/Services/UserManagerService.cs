@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts.Identity;
+using ArtGallery.Application.Contracts.Identity;
 using ArtGallery.Application.Exceptions;
 using ArtGallery.Domain.Entities;
 using ArtGallery.Identity.Context;
@@ -166,7 +166,7 @@ public class UserManagerService : IUserManagerService
 
         return await GetUserRolesAsync(user);
     }
-    
+
     public async Task UpdateLastActiveAsync(string userId)
     {
         var user = await UserManager.FindByIdAsync(userId);

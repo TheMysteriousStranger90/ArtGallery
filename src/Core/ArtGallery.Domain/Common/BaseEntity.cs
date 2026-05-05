@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Domain.Common;
+namespace ArtGallery.Domain.Common;
 
 public abstract class BaseEntity
 {

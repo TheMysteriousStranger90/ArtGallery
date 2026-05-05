@@ -1,4 +1,4 @@
-﻿using ArtGallery.WebAPI.Errors;
+using ArtGallery.WebAPI.Errors;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace ArtGallery.WebAPI.Services;

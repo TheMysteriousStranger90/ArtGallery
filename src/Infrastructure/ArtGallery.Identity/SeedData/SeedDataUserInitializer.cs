@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Entities;
+using ArtGallery.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,7 +16,7 @@ namespace ArtGallery.Identity.SeedData
                 await SeedRolesAsync(roleManager);
                 await SeedUsersAsync(userManager);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

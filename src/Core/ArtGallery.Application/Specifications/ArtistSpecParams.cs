@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.Application.Specifications;
+namespace ArtGallery.Application.Specifications;
 
 public class ArtistSpecParams
 {
@@ -14,11 +14,11 @@ public class ArtistSpecParams
 
     public string Sort { get; set; } = "lastName";
     public string Nationality { get; set; }
-        
+
     private string _search = "";
     public string Search
     {
         get => _search;
-        set => _search = value.ToLower();
+        set => _search = value.ToLowerInvariant();
     }
 }

@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
 using AutoMapper;
 using MediatR;
@@ -19,11 +19,11 @@ public class GetUserFavoriteArtistsQueryHandler : IRequestHandler<GetUserFavorit
     public async Task<UserFavoriteArtistsResponse> Handle(GetUserFavoriteArtistsQuery request, CancellationToken cancellationToken)
     {
         var response = new UserFavoriteArtistsResponse();
-            
+
         try
         {
             var favorites = await _unitOfWork.UserFavoritesRepository.GetUserFavoriteArtistsAsync(request.UserId);
-                
+
             response.FavoriteArtists = _mapper.Map<List<ArtistDto>>(favorites.Select(f => f.Artist));
             response.Count = favorites.Count;
             response.Success = true;
@@ -33,7 +33,7 @@ public class GetUserFavoriteArtistsQueryHandler : IRequestHandler<GetUserFavorit
             response.Success = false;
             response.Message = $"An error occurred while retrieving favorite artists: {ex.Message}";
         }
-            
+
         return response;
     }
 }

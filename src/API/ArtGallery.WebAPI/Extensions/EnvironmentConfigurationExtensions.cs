@@ -1,4 +1,4 @@
-﻿using DotNetEnv;
+using DotNetEnv;
 
 namespace ArtGallery.WebAPI.Extensions;
 
@@ -6,7 +6,7 @@ public static class EnvironmentConfigurationExtensions
 {
     public static void ConfigureEnvironmentVariables(this WebApplicationBuilder builder)
     {
-        string environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
+        string environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLowerInvariant();
         string envFileName = environmentName == "production" ? ".env.production" : ".env";
 
         List<string> possiblePaths = new List<string>();
@@ -31,7 +31,7 @@ public static class EnvironmentConfigurationExtensions
         foreach (string path in possiblePaths)
         {
             Console.WriteLine($"Checking for env file at: {path}");
-            
+
             if (File.Exists(path))
             {
                 Env.Load(path);

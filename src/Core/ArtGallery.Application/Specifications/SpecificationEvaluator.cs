@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Specifications.Interfaces;
+using ArtGallery.Application.Specifications.Interfaces;
 using ArtGallery.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,5 +1,3 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using ArtGallery.ClientApp.Constants;
 
 namespace ArtGallery.ClientApp.Services.Interfaces

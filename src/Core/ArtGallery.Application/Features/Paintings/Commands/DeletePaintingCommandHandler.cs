@@ -1,10 +1,8 @@
 using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
-using ArtGallery.Application.Exceptions;
 using ArtGallery.Application.Specifications;
 using ArtGallery.Domain.Entities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace ArtGallery.Application.Features.Paintings.Commands;
 
@@ -45,10 +43,10 @@ public class DeletePaintingCommandHandler : IRequestHandler<DeletePaintingComman
                         await _imageService.DeleteImageAsync(image.PublicId);
                     }
                 }
-            
+
                 //await _unitOfWork.Repository<Painting>().RemoveAsync(painting);
                 await _unitOfWork.PaintingRepository.RemoveAsync(painting);
-            
+
                 await _unitOfWork.Complete();
             });
 

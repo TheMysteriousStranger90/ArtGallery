@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.ClientApp.Services.Interfaces;
+namespace ArtGallery.ClientApp.Services.Interfaces;
 
 public interface IExhibitionsService
 {

@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Helpers;
 using ArtGallery.Application.Specifications;
@@ -34,15 +34,15 @@ public class GetPaintingsListQueryHandler : IRequestHandler<GetPaintingsListQuer
             ToYear = request.ToYear,
             Sort = request.Sort
         };
-        
+
         var spec = new PaintingSpecification(paintingParams);
         var countSpec = new PaintingWithFiltersForCountSpecification(paintingParams);
-        
+
         var paintings = await _unitOfWork.Repository<Painting>().ListAsync(spec);
         var totalItems = await _unitOfWork.Repository<Painting>().CountAsync(countSpec);
-        
+
         var paintingDtos = _mapper.Map<IReadOnlyList<PaintingDto>>(paintings);
-            
+
         return new Pagination<PaintingDto>(
             paintingParams.PageIndex,
             paintingParams.PageSize,

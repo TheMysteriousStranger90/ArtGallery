@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Entities;
+using ArtGallery.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,7 +14,7 @@ public class ExhibitionConfiguration : IEntityTypeConfiguration<Exhibition>
 
         builder.Property(e => e.Description)
             .HasMaxLength(2000);
-        
+
         builder.HasMany(e => e.Paintings)
             .WithOne(pe => pe.Exhibition)
             .HasForeignKey(pe => pe.ExhibitionId);

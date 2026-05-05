@@ -1,21 +1,18 @@
-﻿using Serilog;
-using System.Net.Http.Json;
-
 namespace ArtGallery.WebAPI.Errors;
 
 public class ErrorNotifier : IErrorNotifier
 {
     private readonly HttpClient _httpClient;
-    private readonly string _webhookUrl;
+    private readonly string? _webhookUrl;
     private readonly Serilog.ILogger _logger;
-    
+
     public ErrorNotifier(IConfiguration configuration, Serilog.ILogger logger)
     {
         _httpClient = new HttpClient();
         _webhookUrl = configuration["Monitoring:AlertWebhook"];
         _logger = logger;
     }
-    
+
     public async Task NotifyErrorAsync(Exception exception, string context, object additionalData = null)
     {
         try
@@ -25,7 +22,7 @@ public class ErrorNotifier : IErrorNotifier
                 _logger.Warning("No alert webhook configured. Skipping alert notification.");
                 return;
             }
-            
+
             var alert = new
             {
                 Application = "ArtGalleryAPI",
@@ -35,9 +32,9 @@ public class ErrorNotifier : IErrorNotifier
                 AdditionalData = additionalData,
                 Timestamp = DateTime.UtcNow
             };
-            
+
             await _httpClient.PostAsJsonAsync(_webhookUrl, alert);
-            
+
             _logger.Information("Error alert notification sent for {Context}", context);
         }
         catch (Exception ex)

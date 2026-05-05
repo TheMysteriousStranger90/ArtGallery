@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Exceptions;
+using ArtGallery.Application.Exceptions;
 using ArtGallery.WebAPI.Errors;
 
 namespace ArtGallery.WebAPI.Middleware;
@@ -28,15 +28,15 @@ public class GlobalExceptionHandlingMiddleware
         catch (CustomException ex)
         {
             _logger.LogError(ex, "Custom Exception: {Message}", ex.Message);
-            
+
             var response = context.Response;
             response.ContentType = "application/json";
             response.StatusCode = (int)ex.StatusCode;
 
             var errorResponse = new ErrorResponse
             {
-                Errors = ex.ErrorMessages?.Count > 0 
-                    ? ex.ErrorMessages 
+                Errors = ex.ErrorMessages?.Count > 0
+                    ? ex.ErrorMessages
                     : new List<string> { ex.Message }
             };
 
@@ -45,12 +45,12 @@ public class GlobalExceptionHandlingMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unhandled exception occurred");
-        
+
             var response = context.Response;
             response.ContentType = "application/json";
             response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            var errorResponse = _env.IsDevelopment() 
+            var errorResponse = _env.IsDevelopment()
                 ? new ErrorResponse
                 {
                     Errors = new List<string> { ex.Message },

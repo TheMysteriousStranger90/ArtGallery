@@ -1,11 +1,9 @@
-﻿using System.Net;
+using System.Net;
 using System.Security.Claims;
-using ArtGallery.Application.Features.Artists.Commands;
-using ArtGallery.Application.Features.Artists.Queries;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Exceptions;
-using ArtGallery.Application.Features.Paintings.Commands;
-using ArtGallery.Application.Features.Paintings.Queries;
+using ArtGallery.Application.Features.Artists.Commands;
+using ArtGallery.Application.Features.Artists.Queries;
 using ArtGallery.Application.Helpers;
 using ArtGallery.Domain.Entities;
 using Asp.Versioning;
@@ -117,7 +115,7 @@ public class ArtistsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<CreateArtistDto>> CreateArtist([FromForm] CreateArtistCommand command)
     {
-        _logger.LogInformation("Creating new artist: {FirstName} {LastName}", 
+        _logger.LogInformation("Creating new artist: {FirstName} {LastName}",
             command.FirstName, command.LastName);
 
         var response = await _mediator.Send(command);
@@ -145,12 +143,12 @@ public class ArtistsController : ControllerBase
         }
 
         return CreatedAtAction(
-            nameof(GetArtist), 
-            new { id = response.Artist.Id }, 
+            nameof(GetArtist),
+            new { id = response.Artist.Id },
             response.Artist
         );
     }
-    
+
     /// <summary>
     /// Update an existing artist
     /// </summary>
@@ -186,7 +184,7 @@ public class ArtistsController : ControllerBase
                     Title = "Validation errors occurred",
                     Status = (int)HttpStatusCode.BadRequest
                 };
-            
+
                 foreach (var error in response.ValidationErrors)
                 {
                     problemDetails.Errors.Add("Validation", new[] { error });
@@ -236,7 +234,7 @@ public class ArtistsController : ControllerBase
 
         return Ok(new { message = response.Message });
     }
-    
+
     /// Add an artist to the current user's favorites
     /// </summary>
     /// <param name="artistId">ID of the artist to add to favorites</param>
@@ -269,8 +267,8 @@ public class ArtistsController : ControllerBase
             message = result.Message
         });
     }
-    
-        
+
+
     /// <summary>
     /// Get current user's favorite artists
     /// </summary>

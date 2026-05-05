@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using ArtGallery.Domain.Entities.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;

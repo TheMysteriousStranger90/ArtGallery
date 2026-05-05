@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.AspNetCore.Components.Authorization;
 using ArtGallery.ClientApp;
-using ArtGallery.ClientApp.Services;
-using ArtGallery.ClientApp.Services.Interfaces;
 using ArtGallery.ClientApp.Auth;
 using ArtGallery.ClientApp.Constants;
+using ArtGallery.ClientApp.Services;
+using ArtGallery.ClientApp.Services.Interfaces;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -25,7 +25,7 @@ builder.Services.AddScoped<AuthenticationMessageHandler>();
 
 // Register Authentication State Provider
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(provider => 
+builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
     provider.GetRequiredService<CustomAuthenticationStateProvider>());
 
 // Add Authorization

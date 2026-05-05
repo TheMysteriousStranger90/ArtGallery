@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Common;
+using ArtGallery.Domain.Common;
 
 namespace ArtGallery.Domain.Entities;
 

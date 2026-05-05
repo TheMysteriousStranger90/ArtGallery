@@ -1,6 +1,6 @@
-﻿using ArtGallery.ClientApp.Services.Interfaces;
-using ArtGallery.ClientApp.ViewModels;
 using ArtGallery.ClientApp.Auth;
+using ArtGallery.ClientApp.Services.Interfaces;
+using ArtGallery.ClientApp.ViewModels;
 
 namespace ArtGallery.ClientApp.Services
 {

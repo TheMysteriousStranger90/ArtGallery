@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts.Identity;
+using ArtGallery.Application.Contracts.Identity;
 using ArtGallery.Application.Exceptions;
 using ArtGallery.Application.Models.Authentication;
 using ArtGallery.Domain.Entities;
@@ -39,7 +39,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
 
             var user = new ApplicationUser
             {
-                Email = request.Email.ToLower(),
+                Email = request.Email.ToLowerInvariant(),
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 UserName = uniqueUsername,
@@ -83,7 +83,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
 
             do
             {
-                uniqueUsername = $"{baseUsername}{new Random().Next(100, 999)}".ToLower();
+                uniqueUsername = $"{baseUsername}{new Random().Next(100, 999)}".ToLowerInvariant();
                 attempts++;
 
                 if (attempts > 10)

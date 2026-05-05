@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using ArtGallery.Application.Features.Authentication.Commands;
 using ArtGallery.Application.Models.Authentication;
 using ArtGallery.WebAPI.Errors;
@@ -177,7 +177,7 @@ namespace ArtGallery.WebAPI.Controllers
                 {
                     _logger.LogError("Could not extract email from Microsoft response");
                     return BadRequest(new ErrorResponse
-                        { Errors = new[] { "Could not retrieve email from Microsoft account" } });
+                    { Errors = new[] { "Could not retrieve email from Microsoft account" } });
                 }
 
                 var command = new ExternalAuthCommand

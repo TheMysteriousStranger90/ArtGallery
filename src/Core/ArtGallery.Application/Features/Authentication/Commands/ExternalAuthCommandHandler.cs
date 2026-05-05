@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ArtGallery.Application.Contracts.Identity;
@@ -30,7 +30,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
 
         public async Task<ExternalAuthResponse> Handle(ExternalAuthCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Processing external authentication for provider: {Provider}, Email: {Email}", 
+            _logger.LogInformation("Processing external authentication for provider: {Provider}, Email: {Email}",
                 request.Provider, request.Email);
 
             var user = await _userManagerService.UserManager.FindByEmailAsync(request.Email);
@@ -43,7 +43,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
 
                 user = new ApplicationUser
                 {
-                    Email = request.Email.ToLower(),
+                    Email = request.Email.ToLowerInvariant(),
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     UserName = uniqueUsername,
@@ -53,7 +53,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
                 var createResult = await _userManagerService.UserManager.CreateAsync(user);
                 if (!createResult.Succeeded)
                 {
-                    _logger.LogError("Failed to create user via external auth: {Errors}", 
+                    _logger.LogError("Failed to create user via external auth: {Errors}",
                         string.Join(", ", createResult.Errors.Select(e => e.Description)));
                     throw new Exception("Failed to create user account");
                 }
@@ -67,7 +67,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
             {
                 var loginInfo = new Microsoft.AspNetCore.Identity.UserLoginInfo(request.Provider, request.ExternalId, request.Provider);
                 var addLoginResult = await _userManagerService.UserManager.AddLoginAsync(user, loginInfo);
-                
+
                 if (!addLoginResult.Succeeded)
                 {
                     _logger.LogWarning("Failed to add external login for user: {Email}", request.Email);
@@ -75,7 +75,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
             }
 
             var jwtToken = await GenerateTokenAsync(user);
-            
+
             user.LastActive = DateTime.UtcNow;
             await _userManagerService.UserManager.UpdateAsync(user);
 
@@ -100,7 +100,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
 
             do
             {
-                uniqueUsername = $"{baseUsername}{new Random().Next(100, 999)}".ToLower();
+                uniqueUsername = $"{baseUsername}{new Random().Next(100, 999)}".ToLowerInvariant();
                 attempts++;
 
                 if (attempts > 10)
@@ -118,7 +118,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
         {
             var userClaims = await _userManagerService.UserManager.GetClaimsAsync(user);
             var roles = await _userManagerService.GetUserRolesAsync(user);
-            
+
             var roleClaims = new List<Claim>();
             foreach (var role in roles)
             {
@@ -137,7 +137,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
                 }
                 .Union(userClaims)
                 .Union(roleClaims);
-            
+
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
 
@@ -147,7 +147,7 @@ namespace ArtGallery.Application.Features.Authentication.Commands
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
                 signingCredentials: signingCredentials);
-            
+
             return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
         }
     }

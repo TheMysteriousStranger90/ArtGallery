@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.DTOs;
+using ArtGallery.Application.DTOs;
 using MediatR;
 
 namespace ArtGallery.Application.Features.Paintings.Queries;

@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts.Persistence;
+using ArtGallery.Application.Contracts.Persistence;
 using ArtGallery.Domain.Entities;
 using ArtGallery.Persistence.Context;
 using Microsoft.EntityFrameworkCore;

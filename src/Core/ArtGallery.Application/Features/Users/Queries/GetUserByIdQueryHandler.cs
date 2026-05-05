@@ -4,7 +4,6 @@ using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Exceptions;
 using AutoMapper;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace ArtGallery.Application.Features.Users.Queries
 {
@@ -13,18 +12,15 @@ namespace ArtGallery.Application.Features.Users.Queries
         private readonly IUserManagerService _userManagerService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<GetUserByIdQueryHandler> _logger;
 
         public GetUserByIdQueryHandler(
             IUserManagerService userManagerService,
             IUnitOfWork unitOfWork,
-            IMapper mapper,
-            ILogger<GetUserByIdQueryHandler> logger)
+            IMapper mapper)
         {
             _userManagerService = userManagerService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _logger = logger;
         }
 
         public async Task<UserDetailDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)

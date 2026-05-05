@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.DTOs;
+using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Exceptions;
 using ArtGallery.Application.Features.Exhibitions.Commands;
 using ArtGallery.Application.Features.Exhibitions.Queries;

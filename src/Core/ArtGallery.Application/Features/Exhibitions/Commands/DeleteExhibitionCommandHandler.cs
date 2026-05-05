@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Domain.Entities;
 using MediatR;
 
@@ -31,7 +31,7 @@ namespace ArtGallery.Application.Features.Exhibitions.Commands
                 await _unitOfWork.ExecuteWithTransactionAsync(async () =>
                 {
                     await _unitOfWork.Repository<Exhibition>().RemoveAsync(exhibition);
-                    
+
                     await _unitOfWork.Complete();
                 });
 

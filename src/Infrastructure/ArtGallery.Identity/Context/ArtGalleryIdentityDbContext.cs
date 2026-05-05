@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using ArtGallery.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -13,13 +13,13 @@ public class ArtGalleryIdentityDbContext : IdentityDbContext<ApplicationUser, Ap
     public ArtGalleryIdentityDbContext(DbContextOptions<ArtGalleryIdentityDbContext> options) : base(options)
     {
     }
-    
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        
+
         builder.Entity<ApplicationUser>().ToTable("Users");
         builder.Entity<AppRole>().ToTable("Roles");
         builder.Entity<AppUserRole>().ToTable("UserRoles");

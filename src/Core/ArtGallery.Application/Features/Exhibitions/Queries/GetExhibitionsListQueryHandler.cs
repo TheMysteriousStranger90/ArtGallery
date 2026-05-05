@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts;
+using ArtGallery.Application.Contracts;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Specifications;
 using ArtGallery.Domain.Entities;
@@ -21,14 +21,14 @@ public class GetExhibitionsListQueryHandler : IRequestHandler<GetExhibitionsList
     public async Task<List<ExhibitionDto>> Handle(GetExhibitionsListQuery request, CancellationToken cancellationToken)
     {
         IReadOnlyList<Exhibition> exhibitions;
-            
+
         if (request.MuseumId.HasValue)
         {
             var spec = new BaseSpecification<Exhibition>(e => e.MuseumId == request.MuseumId.Value);
             spec.AddInclude(e => e.Museum);
             spec.AddInclude(e => e.Museum.City.Country);
             spec.AddOrderBy(e => e.StartDate);
-                
+
             exhibitions = await _unitOfWork.Repository<Exhibition>().ListAsync(spec);
         }
         else
@@ -37,10 +37,10 @@ public class GetExhibitionsListQueryHandler : IRequestHandler<GetExhibitionsList
             spec.AddInclude(e => e.Museum);
             spec.AddInclude(e => e.Museum.City.Country);
             spec.AddOrderBy(e => e.StartDate);
-                
+
             exhibitions = await _unitOfWork.Repository<Exhibition>().ListAsync(spec);
         }
-            
+
         return _mapper.Map<List<ExhibitionDto>>(exhibitions);
     }
 }

@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.DTOs;
+using ArtGallery.Application.DTOs;
 using ArtGallery.Application.Helpers;
 using ArtGallery.Domain.Entities.Enums;
 using MediatR;

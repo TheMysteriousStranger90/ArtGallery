@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography.X509Certificates;
 using ArtGallery.WebAPI.Services;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using TlsCertificateLoader.Extensions;
@@ -10,10 +10,10 @@ public static class TlsCertificateExtensions
     public static void ConfigureTlsCertificates(this WebApplicationBuilder builder)
     {
         TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader = null;
-        
+
         string effectiveCertificatePath = ResolveCertificatePath();
         tlsCertificateLoader = LoadCertificates(effectiveCertificatePath, builder);
-        
+
         if (tlsCertificateLoader != null)
         {
             builder.Services.AddSingleton(tlsCertificateLoader);
@@ -27,12 +27,12 @@ public static class TlsCertificateExtensions
     private static string ResolveCertificatePath()
     {
         var certificateEnvVarPath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH");
-        
+
         if (!string.IsNullOrEmpty(certificateEnvVarPath))
         {
             return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", certificateEnvVarPath));
         }
-        
+
         return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "certificates"));
     }
 
@@ -40,7 +40,7 @@ public static class TlsCertificateExtensions
     {
         var fullChainPath = Path.Combine(certificatePath, "fullchain.pem");
         var privateKeyPath = Path.Combine(certificatePath, "privkey.pem");
-        
+
         Console.WriteLine($"Effective certificate path: {certificatePath}");
         Console.WriteLine($"Checking for certificate files:");
         Console.WriteLine($"  - fullchain.pem: {(File.Exists(fullChainPath) ? "FOUND" : "NOT FOUND")} at {fullChainPath}");
@@ -58,7 +58,7 @@ public static class TlsCertificateExtensions
                 Console.WriteLine($"   Valid from: {cert.NotBefore}");
                 Console.WriteLine($"   Valid to: {cert.NotAfter}");
                 Console.WriteLine($"   Has private key: {cert.HasPrivateKey}");
-                
+
                 var loader = new TlsCertificateLoader.TlsCertificateLoader(fullChainPath, privateKeyPath);
                 Console.WriteLine("✅ TLS certificate loader created successfully");
                 return loader;
@@ -70,7 +70,7 @@ public static class TlsCertificateExtensions
                 return null;
             }
         }
-        
+
         Console.WriteLine("HTTPS certificate files not found. Running with HTTP only.");
         return null;
     }
@@ -82,23 +82,23 @@ public static class TlsCertificateExtensions
             Console.WriteLine("🔧 Using development configuration with dev certificates");
             return;
         }
-        
+
         builder.WebHost.ConfigureKestrel((context, serverOptions) =>
         {
             serverOptions.ConfigurationLoader = null;
-            
+
             var httpPort = int.Parse(Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS") ?? "8080");
             var httpsPort = int.Parse(Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORTS") ?? "8081");
-            
+
             // HTTP endpoint
             serverOptions.ListenAnyIP(httpPort, listenOptions =>
             {
                 listenOptions.Protocols = HttpProtocols.Http1;
             });
-            
+
             Console.WriteLine($"✅ HTTP endpoint configured: http://localhost:{httpPort}");
             Console.WriteLine($"✅ Try accessing: http://localhost:{httpPort}/docs/index.html");
-            
+
             // HTTPS endpoint
             if (tlsCertificateLoader != null)
             {
@@ -110,7 +110,7 @@ public static class TlsCertificateExtensions
                         listenOptions.SetHttpsConnectionAdapterOptions(tlsCertificateLoader);
                         listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
                     });
-                    
+
                     Console.WriteLine($"✅ HTTPS endpoint configured: https://localhost:{httpsPort}");
                     Console.WriteLine($"✅ Try accessing: https://localhost:{httpsPort}/docs/index.html");
                     Console.WriteLine($"⚠️  If browser shows security warning, click 'Advanced' -> 'Proceed to localhost (unsafe)'");

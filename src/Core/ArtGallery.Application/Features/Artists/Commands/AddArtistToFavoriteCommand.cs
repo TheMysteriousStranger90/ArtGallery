@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 
 namespace ArtGallery.Application.Features.Artists.Commands;
 

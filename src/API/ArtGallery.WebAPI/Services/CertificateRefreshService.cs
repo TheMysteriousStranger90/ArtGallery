@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.WebAPI.Services;
+namespace ArtGallery.WebAPI.Services;
 
 public class CertificateRefreshService : BackgroundService
 {

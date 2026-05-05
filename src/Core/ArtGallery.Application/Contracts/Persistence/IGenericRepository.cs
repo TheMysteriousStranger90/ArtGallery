@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ArtGallery.Application.Specifications.Interfaces;
 using ArtGallery.Domain.Common;
 

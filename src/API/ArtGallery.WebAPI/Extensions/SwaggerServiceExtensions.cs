@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using ArtGallery.WebAPI.Helpers;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
@@ -32,7 +32,7 @@ public static class SwaggerServiceExtensions
         {
             // Add a custom operation filter which sets default values
             options.OperationFilter<SwaggerDefaultValues>();
-            
+
             // Set the comments path for the XmlComments file
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -69,10 +69,10 @@ public static class SwaggerServiceExtensions
             options.CustomSchemaIds(type => type.FullName);
 
             // Sort endpoints by method and path
-            options.OrderActionsBy(apiDesc => 
+            options.OrderActionsBy(apiDesc =>
                 $"{apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.HttpMethod}");
         });
-        
+
 
         return services;
     }
@@ -94,7 +94,7 @@ public static class SwaggerServiceExtensions
                     $"/docs/{description.GroupName}/docs.json",
                     description.GroupName.ToUpperInvariant());
             }
-            
+
             options.RoutePrefix = "docs";
             options.DocumentTitle = "Art Gallery API Documentation";
             options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);

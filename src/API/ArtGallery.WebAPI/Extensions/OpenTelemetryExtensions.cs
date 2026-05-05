@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Prometheus;
 using Serilog;
 
 namespace ArtGallery.WebAPI.Extensions;
@@ -15,7 +14,7 @@ public static class OpenTelemetryExtensions
         {
             var serviceName = "ArtGalleryAPI";
             var serviceVersion = "1.0.0";
-            
+
             builder.Services.AddSingleton(new ActivitySource(serviceName));
 
             builder.Services.AddOpenTelemetry()
@@ -52,7 +51,7 @@ public static class OpenTelemetryExtensions
                         .AddMeter(serviceName)
                         .AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation();
-                    
+
                     try
                     {
                         var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ??

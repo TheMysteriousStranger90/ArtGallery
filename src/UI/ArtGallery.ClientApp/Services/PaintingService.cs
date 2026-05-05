@@ -1,5 +1,5 @@
-﻿using ArtGallery.ClientApp.Services.Interfaces;
 using ArtGallery.ClientApp.Constants;
+using ArtGallery.ClientApp.Services.Interfaces;
 
 namespace ArtGallery.ClientApp.Services
 {
@@ -201,14 +201,15 @@ namespace ArtGallery.ClientApp.Services
                     "API error fetching favorite paintings. Status: {StatusCode}, Response: {Response}", ex.StatusCode,
                     ex.Response);
                 return new UserFavoritePaintingsResponse
-                    { Success = false, Message = "API error occurred.", FavoritePaintings = new List<PaintingDto>() };
+                { Success = false, Message = "API error occurred.", FavoritePaintings = new List<PaintingDto>() };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Generic error fetching favorite paintings.");
                 return new UserFavoritePaintingsResponse
                 {
-                    Success = false, Message = "An unexpected error occurred.",
+                    Success = false,
+                    Message = "An unexpected error occurred.",
                     FavoritePaintings = new List<PaintingDto>()
                 };
             }

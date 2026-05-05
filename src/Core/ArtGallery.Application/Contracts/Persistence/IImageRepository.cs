@@ -1,4 +1,4 @@
-﻿using ArtGallery.Domain.Entities;
+using ArtGallery.Domain.Entities;
 
 namespace ArtGallery.Application.Contracts.Persistence;
 

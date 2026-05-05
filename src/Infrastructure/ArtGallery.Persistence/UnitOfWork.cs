@@ -12,16 +12,16 @@ namespace ArtGallery.Persistence
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ArtGalleryDbContext _context;
-        private Hashtable _repositories;
-        private IDbContextTransaction _transaction;
+        private Hashtable? _repositories;
+        private IDbContextTransaction? _transaction;
         private bool _disposed;
 
-        private IArtistRepository _artistRepository;
-        private IPaintingRepository _paintingRepository;
-        private IExhibitionRepository _exhibitionRepository;
-        private IMuseumRepository _museumRepository;
-        private IImageRepository _imageRepository;
-        private IUserFavoritesRepository _userFavoritesRepository;
+        private IArtistRepository? _artistRepository;
+        private IPaintingRepository? _paintingRepository;
+        private IExhibitionRepository? _exhibitionRepository;
+        private IMuseumRepository? _museumRepository;
+        private IImageRepository? _imageRepository;
+        private IUserFavoritesRepository? _userFavoritesRepository;
 
         public UnitOfWork(ArtGalleryDbContext context)
         {

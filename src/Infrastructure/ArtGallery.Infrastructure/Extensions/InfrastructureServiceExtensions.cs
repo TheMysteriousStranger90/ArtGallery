@@ -1,4 +1,4 @@
-﻿using ArtGallery.Application.Contracts.Infrastructure;
+using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.Helpers;
 using ArtGallery.Infrastructure.Image;
 using Microsoft.Extensions.Configuration;
@@ -12,9 +12,9 @@ public static class InfrastructureServiceExtensions
         IConfiguration configuration)
     {
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
-        
+
         services.AddScoped<IImageService, ImageService>();
-        
+
         return services;
     }
 }

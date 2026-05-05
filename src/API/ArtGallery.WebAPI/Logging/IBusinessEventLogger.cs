@@ -1,4 +1,4 @@
-﻿namespace ArtGallery.WebAPI.Logging;
+namespace ArtGallery.WebAPI.Logging;
 
 public interface IBusinessEventLogger
 {
