@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>ArtGallery.Application</AssemblyName>
+    <RootNamespace>ArtGallery.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper"/>
+    <PackageReference Include="CloudinaryDotNet"/>
+    <PackageReference Include="FluentValidation"/>
+    <PackageReference Include="MediatR"/>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google"/>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount"/>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features"/>
+    <PackageReference Include="Microsoft.AspNetCore.Identity"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.Extensions.Identity.Core"/>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer"/>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ArtGallery.Domain\ArtGallery.Domain.csproj"/>
+  </ItemGroup>
+
+</Project>

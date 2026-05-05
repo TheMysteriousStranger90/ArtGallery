@@ -1,11 +1,11 @@
-﻿version: '3.8'
+version: '3.8'
 
 services:
   artgallery.webapi:
     image: artgallery.webapi
     build:
       context: .
-      dockerfile: ArtGallery.WebAPI/Dockerfile
+      dockerfile: src/API/ArtGallery.WebAPI/Dockerfile
     ports:
       - "8080:8080"
       - "8081:8081"
@@ -39,7 +39,7 @@ services:
     image: artgallery.clientapp
     build:
       context: .
-      dockerfile: ArtGallery.ClientApp/Dockerfile
+      dockerfile: src/UI/ArtGallery.ClientApp/Dockerfile
     ports:
       - "8082:80"
       - "8083:443"
@@ -103,7 +103,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./ArtGallery.WebAPI/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./src/API/ArtGallery.WebAPI/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     networks:
       - art-gallery-network
@@ -115,8 +115,8 @@ services:
       - "3000:3000"
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./ArtGallery.WebAPI/grafana/provisioning:/etc/grafana/provisioning
-      - ./ArtGallery.WebAPI/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./src/API/ArtGallery.WebAPI/grafana/provisioning:/etc/grafana/provisioning
+      - ./src/API/ArtGallery.WebAPI/grafana/dashboards:/var/lib/grafana/dashboards
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -129,10 +129,11 @@ services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.91.0
     volumes:
-      - ./ArtGallery.WebAPI/otelcol-contrib/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./src/API/ArtGallery.WebAPI/otelcol-contrib/otel-collector-config.yaml:/etc/otel-collector-config.yaml
     command: ["--config=/etc/otel-collector-config.yaml"]
     ports:
       - "4317:4317"
+      - "8889:8889"
     networks:
       - art-gallery-network
     restart: unless-stopped

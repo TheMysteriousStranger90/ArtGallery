@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BD6DE95D-9880-4197-B8A9-63AA2A54A346}"
 EndProject
@@ -12,28 +12,30 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{1A9A3D03-D09
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{62891B07-097B-484F-9F8A-30B4D7F37405}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.WebAPI", "ArtGallery.WebAPI\ArtGallery.WebAPI.csproj", "{BCBE03BD-447D-45F8-9224-49792F85A451}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.WebAPI", "src\API\ArtGallery.WebAPI\ArtGallery.WebAPI.csproj", "{BCBE03BD-447D-45F8-9224-49792F85A451}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Domain", "ArtGallery.Domain\ArtGallery.Domain.csproj", "{A689FFF5-7C3D-4D74-89C6-91D8088E43CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Domain", "src\Core\ArtGallery.Domain\ArtGallery.Domain.csproj", "{A689FFF5-7C3D-4D74-89C6-91D8088E43CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Application", "ArtGallery.Application\ArtGallery.Application.csproj", "{F563FD4D-B21C-4FD0-B3B3-821107B8CA35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Application", "src\Core\ArtGallery.Application\ArtGallery.Application.csproj", "{F563FD4D-B21C-4FD0-B3B3-821107B8CA35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Infrastructure", "ArtGallery.Infrastructure\ArtGallery.Infrastructure.csproj", "{99DCD6F6-B0B6-4CF9-80DF-46E92E5FE7BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Infrastructure", "src\Infrastructure\ArtGallery.Infrastructure\ArtGallery.Infrastructure.csproj", "{99DCD6F6-B0B6-4CF9-80DF-46E92E5FE7BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Persistence", "ArtGallery.Persistence\ArtGallery.Persistence.csproj", "{815008C7-6AD9-4A36-B974-1EE98B2078F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Persistence", "src\Infrastructure\ArtGallery.Persistence\ArtGallery.Persistence.csproj", "{815008C7-6AD9-4A36-B974-1EE98B2078F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Identity", "ArtGallery.Identity\ArtGallery.Identity.csproj", "{F12DFB2D-FE83-4A4F-BE8F-1431E44D67DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.Identity", "src\Infrastructure\ArtGallery.Identity\ArtGallery.Identity.csproj", "{F12DFB2D-FE83-4A4F-BE8F-1431E44D67DE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5CDD563D-3599-45A1-A457-27F770942278}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 		.env.production = .env.production
 		.env = .env
+		Directory.Packages.props = Directory.Packages.props
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.WebAPI.Tests", "ArtGallery.WebAPI.Tests\ArtGallery.WebAPI.Tests.csproj", "{8763266E-65A0-4BA9-93A7-538BD142BA95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.WebAPI.Tests", "test\ArtGallery.WebAPI.Tests\ArtGallery.WebAPI.Tests.csproj", "{8763266E-65A0-4BA9-93A7-538BD142BA95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.ClientApp", "ArtGallery.ClientApp\ArtGallery.ClientApp.csproj", "{07B3AB95-7908-4F98-8F57-BFAB59E7E2E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtGallery.ClientApp", "src\UI\ArtGallery.ClientApp\ArtGallery.ClientApp.csproj", "{07B3AB95-7908-4F98-8F57-BFAB59E7E2E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
