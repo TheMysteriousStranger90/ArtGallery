@@ -1,17 +1,71 @@
-bin/
-obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/
+# ─── Build output ─────────────────────────────────────────────────────────────
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+*.log
 
+# ─── NuGet ────────────────────────────────────────────────────────────────────
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!**/packages/build/
+nuget.dgspec.json
+project.nuget.cache
+*.nuget.g.props
+*.nuget.g.targets
 
+# ─── Visual Studio ────────────────────────────────────────────────────────────
+.vs/
+.vscode/!.vscode/extensions.json
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.pidb
+*.booproj
+*.svd
+.vscode/
 
-src/API/ArtGallery.WebAPI/appsettings.json
-src/API/ArtGallery.WebAPI/appsettings.Production.json
+# ─── Rider / JetBrains ────────────────────────────────────────────────────────
 .idea/
-certificates/
+*.iml
+*.ipr
+*.iws
+_ReSharper*/
+riderModule.iml
+*.DotSettings.user
 
-# Environment variables
+# ─── OS generated ─────────────────────────────────────────────────────────────
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# ─── Test results ─────────────────────────────────────────────────────────────
+TestResults/
+[Tt]est[Rr]esult*/
+coverage*/
+*.trx
+*.coveragexml
+*.coverage
+*.opencover.xml
+cobertura.xml
+lcov.info
+
+# ─── Entity Framework / Migrations generated ──────────────────────────────────
+# Keep migrations in source control — intentionally not ignored
+
+# ─── Environment / Secrets ────────────────────────────────────────────────────
 .env
 .env.local
 .env.development
@@ -20,7 +74,52 @@ certificates/
 src/API/ArtGallery.WebAPI/.env
 src/API/ArtGallery.WebAPI/.env.production
 
-# Log files
-*.log
-logs/
+# App settings that contain secrets (keep .Development in source control)
+appsettings.json
+appsettings.Production.json
+src/API/ArtGallery.WebAPI/appsettings.json
+src/API/ArtGallery.WebAPI/appsettings.Production.json
+
+# ─── Certificates ─────────────────────────────────────────────────────────────
+certificates/
+*.pfx
+*.cer
+*.p12
+*.key
+*.pem
+*.crt
+
+# ─── Docker / Compose overrides ───────────────────────────────────────────────
+docker-compose.override.yml
+
+# ─── Publish / Deploy artifacts ───────────────────────────────────────────────
+publish/
+deploy/
+artifacts/
+*.zip
+*.tar.gz
+
+# ─── Blazor WebAssembly ───────────────────────────────────────────────────────
+wwwroot/_framework/
+wwwroot/appsettings*.json
+
+# ─── Observability / Telemetry local files ────────────────────────────────────
 src/API/ArtGallery.WebAPI/logs/
+src/API/ArtGallery.WebAPI/otelcol-contrib/
+src/API/ArtGallery.WebAPI/prometheus/
+src/API/ArtGallery.WebAPI/grafana/
+
+# ─── Node / npm (if any frontend tooling) ────────────────────────────────────
+node_modules/
+.npm/
+.pnpm-store/
+dist/
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+*.swp
+*~
+*.orig
+*.bak
+.fake/
+.paket/
+paket-files/

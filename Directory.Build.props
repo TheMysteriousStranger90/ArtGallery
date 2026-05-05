@@ -1,0 +1,52 @@
+﻿<Project>
+  <!--
+    Directory.Build.props — applies to EVERY project in the solution.
+    Per-project .csproj values always win over these defaults.
+  -->
+
+  <PropertyGroup Label="Framework">
+    <!--
+      All projects in this solution target net8.0.
+      TargetFramework must stay here because no individual .csproj sets it.
+    -->
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Build Quality">
+    <!-- Treat warnings as errors only in CI -->
+    <TreatWarningsAsErrors Condition="'$(CI)' == 'true'">true</TreatWarningsAsErrors>
+    <WarningLevel>9999</WarningLevel>
+    <!-- Run .editorconfig / analyzer rules during build -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Metadata">
+    <Company>Bohdan Harabadzhyu</Company>
+    <Product>ArtGallery</Product>
+    <Copyright>Copyright © Bohdan Harabadzhyu $([System.DateTime]::UtcNow.Year)</Copyright>
+    <Authors>Bohdan Harabadzhyu</Authors>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Deterministic Build">
+    <Deterministic>true</Deterministic>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Packaging">
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- Suppress missing XML-doc warning globally -->
+  <PropertyGroup Label="Suppressions">
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+</Project>
