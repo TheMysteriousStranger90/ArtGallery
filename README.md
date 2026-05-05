@@ -1,8 +1,8 @@
-# 🎨 ArtGallery - Modern Art Gallery Management System
+# ArtGallery - Modern Art Gallery Management System
 
 A comprehensive, modern art gallery management system built with ASP.NET, Blazor WebAssembly, and Docker. This application provides a complete solution for managing artists, paintings, exhibitions, and museums with advanced features like search, favorites, user management, and monitoring.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Architecture](#architecture)
@@ -20,7 +20,7 @@ A comprehensive, modern art gallery management system built with ASP.NET, Blazor
 - [YouTube Review](#youtube-review)
 
 
-## ✨ Features
+## Features
 
 ### Core Features
 - **Artist Management**: Full CRUD operations for artists with biographical information
@@ -47,20 +47,20 @@ A comprehensive, modern art gallery management system built with ASP.NET, Blazor
 - **Input Validation**: Comprehensive input validation and sanitization
 - **CORS Configuration**: Proper cross-origin resource sharing setup
 
-## 🏗️ Architecture
+## Architecture
 
 The application follows Clean Architecture principles with the following layers:
 
 ```
 ArtGallery/
-├── ArtGallery.Domain/          # Business entities and domain logic
-├── ArtGallery.Application/     # Use cases and business rules
-├── ArtGallery.Infrastructure/  # External services (Cloudinary, etc.)
-├── ArtGallery.Persistence/     # Data access layer (Entity Framework)
-├── ArtGallery.Identity/        # Authentication and user management
-├── ArtGallery.WebAPI/          # REST API controllers and middleware
-├── ArtGallery.ClientApp/       # Blazor WebAssembly frontend
-└── docker-compose.yml         # Container orchestration
+ ArtGallery.Domain/          # Business entities and domain logic
+ ArtGallery.Application/     # Use cases and business rules
+ ArtGallery.Infrastructure/  # External services (Cloudinary, etc.)
+ ArtGallery.Persistence/     # Data access layer (Entity Framework)
+ ArtGallery.Identity/        # Authentication and user management
+ ArtGallery.WebAPI/          # REST API controllers and middleware
+ ArtGallery.ClientApp/       # Blazor WebAssembly frontend
+ docker-compose.yml         # Container orchestration
 ```
 
 ### Database Architecture
@@ -93,7 +93,7 @@ This separation provides:
 - **Repository Pattern**: Data access abstraction
 - **Unit of Work**: Transaction management
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
 - **ASP.NET Core Web API**: RESTful API development
@@ -121,17 +121,16 @@ This separation provides:
 - **Cloudinary**: Image storage and transformation
 - **Microsoft Graph API**: External authentication
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
 - **Docker Desktop** (latest version)
 - **Docker Compose** (v3.8+)
 - **.NET 8 SDK** (for local development)
-- **Node.js** (v18+ for frontend development)
 - **OpenSSL** (for certificate generation)
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone the Repository
 
@@ -165,7 +164,7 @@ docker-compose ps
 - **Kibana**: http://localhost:5601
 - **Prometheus**: http://localhost:9090
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -234,7 +233,7 @@ Default rate limits (configurable in appsettings.json):
 - **Registration**: 3 requests per minute
 - **General API**: 100 requests per minute
 
-## 🔧 Development
+## Development
 
 ### Local Development Setup
 
@@ -289,7 +288,7 @@ We use the following tools to maintain code quality:
 - **StyleCop**: Code style analysis
 - **Unit Tests**: xUnit testing framework
 
-## 📖 API Documentation
+## API Documentation
 
 The API is fully documented using OpenAPI/Swagger. Access the interactive documentation at:
 - **Development**: https://localhost:8081/docs
@@ -321,7 +320,7 @@ The API is fully documented using OpenAPI/Swagger. Access the interactive docume
 - `GET /api/exhibitions/upcoming` - Get upcoming exhibitions
 - `POST /api/exhibitions` - Create exhibition (Admin only)
 
-## 📊 Monitoring & Observability
+## Monitoring & Observability
 
 ### Metrics (Prometheus + Grafana)
 - **Application Metrics**: Request rates, response times, error rates
@@ -348,7 +347,7 @@ Access monitoring tools:
 - **Kibana**: http://localhost:5601
 - **Prometheus**: http://localhost:9090
 
-## 🔐 Authentication
+## Authentication
 
 ### Supported Authentication Methods
 
@@ -416,7 +415,7 @@ Contributions are welcome. Please fork the repository and create a pull request 
 
 ## YouTube Review
 <details>
-<summary>📺 Watch Video Review</summary>
+<summary>Watch Video Review</summary>
 
 [![YouTube](https://img.youtube.com/vi/wLmx1pw73I0/maxresdefault.jpg)](https://youtu.be/wLmx1pw73I0)
 </details>
