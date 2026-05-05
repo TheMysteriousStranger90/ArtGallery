@@ -1,5 +1,6 @@
 using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Cache;
+using ArtGallery.Application.Mapping;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +12,7 @@ public static class ApplicationServicesExtensions
         IConfiguration config)
     {
 
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        services.AddAutoMapper(cfg => cfg.AddProfile<ArtistMappingProfile>());
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 
         services.AddSingleton<ICacheKeyService, CacheKeyService>();
