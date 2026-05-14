@@ -22,4 +22,7 @@
     <ProjectReference Include="..\..\Core\ArtGallery.Application\ArtGallery.Application.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA1510</NoWarn>
+  </PropertyGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿@page "/login"
+@page "/login"
 @using ArtGallery.ClientApp.ViewModels
 @using ArtGallery.ClientApp.Services.Interfaces
 @inject IAuthenticationService AuthService
@@ -174,8 +174,7 @@
 @code {
     [SupplyParameterFromForm] private LoginViewModel loginViewModel { get; set; } = new();
 
-    private bool hasRendered = false;
-    private bool isMicrosoftLoading = false;
+    private bool isMicrosoftLoading;
 
     protected override async Task OnInitializedAsync()
     {
@@ -204,7 +203,6 @@
     {
         if (firstRender)
         {
-            hasRendered = true;
             await JSRuntime.InvokeVoidAsync("initializeMicrosoftAuth");
         }
     }

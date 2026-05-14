@@ -36,7 +36,7 @@ public static class TlsCertificateExtensions
         return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "certificates"));
     }
 
-    private static TlsCertificateLoader.TlsCertificateLoader LoadCertificates(string certificatePath, WebApplicationBuilder builder)
+    private static TlsCertificateLoader.TlsCertificateLoader? LoadCertificates(string certificatePath, WebApplicationBuilder builder)
     {
         var fullChainPath = Path.Combine(certificatePath, "fullchain.pem");
         var privateKeyPath = Path.Combine(certificatePath, "privkey.pem");

@@ -42,12 +42,12 @@ public class UserManagerService : IUserManagerService
         return await _userManager.FindByNameAsync(username) != null;
     }
 
-    public async Task<ApplicationUser> GetUserByUsernameAsync(string username)
+    public async Task<ApplicationUser?> GetUserByUsernameAsync(string username)
     {
         return await _userManager.FindByNameAsync(username);
     }
 
-    public async Task<ApplicationUser> GetUserByIdAsync(string id)
+    public async Task<ApplicationUser?> GetUserByIdAsync(string id)
     {
         return await UserManager.Users
             .Include(u => u.FavoritePaintings)
@@ -78,7 +78,7 @@ public class UserManagerService : IUserManagerService
             {
                 var roleNames = await dbContext.Roles
                     .Where(r => userRoleIds.Contains(r.Id))
-                    .Select(r => r.Name)
+                    .Select(r => r.Name!)
                     .ToListAsync();
 
                 if (roleNames.Any())

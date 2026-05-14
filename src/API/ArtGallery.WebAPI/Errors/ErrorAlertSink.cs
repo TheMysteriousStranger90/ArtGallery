@@ -17,7 +17,9 @@ public class ErrorAlertSink : ILogEventSink
     public void Emit(LogEvent logEvent)
     {
         if (string.IsNullOrEmpty(_webhookUrl) || logEvent.Level < LogEventLevel.Error)
+        {
             return;
+        }
 
         try
         {

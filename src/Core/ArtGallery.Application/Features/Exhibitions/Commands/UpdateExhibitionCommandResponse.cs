@@ -7,5 +7,5 @@ public class UpdateExhibitionCommandResponse : BaseResponse
 {
     public UpdateExhibitionCommandResponse() : base() { }
 
-    public ExhibitionDto Exhibition { get; set; }
+    public ExhibitionDto? Exhibition { get; set; }
 }

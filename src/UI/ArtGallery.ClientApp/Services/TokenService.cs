@@ -42,7 +42,9 @@ public class TokenService : ITokenService
         var token = await GetTokenAsync();
 
         if (string.IsNullOrEmpty(token))
+        {
             return false;
+        }
 
         try
         {
@@ -62,7 +64,9 @@ public class TokenService : ITokenService
         var token = await GetTokenAsync();
 
         if (string.IsNullOrEmpty(token))
+        {
             return new ClaimsPrincipal();
+        }
 
         try
         {

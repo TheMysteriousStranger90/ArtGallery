@@ -1,31 +1,30 @@
 using Microsoft.JSInterop;
 
-namespace ArtGallery.ClientApp.Constants
+namespace ArtGallery.ClientApp.Constants;
+
+public static class Const
 {
-    public static class Const
+    public const string DefaultApiVersion = "1.0";
+    private static string _apiUrl = "https://localhost:8081/";
+
+    public static string DefaultApiUrl
     {
-        public const string DefaultApiVersion = "1.0";
-        private static string _apiUrl = "https://localhost:8081/";
+        get => _apiUrl;
+        set => _apiUrl = value;
+    }
 
-        public static string DefaultApiUrl
+    public static async Task InitializeFromJsAsync(IJSRuntime jsRuntime)
+    {
+        try
         {
-            get => _apiUrl;
-            set => _apiUrl = value;
+            var apiUrl = await jsRuntime.InvokeAsync<string>("eval", "window.API_BASE_URL");
+            if (!string.IsNullOrEmpty(apiUrl))
+            {
+                _apiUrl = apiUrl;
+            }
         }
-
-        public static async Task InitializeFromJsAsync(IJSRuntime jsRuntime)
+        catch
         {
-            try
-            {
-                var apiUrl = await jsRuntime.InvokeAsync<string>("eval", "window.API_BASE_URL");
-                if (!string.IsNullOrEmpty(apiUrl))
-                {
-                    _apiUrl = apiUrl;
-                }
-            }
-            catch
-            {
-            }
         }
     }
 }

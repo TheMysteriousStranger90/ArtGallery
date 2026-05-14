@@ -1,4 +1,4 @@
-﻿@page "/artists"
+@page "/artists"
 @using ArtGallery.ClientApp.Services
 @using ArtGallery.ClientApp.Services.Interfaces
 @using ArtGallery.ClientApp.Shared
@@ -34,7 +34,7 @@
             </div>
             <div class="col-md-3">
                 <label for="sortOrder" class="form-label-sm">Sort by:</label>
-                <select id="sortOrder" class="form-select" @bind="CurrentSort">
+                <select id="sortOrder" class="form-select" @bind="CurrentSort" @bind:after="OnSortChanged">
                     <option value="lastName">Name (A-Z)</option>
                     <option value="-lastName">Name (Z-A)</option>
                     <option value="birthDate">Birth Date</option>
@@ -217,8 +217,7 @@
     private Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null? pagedArtists;
     private bool isLoading = true;
     private string? errorMessage;
-    private bool _hasCompletedInitialParameterSet = false;
-    private bool isAdministrator = false;
+    private bool isAdministrator;
     private ICollection<string>? nationalities;
 
     private bool HasActiveFilters =>
@@ -232,43 +231,17 @@
 
     [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
 
-    private string _currentSort = "lastName";
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string CurrentSort { get; set; } = "lastName";
+
+    
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string CurrentSort
-    {
-        get => _currentSort;
-        set
-        {
-            if (_currentSort != value)
-            {
-                _currentSort = value;
-                if (_hasCompletedInitialParameterSet)
-                {
-                    CurrentPage = 1;
-                    NavigateToPage();
-                }
-            }
-        }
-    }
+    public string Nationality { get; set; } = string.Empty;
 
-    private string _nationality = string.Empty;
-
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string Nationality
-    {
-        get => _nationality;
-        set
-        {
-            if (_nationality != value)
-            {
-                _nationality = value;
-                if (_hasCompletedInitialParameterSet) ApplyFilters();
-            }
-        }
-    }
+    
 
     [Parameter] [SupplyParameterFromQuery] public int? FromYear { get; set; }
 
@@ -283,8 +256,6 @@
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         isAdministrator = authState.User.IsInRole("Administrator");
 
-        _currentSort = CurrentSort;
-        _nationality = Nationality;
 
         if (!string.IsNullOrEmpty(ActiveSearch))
         {
@@ -322,7 +293,6 @@
         }
 
         await LoadArtists();
-        _hasCompletedInitialParameterSet = true;
     }
 
     private async Task LoadArtists()
@@ -467,6 +437,12 @@
         }
 
         CurrentPage = pageNumber;
+        NavigateToPage();
+    }
+
+    private void OnSortChanged()
+    {
+        CurrentPage = 1;
         NavigateToPage();
     }
 

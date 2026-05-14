@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
   <!--
     Directory.Build.props — applies to EVERY project in the solution.
     Per-project .csproj values always win over these defaults.
@@ -46,7 +46,7 @@
 
   <!-- Suppress missing XML-doc warning globally -->
   <PropertyGroup Label="Suppressions">
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <NoWarn>$(NoWarn);CS1591;CA1848;CA1873;CA1860;CA2201</NoWarn>
   </PropertyGroup>
 
 </Project>

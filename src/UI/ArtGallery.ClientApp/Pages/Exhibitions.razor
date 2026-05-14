@@ -1,4 +1,4 @@
-﻿@page "/exhibitions"
+@page "/exhibitions"
 @using ArtGallery.ClientApp.Services
 @using ArtGallery.ClientApp.Services.Interfaces
 @using ArtGallery.ClientApp.Shared
@@ -170,8 +170,7 @@
     private ICollection<ExhibitionDto> allExhibitions = new List<ExhibitionDto>();
     private bool isLoading = true;
     private string? errorMessage;
-    private bool _hasCompletedInitialParameterSet = false;
-    private bool isAdministrator = false;
+    private bool isAdministrator;
 
     private List<MuseumBriefDto> museums = new();
     
@@ -241,7 +240,6 @@
         }
 
         await LoadExhibitions();
-        _hasCompletedInitialParameterSet = true;
     }
 
     private async Task LoadExhibitions()

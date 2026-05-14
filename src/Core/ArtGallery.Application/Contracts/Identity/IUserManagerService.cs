@@ -11,8 +11,8 @@ public interface IUserManagerService
 
     Task<bool> CreateUserAsync(ApplicationUser user, string password);
     Task<bool> UserExistsAsync(string username);
-    Task<ApplicationUser> GetUserByUsernameAsync(string username);
-    Task<ApplicationUser> GetUserByIdAsync(string id);
+    Task<ApplicationUser?> GetUserByUsernameAsync(string username);
+    Task<ApplicationUser?> GetUserByIdAsync(string id);
     Task<IList<string>> GetUserRolesAsync(ApplicationUser user);
     Task<bool> CheckUserPasswordAsync(ApplicationUser user, string password);
     Task<bool> AddUserToRoleAsync(ApplicationUser user, string roleName);

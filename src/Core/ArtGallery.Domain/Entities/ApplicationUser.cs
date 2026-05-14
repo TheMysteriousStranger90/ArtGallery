@@ -4,12 +4,12 @@ namespace ArtGallery.Domain.Entities;
 
 public class ApplicationUser : IdentityUser
 {
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
     public DateTime Created { get; set; } = DateTime.UtcNow;
     public DateTime? LastActive { get; set; }
 
-    public ICollection<AppUserRole> UserRoles { get; set; }
+    public ICollection<AppUserRole> UserRoles { get; set; } = new List<AppUserRole>();
 
     public virtual ICollection<UserFavoritePainting> FavoritePaintings { get; set; } = new List<UserFavoritePainting>();
     public virtual ICollection<UserFavoriteArtist> FavoriteArtists { get; set; } = new List<UserFavoriteArtist>();

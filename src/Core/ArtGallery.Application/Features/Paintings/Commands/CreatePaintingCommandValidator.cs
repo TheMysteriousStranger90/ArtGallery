@@ -53,14 +53,20 @@ public class CreatePaintingCommandValidator : AbstractValidator<CreatePaintingCo
     private async Task<bool> GenreExistsOrNull(Guid? id, CancellationToken token)
     {
         if (!id.HasValue)
+        {
             return true;
+        }
+
         return await _unitOfWork.Repository<Genre>().GetByIdAsync(id.Value) != null;
     }
 
     private async Task<bool> MuseumExistsOrNull(Guid? id, CancellationToken token)
     {
         if (!id.HasValue)
+        {
             return true;
+        }
+
         return await _unitOfWork.Repository<Museum>().GetByIdAsync(id.Value) != null;
     }
 
