@@ -77,10 +77,15 @@ public static class TlsCertificateExtensions
 
     private static void ConfigureKestrelWithDiagnostics(WebApplicationBuilder builder, TlsCertificateLoader.TlsCertificateLoader? tlsCertificateLoader)
     {
+        if (builder.Environment.IsDevelopment() && tlsCertificateLoader == null)
+        {
+            Console.WriteLine("🔧 Development mode: using ASP.NET Core dev certificate (run 'dotnet dev-certs https --trust' if not trusted)");
+            return;
+        }
+
         if (builder.Environment.IsDevelopment())
         {
-            Console.WriteLine("🔧 Using development configuration with dev certificates");
-            return;
+            Console.WriteLine("🔧 Development mode with custom certificates provided");
         }
 
         builder.WebHost.ConfigureKestrel((context, serverOptions) =>
