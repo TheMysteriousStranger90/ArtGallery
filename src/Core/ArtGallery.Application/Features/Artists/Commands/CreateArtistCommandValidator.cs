@@ -23,7 +23,7 @@ public class CreateArtistCommandValidator : AbstractValidator<CreateArtistComman
 
         When(a => a.Biography != null, () =>
         {
-            RuleFor(a => a.Biography.ShortDescription)
+            RuleFor(a => a.Biography!.ShortDescription)
                 .NotEmpty().WithMessage("Biography short description is required.")
                 .MaximumLength(500).WithMessage("Biography short description must not exceed 500 characters.");
         });

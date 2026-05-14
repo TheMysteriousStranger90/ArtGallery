@@ -22,7 +22,7 @@ public class GetUserFavoriteArtistsQueryHandler : IRequestHandler<GetUserFavorit
 
         try
         {
-            var favorites = await _unitOfWork.UserFavoritesRepository.GetUserFavoriteArtistsAsync(request.UserId);
+            var favorites = await _unitOfWork.UserFavoritesRepository.GetUserFavoriteArtistsAsync(request.UserId!);
 
             response.FavoriteArtists = _mapper.Map<List<ArtistDto>>(favorites.Select(f => f.Artist));
             response.Count = favorites.Count;

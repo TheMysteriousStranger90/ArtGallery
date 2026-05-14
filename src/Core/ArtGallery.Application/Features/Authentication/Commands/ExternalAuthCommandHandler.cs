@@ -33,19 +33,19 @@ public class ExternalAuthCommandHandler : IRequestHandler<ExternalAuthCommand, E
         _logger.LogInformation("Processing external authentication for provider: {Provider}, Email: {Email}",
             request.Provider, request.Email);
 
-        var user = await _userManagerService.UserManager.FindByEmailAsync(request.Email);
+        var user = await _userManagerService.UserManager.FindByEmailAsync(request.Email!);
         bool isNewUser = false;
 
         if (user == null)
         {
             isNewUser = true;
-            var uniqueUsername = await GenerateUniqueUsernameAsync(request.FirstName, request.LastName);
+            var uniqueUsername = await GenerateUniqueUsernameAsync(request.FirstName!, request.LastName!);
 
             user = new ApplicationUser
             {
-                Email = request.Email.ToLowerInvariant(),
-                FirstName = request.FirstName,
-                LastName = request.LastName,
+                Email = request.Email!.ToLowerInvariant(),
+                FirstName = request.FirstName!,
+                LastName = request.LastName!,
                 UserName = uniqueUsername,
                 EmailConfirmed = true
             };
@@ -62,10 +62,10 @@ public class ExternalAuthCommandHandler : IRequestHandler<ExternalAuthCommand, E
             _logger.LogInformation("Created new user via external auth: {Email}", request.Email);
         }
 
-        var existingLogin = await _userManagerService.UserManager.FindByLoginAsync(request.Provider, request.ExternalId);
+        var existingLogin = await _userManagerService.UserManager.FindByLoginAsync(request.Provider!, request.ExternalId!);
         if (existingLogin == null)
         {
-            var loginInfo = new Microsoft.AspNetCore.Identity.UserLoginInfo(request.Provider, request.ExternalId, request.Provider);
+            var loginInfo = new Microsoft.AspNetCore.Identity.UserLoginInfo(request.Provider!, request.ExternalId!, request.Provider);
             var addLoginResult = await _userManagerService.UserManager.AddLoginAsync(user, loginInfo);
 
             if (!addLoginResult.Succeeded)
@@ -85,9 +85,9 @@ public class ExternalAuthCommandHandler : IRequestHandler<ExternalAuthCommand, E
         {
             Id = user.Id,
             Token = jwtToken,
-            Email = user.Email,
-            UserName = user.UserName,
-            Provider = request.Provider,
+            Email = user.Email!,
+            UserName = user.UserName!,
+            Provider = request.Provider!,
             IsNewUser = isNewUser
         };
     }
@@ -128,12 +128,12 @@ public class ExternalAuthCommandHandler : IRequestHandler<ExternalAuthCommand, E
 
         var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!),
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                 new Claim("uid", user.Id),
-                new Claim("first_name", user.FirstName),
-                new Claim("last_name", user.LastName)
+                new Claim("first_name", user.FirstName!),
+                new Claim("last_name", user.LastName!)
             }
             .Union(userClaims)
             .Union(roleClaims);

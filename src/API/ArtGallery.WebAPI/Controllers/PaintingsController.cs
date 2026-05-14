@@ -69,7 +69,7 @@ public class PaintingsController : ControllerBase
             $"{PaintingsCacheKey}_{pageIndex}_{pageSize}_{search}_{artistId}_{genreId}_{museumId}_{paintType}_{fromYear}_{toYear}_{sort}";
 
         // Try to get from cache first
-        if (!_memoryCache.TryGetValue(cacheKey, out Pagination<PaintingDto> paintingResult))
+        if (!_memoryCache.TryGetValue(cacheKey, out Pagination<PaintingDto>? paintingResult))
         {
             try
             {
@@ -144,7 +144,7 @@ public class PaintingsController : ControllerBase
         string cacheKey = $"{PaintingsCacheKey}_Detail_{id}";
 
         // Try to get from cache first
-        if (!_memoryCache.TryGetValue(cacheKey, out PaintingDetailDto paintingDetail))
+        if (!_memoryCache.TryGetValue(cacheKey, out PaintingDetailDto? paintingDetail))
         {
             try
             {
@@ -227,7 +227,7 @@ public class PaintingsController : ControllerBase
 
         return CreatedAtAction(
             nameof(GetPainting),
-            new { id = response.Painting.Id },
+            new { id = response.Painting!.Id },
             response.Painting
         );
     }

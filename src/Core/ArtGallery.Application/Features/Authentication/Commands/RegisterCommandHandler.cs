@@ -27,7 +27,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Registrat
     {
         _logger.LogInformation("Attempting to register user: {Email}", request.Email);
 
-        var existingEmail = await _userManagerService.UserManager.FindByEmailAsync(request.Email);
+        var existingEmail = await _userManagerService.UserManager.FindByEmailAsync(request.Email!);
 
         if (existingEmail != null)
         {
@@ -35,18 +35,18 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Registrat
             throw new BadRequestException($"Email {request.Email} already exists.");
         }
 
-        var uniqueUsername = await GenerateUniqueUsernameAsync(request.FirstName, request.LastName);
+        var uniqueUsername = await GenerateUniqueUsernameAsync(request.FirstName!, request.LastName!);
 
         var user = new ApplicationUser
         {
-            Email = request.Email.ToLowerInvariant(),
-            FirstName = request.FirstName,
-            LastName = request.LastName,
+            Email = request.Email!.ToLowerInvariant(),
+            FirstName = request.FirstName!,
+            LastName = request.LastName!,
             UserName = uniqueUsername,
             EmailConfirmed = true
         };
 
-        var result = await _userManagerService.CreateUserAsync(user, request.Password);
+        var result = await _userManagerService.CreateUserAsync(user, request.Password!);
 
         if (!result)
         {
@@ -70,8 +70,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Registrat
         {
             Id = user.Id,
             Token = authResponse.Token,
-            Email = user.Email,
-            UserName = user.UserName
+            Email = user.Email!,
+            UserName = user.UserName!
         };
     }
 

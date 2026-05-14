@@ -84,7 +84,7 @@ public class LoggedInUserService : ILoggedInUserService
 
         foreach (var header in _contextAccessor.HttpContext.Request.Headers)
         {
-            headers.Add(header.Key, header.Value);
+            headers.Add(header.Key, header.Value.ToString());
         }
 
         return headers;

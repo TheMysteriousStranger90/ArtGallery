@@ -9,7 +9,7 @@ public static class TlsCertificateExtensions
 {
     public static void ConfigureTlsCertificates(this WebApplicationBuilder builder)
     {
-        TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader = null;
+        TlsCertificateLoader.TlsCertificateLoader? tlsCertificateLoader = null;
 
         string effectiveCertificatePath = ResolveCertificatePath();
         tlsCertificateLoader = LoadCertificates(effectiveCertificatePath, builder);
@@ -75,7 +75,7 @@ public static class TlsCertificateExtensions
         return null;
     }
 
-    private static void ConfigureKestrelWithDiagnostics(WebApplicationBuilder builder, TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader)
+    private static void ConfigureKestrelWithDiagnostics(WebApplicationBuilder builder, TlsCertificateLoader.TlsCertificateLoader? tlsCertificateLoader)
     {
         if (builder.Environment.IsDevelopment())
         {

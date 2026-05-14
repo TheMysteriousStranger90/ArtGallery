@@ -40,25 +40,25 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
 
         try
         {
-            Painting createdPainting = null;
+            Painting? createdPainting = null;
 
             await _unitOfWork.ExecuteWithTransactionAsync(async () =>
             {
                 var painting = new Painting
                 {
-                    Title = request.Title,
-                    Description = request.Description,
+                    Title = request.Title!,
+                    Description = request.Description!,
                     CreationYear = request.CreationYear,
-                    Medium = request.Medium,
-                    Dimensions = request.Dimensions,
+                    Medium = request.Medium!,
+                    Dimensions = request.Dimensions!,
                     PaintType = request.PaintType,
                     ArtistId = request.ArtistId,
                     GenreId = request.GenreId,
                     MuseumId = request.MuseumId
                 };
 
-                string imageUrl = null;
-                string publicId = null;
+                string? imageUrl = null;
+                string? publicId = null;
 
                 if (request.Image != null)
                 {
@@ -82,8 +82,8 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
                 {
                     var paintingImage = new PaintingImage
                     {
-                        PictureUrl = imageUrl,
-                        PublicId = publicId,
+                        PictureUrl = imageUrl!,
+                        PublicId = publicId!,
                         IsMain = true,
                         PaintingId = painting.Id
                     };

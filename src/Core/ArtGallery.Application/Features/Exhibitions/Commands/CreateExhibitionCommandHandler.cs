@@ -39,14 +39,14 @@ public class
 
         try
         {
-            Exhibition createdExhibition = null;
+            Exhibition? createdExhibition = null;
 
             await _unitOfWork.ExecuteWithTransactionAsync(async () =>
             {
                 var exhibition = new Exhibition
                 {
-                    Title = request.Title,
-                    Description = request.Description,
+                    Title = request.Title!,
+                    Description = request.Description!,
                     StartDate = request.StartDate,
                     EndDate = request.EndDate,
                     ExternalVenueAddress = request.ExternalVenueAddress,

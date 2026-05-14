@@ -3,7 +3,7 @@ using ArtGallery.Domain.Entities;
 namespace ArtGallery.Application.Specifications;
 
 // EF Core SQL translation: ToLowerInvariant() maps to LOWER() in SQL Server; Contains(StringComparison) is not supported
-#pragma warning disable CA1862
+#pragma warning disable CA1862, CS8603
 
 public class ArtistSpecification : BaseSpecification<Artist>
 {

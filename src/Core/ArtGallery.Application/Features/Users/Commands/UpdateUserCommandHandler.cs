@@ -27,11 +27,11 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Updat
             _logger.LogInformation("Updating user with ID: {UserId}", request.Id);
 
             await _userManagerService.UpdateUserAsync(
-                request.Id,
-                request.FirstName,
-                request.LastName,
-                request.Email,
-                request.UserName);
+                request.Id!,
+                request.FirstName!,
+                request.LastName!,
+                request.Email!,
+                request.UserName!);
 
             response.Success = true;
             response.Message = "User updated successfully";

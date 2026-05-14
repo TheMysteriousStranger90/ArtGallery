@@ -6,7 +6,7 @@ public static class EnvironmentConfigurationExtensions
 {
     public static void ConfigureEnvironmentVariables(this WebApplicationBuilder builder)
     {
-        string environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLowerInvariant();
+        string? environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLowerInvariant();
         string envFileName = environmentName == "production" ? ".env.production" : ".env";
 
         List<string> possiblePaths = new List<string>();

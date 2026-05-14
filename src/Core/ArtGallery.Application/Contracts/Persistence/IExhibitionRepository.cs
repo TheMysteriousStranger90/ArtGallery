@@ -7,5 +7,5 @@ public interface IExhibitionRepository : IGenericRepository<Exhibition>
     Task<IReadOnlyList<Exhibition>> GetCurrentExhibitionsAsync();
     Task<IReadOnlyList<Exhibition>> GetUpcomingExhibitionsAsync();
     Task<IReadOnlyList<Exhibition>> GetPastExhibitionsAsync();
-    Task<Exhibition> GetExhibitionWithPaintingsAsync(Guid exhibitionId);
+    Task<Exhibition?> GetExhibitionWithPaintingsAsync(Guid exhibitionId);
 }

@@ -39,17 +39,17 @@ public class CreateArtistCommandHandler : IRequestHandler<CreateArtistCommand, C
 
         try
         {
-            Artist createdArtist = null;
+            Artist? createdArtist = null;
 
             await _unitOfWork.ExecuteWithTransactionAsync(async () =>
             {
                 var artist = new Artist
                 {
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
+                    FirstName = request.FirstName!,
+                    LastName = request.LastName!,
                     BirthDate = request.BirthDate,
                     DeathDate = request.DeathDate,
-                    Nationality = request.Nationality
+                    Nationality = request.Nationality!
                 };
 
                 await _unitOfWork.ArtistRepository.AddAsync(artist);
@@ -59,9 +59,9 @@ public class CreateArtistCommandHandler : IRequestHandler<CreateArtistCommand, C
                     var biography = new Biography
                     {
                         ArtistId = artist.Id,
-                        Content = request.Biography.Content,
-                        ShortDescription = request.Biography.ShortDescription,
-                        References = request.Biography.References
+                        Content = request.Biography.Content!,
+                        ShortDescription = request.Biography.ShortDescription!,
+                        References = request.Biography.References!
                     };
 
                     await _unitOfWork.Repository<Biography>().AddAsync(biography);

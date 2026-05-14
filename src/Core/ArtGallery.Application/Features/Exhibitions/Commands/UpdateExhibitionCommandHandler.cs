@@ -45,8 +45,8 @@ public class
                     throw new Exception($"Exhibition with ID {request.Id} not found");
                 }
 
-                exhibition.Title = request.Title;
-                exhibition.Description = request.Description;
+                exhibition.Title = request.Title!;
+                exhibition.Description = request.Description!;
                 exhibition.StartDate = request.StartDate;
                 exhibition.EndDate = request.EndDate;
                 exhibition.ExternalVenueAddress = request.ExternalVenueAddress;

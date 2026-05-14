@@ -25,15 +25,15 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDet
 
     public async Task<UserDetailDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
-        var user = await _userManagerService.GetUserByIdAsync(request.Id);
+        var user = await _userManagerService.GetUserByIdAsync(request.Id!);
         if (user == null)
         {
             throw new NotFoundException("User not found");
         }
 
         var roles = await _userManagerService.GetUserRolesAsync(user);
-        var favoritePaintings = await _unitOfWork.UserFavoritesRepository.GetUserFavoritePaintingsAsync(request.Id);
-        var favoriteArtists = await _unitOfWork.UserFavoritesRepository.GetUserFavoriteArtistsAsync(request.Id);
+        var favoritePaintings = await _unitOfWork.UserFavoritesRepository.GetUserFavoritePaintingsAsync(request.Id!);
+        var favoriteArtists = await _unitOfWork.UserFavoritesRepository.GetUserFavoriteArtistsAsync(request.Id!);
 
         var userDetail = _mapper.Map<UserDetailDto>(user);
         userDetail.Roles = roles.ToList();

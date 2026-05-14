@@ -31,7 +31,7 @@ public class
             }
 
             var result = await _unitOfWork.UserFavoritesRepository.AddFavoritePaintingAsync(
-                request.UserId, request.PaintingId);
+                request.UserId!, request.PaintingId);
 
             if (result)
             {

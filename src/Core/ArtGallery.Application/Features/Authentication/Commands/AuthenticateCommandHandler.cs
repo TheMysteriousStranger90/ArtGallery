@@ -33,7 +33,7 @@ public class AuthenticateCommandHandler : IRequestHandler<AuthenticateCommand, A
     {
         _logger.LogInformation("Attempting to authenticate user: {Email}", request.Email);
 
-        var user = await _userManagerService.UserManager.FindByEmailAsync(request.Email);
+        var user = await _userManagerService.UserManager.FindByEmailAsync(request.Email!);
 
         if (user == null)
         {
@@ -41,7 +41,7 @@ public class AuthenticateCommandHandler : IRequestHandler<AuthenticateCommand, A
             throw new UnauthorizedException("Invalid credentials");
         }
 
-        var isPasswordValid = await _userManagerService.UserManager.CheckPasswordAsync(user, request.Password);
+        var isPasswordValid = await _userManagerService.UserManager.CheckPasswordAsync(user, request.Password!);
 
         if (!isPasswordValid)
         {
@@ -60,8 +60,8 @@ public class AuthenticateCommandHandler : IRequestHandler<AuthenticateCommand, A
         {
             Id = user.Id,
             Token = jwtToken,
-            Email = user.Email,
-            UserName = user.UserName
+            Email = user.Email!,
+            UserName = user.UserName!
         };
     }
 
@@ -79,9 +79,9 @@ public class AuthenticateCommandHandler : IRequestHandler<AuthenticateCommand, A
 
         var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!),
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                 new Claim("uid", user.Id),
                 new Claim("first_name", user.FirstName),
                 new Claim("last_name", user.LastName)

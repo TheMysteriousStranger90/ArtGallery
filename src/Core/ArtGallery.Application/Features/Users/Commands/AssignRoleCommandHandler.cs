@@ -26,18 +26,18 @@ public class AssignRoleCommandHandler : IRequestHandler<AssignRoleCommand, Assig
         {
             _logger.LogInformation("Assigning role {RoleName} to user {UserId}", request.RoleName, request.UserId);
 
-            if (!await _userManagerService.RoleExistsAsync(request.RoleName))
+            if (!await _userManagerService.RoleExistsAsync(request.RoleName!))
             {
                 throw new NotFoundException($"Role '{request.RoleName}' does not exist");
             }
 
-            var user = await _userManagerService.GetUserByIdAsync(request.UserId);
+            var user = await _userManagerService.GetUserByIdAsync(request.UserId!);
             if (user == null)
             {
                 throw new NotFoundException($"User with ID '{request.UserId}' not found");
             }
 
-            await _userManagerService.AddUserToRoleAsync(user, request.RoleName);
+            await _userManagerService.AddUserToRoleAsync(user, request.RoleName!);
             var updatedRoles = await _userManagerService.GetUserRolesAsync(user);
 
             response.Success = true;

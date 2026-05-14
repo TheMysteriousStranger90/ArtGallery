@@ -120,7 +120,7 @@ public static class SeedDataUserInitializer
         foreach (var (user, password, role) in users)
         {
             // Check if user exists
-            var existingUser = await userManager.FindByEmailAsync(user.Email);
+            var existingUser = await userManager.FindByEmailAsync(user.Email!);
 
             if (existingUser == null)
             {

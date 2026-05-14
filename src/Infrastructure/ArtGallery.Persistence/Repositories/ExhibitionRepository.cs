@@ -41,7 +41,7 @@ public class ExhibitionRepository : GenericRepository<Exhibition>, IExhibitionRe
             .ToListAsync();
     }
 
-    public async Task<Exhibition> GetExhibitionWithPaintingsAsync(Guid exhibitionId)
+    public async Task<Exhibition?> GetExhibitionWithPaintingsAsync(Guid exhibitionId)
     {
         return await _context.Exhibitions
             .Include(e => e.Museum)

@@ -17,7 +17,7 @@ public interface IPaintingService
         string sort = "title",
         string apiVersion = "1.0");
 
-    Task<PaintingDetailDto> GetPaintingAsync(Guid id, string apiVersion = Const.DefaultApiVersion);
+    Task<PaintingDetailDto?> GetPaintingAsync(Guid id, string apiVersion = Const.DefaultApiVersion);
 
     Task<PaintingDto> CreatePaintingAsync(
         string title,

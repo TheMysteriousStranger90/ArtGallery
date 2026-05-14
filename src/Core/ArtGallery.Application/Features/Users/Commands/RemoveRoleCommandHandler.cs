@@ -25,7 +25,7 @@ public class RemoveRoleCommandHandler : IRequestHandler<RemoveRoleCommand, Remov
         {
             _logger.LogInformation("Removing role {RoleName} from user {UserId}", request.RoleName, request.UserId);
 
-            var updatedRoles = await _userManagerService.RemoveUserFromRoleAsync(request.UserId, request.RoleName);
+            var updatedRoles = await _userManagerService.RemoveUserFromRoleAsync(request.UserId!, request.RoleName!);
 
             response.Success = true;
             response.Message = $"Role '{request.RoleName}' removed successfully";

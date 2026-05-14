@@ -97,14 +97,14 @@ public class UpdatePaintingCommandHandler : IRequestHandler<UpdatePaintingComman
                     }
 
                     _unitOfWork.ImageRepository.RemovePaintingImage(existingMainImage);
-                    painting.ImageUrl = null;
+                    painting.ImageUrl = null!;
                 }
 
-                painting.Title = request.Title;
-                painting.Description = request.Description;
+                painting.Title = request.Title!;
+                painting.Description = request.Description!;
                 painting.CreationYear = request.CreationYear;
-                painting.Medium = request.Medium;
-                painting.Dimensions = request.Dimensions;
+                painting.Medium = request.Medium!;
+                painting.Dimensions = request.Dimensions!;
                 painting.PaintType = request.PaintType;
                 painting.ArtistId = request.ArtistId;
                 painting.GenreId = request.GenreId;

@@ -7,7 +7,7 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-        <NoWarn>$(NoWarn);CA1707;CA2201</NoWarn>
+        <NoWarn>$(NoWarn);CA1707;CA2201;CS8600;CS8601;CS8602;CS8604;IDE0161</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

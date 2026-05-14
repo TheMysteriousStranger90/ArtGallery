@@ -8,7 +8,7 @@ public interface IArtistService
         int pageIndex = 1, int pageSize = 10, string search = "", string nationality = "",
         string sort = "lastName", string apiVersion = Const.DefaultApiVersion);
 
-    Task<ArtistDetailDto> GetArtistAsync(Guid id, string apiVersion = Const.DefaultApiVersion);
+    Task<ArtistDetailDto?> GetArtistAsync(Guid id, string apiVersion = Const.DefaultApiVersion);
 
     Task<ICollection<string>> GetNationalitiesAsync(string apiVersion = Const.DefaultApiVersion);
 

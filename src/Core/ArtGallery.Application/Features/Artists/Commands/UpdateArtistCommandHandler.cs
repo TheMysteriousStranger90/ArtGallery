@@ -95,11 +95,11 @@ public class UpdateArtistCommandHandler : IRequestHandler<UpdateArtistCommand, U
                     _unitOfWork.ImageRepository.RemoveArtistImage(existingMainImage);
                 }
 
-                artistToUpdate.FirstName = request.FirstName;
-                artistToUpdate.LastName = request.LastName;
+                artistToUpdate.FirstName = request.FirstName!;
+                artistToUpdate.LastName = request.LastName!;
                 artistToUpdate.BirthDate = request.BirthDate;
                 artistToUpdate.DeathDate = request.DeathDate;
-                artistToUpdate.Nationality = request.Nationality;
+                artistToUpdate.Nationality = request.Nationality!;
 
                 await _unitOfWork.ArtistRepository.UpdateAsync(artistToUpdate);
 
@@ -113,18 +113,18 @@ public class UpdateArtistCommandHandler : IRequestHandler<UpdateArtistCommand, U
                         biography = new Biography
                         {
                             ArtistId = request.Id,
-                            Content = request.Biography.Content,
-                            ShortDescription = request.Biography.ShortDescription,
-                            References = request.Biography.References
+                            Content = request.Biography.Content!,
+                            ShortDescription = request.Biography.ShortDescription!,
+                            References = request.Biography.References!
                         };
 
                         await _unitOfWork.Repository<Biography>().AddAsync(biography);
                     }
                     else
                     {
-                        biography.Content = request.Biography.Content;
-                        biography.ShortDescription = request.Biography.ShortDescription;
-                        biography.References = request.Biography.References;
+                        biography.Content = request.Biography.Content!;
+                        biography.ShortDescription = request.Biography.ShortDescription!;
+                        biography.References = request.Biography.References!;
 
                         await _unitOfWork.Repository<Biography>().UpdateAsync(biography);
                     }

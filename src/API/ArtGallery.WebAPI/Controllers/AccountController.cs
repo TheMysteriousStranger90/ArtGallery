@@ -162,7 +162,7 @@ public class AccountController : ControllerBase
 
             var userInfo = JsonSerializer.Deserialize<JsonElement>(content);
 
-            string email = null;
+            string? email = null;
             if (userInfo.TryGetProperty("mail", out var mailProp) && mailProp.ValueKind == JsonValueKind.String)
             {
                 email = mailProp.GetString();
