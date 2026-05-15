@@ -68,7 +68,7 @@ jobs:
       
       # Create deployment artifact BEFORE Docker build
       - name: Publish web project
-        run: dotnet publish ArtGallery.WebAPI/ArtGallery.WebAPI.csproj -c Release -o ./publish
+        run: dotnet publish src/API/ArtGallery.WebAPI/ArtGallery.WebAPI.csproj -c Release -o ./publish
       
       # Build and Push Docker Images
       - name: Build and push Docker images
@@ -93,7 +93,7 @@ jobs:
           # Install EF Core tools if not present
           dotnet tool install --global dotnet-ef || true
           # Check migrations
-          dotnet ef migrations list --project ArtGallery.Persistence --startup-project ArtGallery.WebAPI || echo "No migrations found or EF tools not configured"
+          dotnet ef migrations list --project src/Infrastructure/ArtGallery.Persistence --startup-project src/API/ArtGallery.WebAPI || echo "No migrations found or EF tools not configured"
       
       # Output Build Information
       - name: Add build summary
@@ -101,7 +101,7 @@ jobs:
         run: |
           echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "* **Project**: ArtGallery ASP.NET Application" >> $GITHUB_STEP_SUMMARY
-          echo "* **Version**: $(grep -m 1 '<Version>' ArtGallery.WebAPI/*.csproj | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/' || echo 'Unknown')" >> $GITHUB_STEP_SUMMARY
+          echo "* **Version**: $(grep -m 1 '<Version>' src/API/ArtGallery.WebAPI/*.csproj | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/' || echo 'Unknown')" >> $GITHUB_STEP_SUMMARY
           echo "* **Build Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "* **Image**: ${{ secrets.DOCKER_HUB_USERNAME }}/artgallery.webapi:${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
       
@@ -123,3 +123,4 @@ jobs:
           else
             echo "## ❌ Workflow failed" >> $GITHUB_STEP_SUMMARY
           fi
+
