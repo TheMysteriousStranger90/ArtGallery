@@ -2,15 +2,17 @@ using ArtGallery.Domain.Entities;
 
 namespace ArtGallery.Application.Specifications;
 
-// EF Core SQL translation: ToLowerInvariant() maps to LOWER() in SQL Server; Contains(StringComparison) is not supported
-#pragma warning disable CA1862, CS8603
+// EF Core translates .ToLower() to SQL LOWER(); culture-specific overload is not supported by the provider
+#pragma warning disable CA1304, CA1311, CA1862, CS8603
 
 public class ArtistSpecification : BaseSpecification<Artist>
 {
     public ArtistSpecification(ArtistSpecParams artistParams)
         : base(x =>
-            (string.IsNullOrEmpty(artistParams.Search) || x.FirstName.ToLowerInvariant().Contains(artistParams.Search) ||
-             x.LastName.ToLowerInvariant().Contains(artistParams.Search)) &&
+            (string.IsNullOrEmpty(artistParams.Search) ||
+             x.FirstName.ToLower().Contains(artistParams.Search) ||
+             x.LastName.ToLower().Contains(artistParams.Search) ||
+             (x.FirstName + " " + x.LastName).ToLower().Contains(artistParams.Search)) &&
             (string.IsNullOrEmpty(artistParams.Nationality) || x.Nationality == artistParams.Nationality)
         )
     {
@@ -46,3 +48,4 @@ public class ArtistSpecification : BaseSpecification<Artist>
         AddInclude(a => a.Paintings);
     }
 }
+
