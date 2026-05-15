@@ -1,127 +1,149 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using ArtGallery.ClientApp.Shared
+@using ArtGallery.ClientApp.Layout
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 
+<a href="#main-content" class="skip-link visually-hidden-focusable">Skip to main content</a>
+
 <div class="page">
-    <main>
-        <div class="top-row px-4">
-            <!-- Left section (empty for now) -->
-            <div class="top-row-left">
-            </div>
+    <header class="app-header" role="banner">
+        <div class="header-inner">
+            <!-- Brand -->
+            <a href="/" class="header-brand" aria-label="Art Gallery Home">
+                <i class="bi bi-palette-fill me-2" aria-hidden="true"></i>
+                <span>Art Gallery</span>
+            </a>
 
-            <!-- Center navigation section -->
-            <div class="top-row-center">
-                <nav>
-                    <a href="/gallery" class="nav-link @(Navigation.Uri.Contains("/gallery") ? "active" : "")">
-                        Gallery
-                    </a>
-                    <a href="/artists" class="nav-link @(Navigation.Uri.Contains("/artists") ? "active" : "")">
-                        Artists
-                    </a>
-                    <a href="/exhibitions" class="nav-link @(Navigation.Uri.Contains("/exhibitions") ? "active" : "")">
-                        Exhibitions
-                    </a>
-                </nav>
-            </div>
+            <!-- Hamburger (mobile) -->
+            <button class="navbar-toggler ms-auto me-2 d-md-none"
+                    type="button"
+                    aria-controls="mainNav"
+                    aria-expanded="@_navOpen.ToString().ToLower()"
+                    aria-label="Toggle navigation"
+                    @onclick="ToggleNav">
+                <span class="hamburger-icon">
+                    <span></span><span></span><span></span>
+                </span>
+            </button>
 
-            <!-- Right section (auth controls) -->
-            <div class="top-row-right">
+            <!-- Center nav -->
+            <nav id="mainNav"
+                 class="header-nav @(_navOpen ? "nav-open" : "")"
+                 aria-label="Main navigation">
+                <NavLink href="/gallery"     class="nav-link" ActiveClass="active" Match="NavLinkMatch.Prefix">Gallery</NavLink>
+                <NavLink href="/artists"     class="nav-link" ActiveClass="active" Match="NavLinkMatch.Prefix">Artists</NavLink>
+                <NavLink href="/exhibitions" class="nav-link" ActiveClass="active" Match="NavLinkMatch.Prefix">Exhibitions</NavLink>
+            </nav>
+
+            <!-- Right: auth -->
+            <div class="header-actions">
                 <AuthorizeView>
                     <Authorized>
                         <div class="dropdown">
-                            <button class="btn btn-link dropdown-toggle nav-user-button" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle me-1"></i>
-                                @(context.User.Identity?.Name ?? "User")
+                            <button class="btn btn-user dropdown-toggle"
+                                    type="button"
+                                    id="userMenu"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    aria-haspopup="true">
+                                <i class="bi bi-person-circle me-1" aria-hidden="true"></i>
+                                <span class="user-name-display">@(context.User.Identity?.Name ?? "User")</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <li class="dropdown-header small text-muted px-3 py-1">
+                                    @(context.User.Identity?.Name)
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
                                 <li>
                                     <a class="dropdown-item" href="/favorite-paintings">
-                                        <i class="bi bi-image-fill me-2"></i> My Favorite Paintings
+                                        <i class="bi bi-image-fill me-2" aria-hidden="true"></i>Favourite Paintings
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="/favorite-artists">
-                                        <i class="bi bi-person-heart me-2"></i> My Favorite Artists
+                                        <i class="bi bi-person-heart me-2" aria-hidden="true"></i>Favourite Artists
                                     </a>
                                 </li>
                                 <AuthorizeView Roles="Administrator">
-                                    <Authorized Context="adminContext">
+                                    <Authorized Context="adminCtx">
+                                        <li><hr class="dropdown-divider my-1"></li>
                                         <li>
-                                            <a class="dropdown-item" href="/admin/users">
-                                                <i class="bi bi-people-fill me-2"></i> User Management
+                                            <a class="dropdown-item text-warning" href="/admin/users">
+                                                <i class="bi bi-people-fill me-2" aria-hidden="true"></i>User Management
                                             </a>
                                         </li>
                                     </Authorized>
                                 </AuthorizeView>
+                                <li><hr class="dropdown-divider my-1"></li>
                                 <li>
                                     <a class="dropdown-item" href="/profile">
-                                        <i class="bi bi-person me-2"></i> My Profile
+                                        <i class="bi bi-person me-2" aria-hidden="true"></i>My Profile
                                     </a>
                                 </li>
                                 <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <button class="dropdown-item" @onclick="Logout">
-                                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                    <button class="dropdown-item text-danger" @onclick="Logout">
+                                        <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Sign Out
                                     </button>
                                 </li>
                             </ul>
                         </div>
                     </Authorized>
                     <NotAuthorized>
-                        <a href="/login" class="btn btn-primary btn-sm">Login</a>
+                        <div class="d-flex gap-2">
+                            <a href="/login"    class="btn btn-sm btn-outline-light">Sign In</a>
+                            <a href="/register" class="btn btn-sm btn-primary">Register</a>
+                        </div>
                     </NotAuthorized>
                     <Authorizing>
-                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        <span>Loading...</span>
+                        <span class="spinner-border spinner-border-sm text-light" role="status">
+                            <span class="visually-hidden">Loading…</span>
+                        </span>
                     </Authorizing>
                 </AuthorizeView>
             </div>
         </div>
+    </header>
 
-        <article class="content px-4">
-            <ErrorBoundary>
-                <ChildContent>
-                    @Body
-                </ChildContent>
-                <ErrorContent Context="exception">
-                    <div class="alert alert-danger m-4">
-                        <h4>Page Error</h4>
-                        <p>An error occurred while rendering this page.</p>
-                        <details>
-                            <summary>Error Details</summary>
-                            <pre class="mt-2">@exception.ToString()</pre>
-                        </details>
-                        <button class="btn btn-primary mt-2" @onclick="ReloadPage">
-                            <i class="fas fa-refresh me-2"></i>
-                            Reload Page
+    <main id="main-content" class="app-main" tabindex="-1">
+        <ErrorBoundary @ref="_errorBoundary">
+            <ChildContent>
+                @Body
+            </ChildContent>
+            <ErrorContent Context="ex">
+                <div class="container py-5 text-center">
+                    <div class="alert alert-danger mx-auto" style="max-width:600px">
+                        <i class="bi bi-exclamation-octagon-fill fs-3 d-block mb-3"></i>
+                        <h4 class="alert-heading">An unexpected error occurred</h4>
+                        <p class="mb-3">@ex.Message</p>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="ResetError">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Retry
                         </button>
                     </div>
-                </ErrorContent>
-            </ErrorBoundary>
-        </article>
+                </div>
+            </ErrorContent>
+        </ErrorBoundary>
     </main>
+
+    <AppFooter />
 </div>
 
+<!-- Global toast notifications -->
+<Toast />
+
 @code {
+    private bool _navOpen;
+    private ErrorBoundary? _errorBoundary;
 
-    private async Task Logout()
+    protected override void OnParametersSet() => _errorBoundary?.Recover();
+
+    private void ToggleNav() => _navOpen = !_navOpen;
+
+    private Task Logout()
     {
-        try
-        {
-            Navigation.NavigateTo("/logout", forceLoad: true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Logout error: {ex.Message}");
-            Navigation.NavigateTo("/", forceLoad: true);
-        }
+        Navigation.NavigateTo("/logout", forceLoad: true);
+        return Task.CompletedTask;
     }
 
-    private void ReloadPage()
-    {
-        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
-    }
-
+    private void ResetError() => _errorBoundary?.Recover();
 }

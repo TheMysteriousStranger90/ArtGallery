@@ -1,260 +1,179 @@
-﻿@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services
 @using ArtGallery.ClientApp.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IPaintingService PaintingService
+@inject FavoritesStateService FavoritesState
+@inject ToastService Toast
 @inject ILogger<PaintingCard> Logger
-@inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
-@if (!string.IsNullOrEmpty(Painting?.ImageUrl))
-{
-    <div class="card-img-container">
-        <a href="@($"/paintings/{Painting.Id}")">
-            <img src="@GetFullImageUrl(Painting.ImageUrl)" class="card-img-top" alt="@Painting.Title">
-        </a>
-    </div>
-}
-else
-{
-    <div class="card-img-container">
-        <a href="@($"/paintings/{Painting.Id}")">
-            <div class="card-img-placeholder d-flex align-items-center justify-content-center">
-                <i class="bi bi-image text-muted"></i>
-                <span>No Image Available</span>
+<!-- Image -->
+<div class="card-img-container">
+    <a href="/paintings/@Painting?.Id" tabindex="-1" aria-hidden="true">
+        @if (!string.IsNullOrEmpty(Painting?.ImageUrl))
+        {
+            <img src="@Painting.ImageUrl"
+                 class="card-img-top"
+                 alt="@Painting!.Title"
+                 loading="lazy"
+                 width="400" height="300" />
+        }
+        else
+        {
+            <div class="card-img-placeholder" aria-label="No image available">
+                <i class="bi bi-image text-muted fs-2" aria-hidden="true"></i>
+                <span>No Image</span>
             </div>
-        </a>
-    </div>
-}
+        }
+    </a>
+</div>
+
+<!-- Body -->
 <div class="card-body d-flex flex-column text-center">
-    <h5 class="card-title">
-        <a href="@($"/paintings/{Painting.Id}")" class="text-decoration-none">@Painting?.Title</a>
+    <h5 class="card-title mb-1">
+        <a href="/paintings/@Painting?.Id" class="text-decoration-none stretched-link-text">
+            @Painting?.Title
+        </a>
     </h5>
-    <p class="card-text small">
-        <i class="bi bi-person me-1"></i>
-        <span class="field-label">Artist: </span>
-        @Painting?.Artist.FullName
+    <p class="card-text small text-muted mb-1">
+        <i class="bi bi-person me-1" aria-hidden="true"></i>@Painting?.Artist.FullName
     </p>
     @if (Painting?.CreationYear > 0)
     {
-        <p class="card-text small">
-            <i class="bi bi-calendar me-1"></i>
-            <span class="field-label">Year: </span>
-            <small>@Painting.CreationYear</small>
+        <p class="card-text small text-muted mb-1">
+            <i class="bi bi-calendar3 me-1" aria-hidden="true"></i>@Painting.CreationYear
         </p>
     }
     @if (!string.IsNullOrEmpty(Painting?.Genre?.Name))
     {
-        <p class="card-text small">
-            <i class="bi bi-palette me-1"></i>
-            <span class="field-label">Genre: </span>
-            <small>@Painting.Genre.Name</small>
-        </p>
+        <span class="badge genre-badge mt-1">@Painting.Genre.Name</span>
     }
 </div>
+
+<!-- Footer -->
 <div class="card-footer">
-    <div class="d-flex flex-column gap-2">
-        <a href="@($"/paintings/{Painting.Id}")" class="btn btn-outline-primary w-100">
-            <i class="bi bi-eye me-1"></i> View Details
-        </a>
+    <a href="/paintings/@Painting?.Id" class="btn btn-outline-primary btn-sm w-100 mb-2">
+        <i class="bi bi-eye me-1" aria-hidden="true"></i> View Details
+    </a>
 
-        @if (isAdministrator)
-        {
-            <div class="d-flex flex-column gap-2 w-100">
-                <a href="@($"/admin/paintings/edit/{Painting.Id}")" class="btn btn-outline-primary w-100">
-                    <i class="bi bi-pencil me-1"></i> Edit Painting
-                </a>
-
-                <button class="btn btn-outline-primary w-100"
-                        @onclick="DeletePainting"
-                        disabled="@isDeletingProcessing"
-                        title="Delete painting">
-                    @if (isDeletingProcessing)
-                    {
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    }
-                    else
-                    {
-                        <span>
-                            <i class="bi bi-trash me-1"></i>
-                            Delete Painting
-                        </span>
-                    }
-                </button>
-            </div>
-        }
-
-        @if (isAuthenticated)
-        {
-            <button class="btn @GetFavoriteButtonClass() favorite-btn w-100 mt-1"
-                    @onclick="AddToFavorites"
-                    disabled="@(isFavoriteProcessing || isAddedToFavorites)"
-                    title="@(isAddedToFavorites ? "Already in favorites" : "Add to favorites")">
-                @if (isFavoriteProcessing)
+    @if (_isAdministrator)
+    {
+        <div class="d-flex gap-1 mb-2">
+            <a href="/admin/paintings/edit/@Painting?.Id" class="btn btn-outline-secondary btn-sm flex-fill">
+                <i class="bi bi-pencil me-1" aria-hidden="true"></i>Edit
+            </a>
+            <button class="btn btn-outline-danger btn-sm flex-fill"
+                    @onclick="DeletePainting"
+                    disabled="@_isDeleting"
+                    aria-label="Delete @Painting?.Title">
+                @if (_isDeleting)
                 {
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 }
                 else
                 {
-                    <i class="bi bi-heart@(isAddedToFavorites ? "-fill" : "") heart-icon @(isAddedToFavorites ? "heart-filled" : "")" aria-hidden="true"></i>
-                    @(isAddedToFavorites ? " Added to Favorites" : " Add to Favorites")
+                    <i class="bi bi-trash" aria-hidden="true"></i>
                 }
             </button>
-        }
-    </div>
-
-    @if (isAddedToFavorites)
-    {
-        <div class="mt-2 favorite-confirmation">
-            <small>
-                <i class="bi bi-check-circle me-1"></i> Added to favorites
-            </small>
         </div>
+    }
+
+    @if (_isAuthenticated)
+    {
+        <button class="btn @(_isFavorite ? "btn-favorite-active" : "btn-outline-primary") btn-sm w-100"
+                @onclick="ToggleFavorite"
+                disabled="@(_isFavoriteLoading || _isFavorite)"
+                aria-label="@(_isFavorite ? "Already in favourites" : "Add to favourites")">
+            @if (_isFavoriteLoading)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            }
+            else
+            {
+                <i class="bi @(_isFavorite ? "bi-heart-fill" : "bi-heart") me-1" aria-hidden="true"></i>
+                @(_isFavorite ? "In Favourites" : "Add to Favourites")
+            }
+        </button>
     }
 </div>
 
 @code {
-    [Parameter] public PaintingDto? Painting { get; set; }
-    [Inject] public IConfiguration? Configuration { get; set; }
+    [Parameter, EditorRequired] public PaintingDto? Painting { get; set; }
     [Parameter] public EventCallback<Guid> OnPaintingDeleted { get; set; }
 
-    private bool isAuthenticated = false;
-    private bool isAdministrator = false;
-    private bool isAddedToFavorites = false;
-    private bool isFavoriteProcessing = false;
-    private bool isDeletingProcessing = false;
-
-    private async Task CheckIfInFavorites()
-    {
-        if (Painting == null || !isAuthenticated)
-            return;
-
-        try
-        {
-            var favorites = await PaintingService.GetFavoritePaintingsAsync();
-            if (favorites.Success && favorites.FavoritePaintings.Any(p => p.Id == Painting.Id))
-            {
-                isAddedToFavorites = true;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error checking if painting is in favorites: {PaintingId}", Painting.Id);
-        }
-    }
-
-    private string GetFavoriteButtonClass()
-    {
-        if (isFavoriteProcessing)
-            return "btn-outline-secondary disabled";
-        if (isAddedToFavorites)
-            return "btn-dark favorited";
-        return "btn-outline-primary";
-    }
+    private bool _isAuthenticated;
+    private bool _isAdministrator;
+    private bool _isFavorite;
+    private bool _isFavoriteLoading;
+    private bool _isDeleting;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+        var state = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user  = state.User;
+        _isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+        _isAdministrator = user.IsInRole("Administrator");
 
-        if (isAuthenticated)
-        {
-            isAdministrator = authState.User.IsInRole("Administrator");
-            await CheckIfInFavorites();
-        }
+        // Read from cached state — zero API calls per card
+        if (_isAuthenticated && Painting is not null)
+            _isFavorite = FavoritesState.IsPaintingFavorite(Painting.Id);
     }
 
-    private string GetFullImageUrl(string? relativeUrl)
+    private async Task ToggleFavorite()
     {
-        if (string.IsNullOrEmpty(relativeUrl))
-        {
-            return "placeholder-image.png";
-        }
-
-        if (Uri.TryCreate(relativeUrl, UriKind.Absolute, out _))
-        {
-            return relativeUrl;
-        }
-
-        var apiBaseUrl = Configuration?["ApiBaseUrl"];
-        if (string.IsNullOrEmpty(apiBaseUrl))
-        {
-            return relativeUrl.StartsWith("/") ? relativeUrl : $"/{relativeUrl}";
-        }
-
-        return $"{apiBaseUrl.TrimEnd('/')}/{relativeUrl.TrimStart('/')}";
-    }
-
-    private async Task AddToFavorites()
-    {
-        if (Painting == null || isFavoriteProcessing)
-            return;
-
+        if (Painting is null || _isFavoriteLoading || _isFavorite) return;
+        _isFavoriteLoading = true;
         try
         {
-            isFavoriteProcessing = true;
-            StateHasChanged();
-
-            var result = await PaintingService.AddPaintingToFavoritesAsync(Painting.Id);
-
-            if (result)
+            var ok = await PaintingService.AddPaintingToFavoritesAsync(Painting.Id);
+            if (ok)
             {
-                isAddedToFavorites = true;
-                await Task.Delay(2000);
+                _isFavorite = true;
+                FavoritesState.MarkPaintingFavorite(Painting.Id);
+                Toast.Success($"\"{Painting.Title}\" added to favourites.");
+            }
+            else
+            {
+                Toast.Error("Could not add to favourites. Please try again.");
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error adding painting to favorites: {PaintingId}", Painting.Id);
+            Logger.LogError(ex, "Failed to add painting {Id} to favourites", Painting.Id);
+            Toast.Error("An error occurred.");
         }
         finally
         {
-            isFavoriteProcessing = false;
-            StateHasChanged();
+            _isFavoriteLoading = false;
         }
     }
 
     private async Task DeletePainting()
     {
-        if (Painting == null || isDeletingProcessing || !isAdministrator)
-            return;
-
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the painting '{Painting.Title}'?");
-        if (!confirmed)
-            return;
-
+        if (Painting is null || _isDeleting) return;
+        _isDeleting = true;
         try
         {
-            isDeletingProcessing = true;
-            StateHasChanged();
-
-            var result = await PaintingService.DeletePaintingAsync(Painting.Id);
-
-            if (result)
+            var ok = await PaintingService.DeletePaintingAsync(Painting.Id);
+            if (ok)
             {
-                Logger.LogInformation("Painting {PaintingId} deleted successfully by administrator", Painting.Id);
-
-                if (OnPaintingDeleted.HasDelegate)
-                {
-                    await OnPaintingDeleted.InvokeAsync(Painting.Id);
-                }
+                Toast.Success($"\"{Painting.Title}\" deleted.");
+                await OnPaintingDeleted.InvokeAsync(Painting.Id);
             }
             else
             {
-                Logger.LogWarning("Failed to delete painting {PaintingId}", Painting.Id);
-                await JSRuntime.InvokeVoidAsync("alert", "Failed to delete the painting. Please try again later.");
+                Toast.Error("Delete failed. Please try again.");
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error deleting painting: {PaintingId}", Painting.Id);
-            await JSRuntime.InvokeVoidAsync("alert", "An error occurred while deleting the painting.");
+            Logger.LogError(ex, "Failed to delete painting {Id}", Painting.Id);
+            Toast.Error("An error occurred while deleting.");
         }
         finally
         {
-            isDeletingProcessing = false;
-            StateHasChanged();
+            _isDeleting = false;
         }
     }
-
 }

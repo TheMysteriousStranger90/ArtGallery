@@ -1,0 +1,42 @@
+@namespace ArtGallery.ClientApp.Shared
+@inject ArtGallery.ClientApp.Services.ToastService ToastService
+@implements IDisposable
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999" aria-live="polite" aria-atomic="false">
+    @foreach (var toast in ToastService.Messages)
+    {
+        <div class="toast show align-items-center border-0 toast-@GetClass(toast.Level) mb-2 animate__animated animate__fadeInRight"
+             role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i class="@GetIcon(toast.Level)" aria-hidden="true"></i>
+                    @toast.Message
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        @onclick="() => ToastService.Dismiss(toast.Id)"
+                        aria-label="Close"></button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized() => ToastService.OnChange += StateHasChanged;
+    public void Dispose() => ToastService.OnChange -= StateHasChanged;
+
+    private static string GetClass(Services.ToastLevel level) => level switch
+    {
+        Services.ToastLevel.Success => "success",
+        Services.ToastLevel.Error   => "danger",
+        Services.ToastLevel.Warning => "warning",
+        _                           => "info"
+    };
+
+    private static string GetIcon(Services.ToastLevel level) => level switch
+    {
+        Services.ToastLevel.Success => "bi bi-check-circle-fill",
+        Services.ToastLevel.Error   => "bi bi-x-circle-fill",
+        Services.ToastLevel.Warning => "bi bi-exclamation-triangle-fill",
+        _                           => "bi bi-info-circle-fill"
+    };
+}

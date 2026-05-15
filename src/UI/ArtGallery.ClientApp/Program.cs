@@ -18,48 +18,50 @@ public static class Program
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
-        // Logging
-        builder.Logging.SetMinimumLevel(LogLevel.Information);
+        builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
-        // Add Blazored LocalStorage
+        // Core Blazor services
         builder.Services.AddBlazoredLocalStorage();
-
-        // Register services
-        builder.Services.AddScoped<ITokenService, TokenService>();
-        builder.Services.AddScoped<AuthenticationMessageHandler>();
-
-        // Register Authentication State Provider
-        builder.Services.AddScoped<CustomAuthenticationStateProvider>();
-        builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
-            provider.GetRequiredService<CustomAuthenticationStateProvider>());
-
-        // Add Authorization
         builder.Services.AddAuthorizationCore();
 
-        // Register HttpClient with authentication handler
+        // Authentication
+        builder.Services.AddScoped<ITokenService, TokenService>();
+        builder.Services.AddScoped<AuthenticationMessageHandler>();
+        builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+        builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
+            sp.GetRequiredService<CustomAuthenticationStateProvider>());
+
+        // HTTP client with auth handler
         builder.Services.AddHttpClient<IClient, Client>("ApiClient", client =>
         {
             client.BaseAddress = new Uri(Const.DefaultApiUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
         }).AddHttpMessageHandler<AuthenticationMessageHandler>();
 
-        // Register generated NSwag client
+        // NSwag generated client
         builder.Services.AddScoped<IClient>(sp =>
         {
-            var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-            var httpClient = httpClientFactory.CreateClient("ApiClient");
-            return new Client(Const.DefaultApiUrl, httpClient);
+            var factory = sp.GetRequiredService<IHttpClientFactory>();
+            var http = factory.CreateClient("ApiClient");
+            return new Client(Const.DefaultApiUrl, http);
         });
 
-        // Register Authentication service (now uses IClient directly)
+        // Domain services
         builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
         builder.Services.AddScoped<IPaintingService, PaintingService>();
         builder.Services.AddScoped<IArtistService, ArtistService>();
         builder.Services.AddScoped<IUsersService, UsersService>();
         builder.Services.AddScoped<IExhibitionsService, ExhibitionsService>();
 
-        // Default HttpClient for other purposes
-        builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+        // UI state services
+        builder.Services.AddScoped<FavoritesStateService>();
+        builder.Services.AddScoped<ToastService>();
+
+        // Default HttpClient for app assets
+        builder.Services.AddScoped(_ => new HttpClient
+        {
+            BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+        });
 
         var app = builder.Build();
         var jsRuntime = app.Services.GetRequiredService<IJSRuntime>();

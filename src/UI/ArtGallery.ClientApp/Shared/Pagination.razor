@@ -1,0 +1,64 @@
+@namespace ArtGallery.ClientApp.Shared
+
+@if (TotalPages > 1)
+{
+    <nav aria-label="@AriaLabel" class="pagination-nav">
+        <ul class="pagination justify-content-center flex-wrap gap-1 mb-0">
+            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="() => PageChanged(CurrentPage - 1)"
+                        disabled="@(CurrentPage == 1)" aria-label="Previous page">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                </button>
+            </li>
+
+            @foreach (var p in GetPageNumbers())
+            {
+                @if (p == -1)
+                {
+                    <li class="page-item disabled" aria-hidden="true">
+                        <span class="page-link">&hellip;</span>
+                    </li>
+                }
+                else
+                {
+                    var pageNum = p;
+                    <li class="page-item @(pageNum == CurrentPage ? "active" : "")"
+                        aria-current="@(pageNum == CurrentPage ? "page" : null)">
+                        <button class="page-link" @onclick="() => PageChanged(pageNum)">@pageNum</button>
+                    </li>
+                }
+            }
+
+            <li class="page-item @(CurrentPage >= TotalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="() => PageChanged(CurrentPage + 1)"
+                        disabled="@(CurrentPage >= TotalPages)" aria-label="Next page">
+                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </button>
+            </li>
+        </ul>
+    </nav>
+}
+
+@code {
+    [Parameter, EditorRequired] public int CurrentPage  { get; set; }
+    [Parameter, EditorRequired] public int TotalPages   { get; set; }
+    [Parameter, EditorRequired] public EventCallback<int> OnPageChanged { get; set; }
+    [Parameter] public string AriaLabel { get; set; } = "Page navigation";
+
+    private Task PageChanged(int page) => OnPageChanged.InvokeAsync(page);
+
+    private IEnumerable<int> GetPageNumbers()
+    {
+        if (TotalPages <= 7) { for (int i = 1; i <= TotalPages; i++) yield return i; yield break; }
+
+        yield return 1;
+        if (CurrentPage > 3) yield return -1; // ellipsis
+
+        int start = Math.Max(2, CurrentPage - 1);
+        int end   = Math.Min(TotalPages - 1, CurrentPage + 1);
+        for (int i = start; i <= end; i++) yield return i;
+
+        if (CurrentPage < TotalPages - 2) yield return -1; // ellipsis
+        yield return TotalPages;
+    }
+}

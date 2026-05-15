@@ -1,22 +1,25 @@
 {
-  "name": "ArtGallery.ClientApp",
-  "short_name": "ArtGallery.ClientApp",
+  "name": "Art Gallery",
+  "short_name": "ArtGallery",
+  "description": "Discover the world's finest paintings and artists",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#03173d",
+  "background_color": "#212121",
+  "theme_color": "#5D4037",
   "prefer_related_applications": false,
   "icons": [
     {
       "src": "icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     }
   ]
 }
