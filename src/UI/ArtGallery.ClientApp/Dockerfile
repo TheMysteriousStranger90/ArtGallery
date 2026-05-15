@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["src/UI/ArtGallery.ClientApp/ArtGallery.ClientApp.csproj", "src/UI/ArtGallery.ClientApp/"]
+COPY ["Directory.Build.props", "./"]
 COPY ["Directory.Packages.props", "./"]
 RUN dotnet restore "src/UI/ArtGallery.ClientApp/ArtGallery.ClientApp.csproj"
 COPY . .
