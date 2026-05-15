@@ -7,5 +7,5 @@ public class CreatePaintingCommandResponse : BaseResponse
 {
     public CreatePaintingCommandResponse() : base() { }
 
-    public PaintingDto Painting { get; set; }
+    public PaintingDto? Painting { get; set; }
 }

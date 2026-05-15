@@ -29,7 +29,7 @@ public class AddArtistToFavoriteCommandHandler : IRequestHandler<AddArtistToFavo
             }
 
             var result = await _unitOfWork.UserFavoritesRepository.AddFavoriteArtistAsync(
-                request.UserId, request.ArtistId);
+                request.UserId!, request.ArtistId);
 
             if (result)
             {

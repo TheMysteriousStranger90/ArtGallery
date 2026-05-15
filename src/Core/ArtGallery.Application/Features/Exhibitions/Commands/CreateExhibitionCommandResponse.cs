@@ -7,5 +7,5 @@ public class CreateExhibitionCommandResponse : BaseResponse
 {
     public CreateExhibitionCommandResponse() : base() { }
 
-    public ExhibitionDto Exhibition { get; set; }
+    public ExhibitionDto? Exhibition { get; set; }
 }

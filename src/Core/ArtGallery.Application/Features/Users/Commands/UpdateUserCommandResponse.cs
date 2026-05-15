@@ -6,5 +6,5 @@ public class UpdateUserCommandResponse : BaseResponse
 {
     public UpdateUserCommandResponse() : base() { }
 
-    public string Message { get; set; }
+    public new string Message { get; set; } = string.Empty;
 }

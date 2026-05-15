@@ -7,5 +7,5 @@ public class UpdateArtistCommandResponse : BaseResponse
 {
     public UpdateArtistCommandResponse() : base() { }
 
-    public ArtistDto Artist { get; set; }
+    public ArtistDto? Artist { get; set; }
 }

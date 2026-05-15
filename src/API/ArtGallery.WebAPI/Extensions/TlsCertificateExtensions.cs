@@ -9,7 +9,7 @@ public static class TlsCertificateExtensions
 {
     public static void ConfigureTlsCertificates(this WebApplicationBuilder builder)
     {
-        TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader = null;
+        TlsCertificateLoader.TlsCertificateLoader? tlsCertificateLoader = null;
 
         string effectiveCertificatePath = ResolveCertificatePath();
         tlsCertificateLoader = LoadCertificates(effectiveCertificatePath, builder);
@@ -36,7 +36,7 @@ public static class TlsCertificateExtensions
         return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "certificates"));
     }
 
-    private static TlsCertificateLoader.TlsCertificateLoader LoadCertificates(string certificatePath, WebApplicationBuilder builder)
+    private static TlsCertificateLoader.TlsCertificateLoader? LoadCertificates(string certificatePath, WebApplicationBuilder builder)
     {
         var fullChainPath = Path.Combine(certificatePath, "fullchain.pem");
         var privateKeyPath = Path.Combine(certificatePath, "privkey.pem");
@@ -75,12 +75,17 @@ public static class TlsCertificateExtensions
         return null;
     }
 
-    private static void ConfigureKestrelWithDiagnostics(WebApplicationBuilder builder, TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader)
+    private static void ConfigureKestrelWithDiagnostics(WebApplicationBuilder builder, TlsCertificateLoader.TlsCertificateLoader? tlsCertificateLoader)
     {
+        if (builder.Environment.IsDevelopment() && tlsCertificateLoader == null)
+        {
+            Console.WriteLine("🔧 Development mode: using ASP.NET Core dev certificate (run 'dotnet dev-certs https --trust' if not trusted)");
+            return;
+        }
+
         if (builder.Environment.IsDevelopment())
         {
-            Console.WriteLine("🔧 Using development configuration with dev certificates");
-            return;
+            Console.WriteLine("🔧 Development mode with custom certificates provided");
         }
 
         builder.WebHost.ConfigureKestrel((context, serverOptions) =>

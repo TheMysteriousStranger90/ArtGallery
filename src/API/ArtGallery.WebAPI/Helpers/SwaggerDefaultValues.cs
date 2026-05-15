@@ -40,7 +40,7 @@ public class SwaggerDefaultValues : IOperationFilter
             if (parameter.Schema.Default == null && description.DefaultValue != null)
             {
                 var json = System.Text.Json.JsonSerializer.Serialize(description.DefaultValue,
-                    description.ModelMetadata.ModelType);
+                    description.ModelMetadata!.ModelType);
                 parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson(json);
             }
 

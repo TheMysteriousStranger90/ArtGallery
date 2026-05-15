@@ -57,6 +57,6 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn>
+    <NoWarn>$(NoWarn);1591;CA1861;CA1001;CA1305;CA1000;CA1859;CS1570;CA1305</NoWarn>
   </PropertyGroup>
 </Project>

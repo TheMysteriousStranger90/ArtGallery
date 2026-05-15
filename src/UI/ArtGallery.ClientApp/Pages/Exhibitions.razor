@@ -1,4 +1,4 @@
-﻿@page "/exhibitions"
+@page "/exhibitions"
 @using ArtGallery.ClientApp.Services
 @using ArtGallery.ClientApp.Services.Interfaces
 @using ArtGallery.ClientApp.Shared
@@ -8,12 +8,13 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILogger<Exhibitions> Logger
 @inject IClient ApiClient
+@inject ToastService Toast
 @inject IJSRuntime JSRuntime
 
-<PageTitle>Art Exhibitions</PageTitle>
+<PageTitle>Exhibitions – Art Gallery</PageTitle>
 
 <div class="gallery-container">
-    <h1 class="gallery-page-title">Art Exhibitions</h1>
+    <h1 class="gallery-page-title">Exhibitions – Art Gallery</h1>
 
     <div class="exhibition-controls mb-4">
         <div class="row align-items-end">
@@ -93,11 +94,20 @@
         <div class="col-md-9">
             @if (isLoading)
             {
-                <div class="loading-container">
-                    <div class="spinner-border loading-spinner" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="loading-text">Loading exhibitions...</p>
+                <div class="exhibition-list">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <div class="exhibition-card">
+                            <div class="card mb-4 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="skeleton-line shimmer mb-3" style="width:60%;height:22px;"></div>
+                                    <div class="skeleton-line shimmer mb-2" style="width:45%;height:14px;"></div>
+                                    <div class="skeleton-line shimmer mb-2" style="width:55%;height:14px;"></div>
+                                    <div class="skeleton-line shimmer" style="width:90%;height:14px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             }
             else if (exhibitions != null && exhibitions.Any())
@@ -154,12 +164,8 @@
             }
             else
             {
-                <div class="gallery-message">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle-fill me-2"></i>
-                        No exhibitions found. Try adjusting your search or filter parameters.
-                    </div>
-                </div>
+                <EmptyState Icon="bi bi-building-x fs-1" Title="No Exhibitions Found"
+                            Message="Try adjusting your search or filter parameters." />
             }
         </div>
     </div>
@@ -170,8 +176,7 @@
     private ICollection<ExhibitionDto> allExhibitions = new List<ExhibitionDto>();
     private bool isLoading = true;
     private string? errorMessage;
-    private bool _hasCompletedInitialParameterSet = false;
-    private bool isAdministrator = false;
+    private bool isAdministrator;
 
     private List<MuseumBriefDto> museums = new();
     
@@ -241,7 +246,6 @@
         }
 
         await LoadExhibitions();
-        _hasCompletedInitialParameterSet = true;
     }
 
     private async Task LoadExhibitions()
@@ -410,18 +414,18 @@
                 
                 if (success)
                 {
-                    await JSRuntime.InvokeVoidAsync("alert", "Exhibition has been successfully deleted");
+                    Toast.Success("Exhibition deleted successfully.");
                     await LoadExhibitions();
                 }
                 else
                 {
-                    await JSRuntime.InvokeVoidAsync("alert", "Failed to delete the exhibition");
+                    Toast.Error("Failed to delete the exhibition.");
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error deleting exhibition {ExhibitionId}", exhibitionId);
-                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+                Toast.Error($"Delete failed: {ex.Message}");
             }
         }
     }
@@ -437,3 +441,4 @@
         };
     }
 }
+

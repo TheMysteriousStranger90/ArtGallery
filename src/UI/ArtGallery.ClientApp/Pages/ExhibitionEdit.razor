@@ -1,4 +1,4 @@
-﻿@page "/admin/exhibitions/edit/{Id:guid}"
+@page "/admin/exhibitions/edit/{Id:guid}"
 @using ArtGallery.ClientApp.Services
 @using ArtGallery.ClientApp.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
@@ -308,7 +308,7 @@
         }
     }
 
-    private PaintingDto GetPaintingById(Guid paintingId)
+    private PaintingDto? GetPaintingById(Guid paintingId)
     {
         var painting = availablePaintings.FirstOrDefault(p => p.Id == paintingId);
         if (painting != null)

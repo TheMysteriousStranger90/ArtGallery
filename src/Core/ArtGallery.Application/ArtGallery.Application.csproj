@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>ArtGallery.Application</AssemblyName>
@@ -24,4 +24,7 @@
     <ProjectReference Include="..\ArtGallery.Domain\ArtGallery.Domain.csproj"/>
   </ItemGroup>
 
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA1000;CA1716;CA1861</NoWarn>
+  </PropertyGroup>
 </Project>

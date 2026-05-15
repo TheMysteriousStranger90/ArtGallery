@@ -9,7 +9,7 @@ public class BusinessEventLogger : IBusinessEventLogger
         _logger = logger;
     }
 
-    public void LogUserAction(string userId, string action, object details = null)
+    public void LogUserAction(string userId, string action, object? details = null)
     {
         _logger.ForContext("EventType", "BusinessEvent.UserAction")
             .ForContext("UserId", userId)
@@ -17,14 +17,14 @@ public class BusinessEventLogger : IBusinessEventLogger
                 action, userId, details ?? new { });
     }
 
-    public void LogBusinessEvent(string eventType, string description, object details = null)
+    public void LogBusinessEvent(string eventType, string description, object? details = null)
     {
         _logger.ForContext("EventType", $"BusinessEvent.{eventType}")
             .Information("{Description} {Details}",
                 description, details ?? new { });
     }
 
-    public void LogSecurityEvent(string eventType, string userId, string description, object details = null)
+    public void LogSecurityEvent(string eventType, string userId, string description, object? details = null)
     {
         _logger.ForContext("EventType", $"SecurityEvent.{eventType}")
             .ForContext("UserId", userId)

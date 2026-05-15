@@ -4,7 +4,7 @@ namespace ArtGallery.Domain.Entities;
 
 public class Tag : BaseEntity
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public virtual ICollection<PaintingTag> Paintings { get; set; } = new List<PaintingTag>();
 }

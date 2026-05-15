@@ -20,7 +20,7 @@ public class GetUserFavoritePaintingsQueryHandler : IRequestHandler<GetUserFavor
     {
         var response = new UserFavoritePaintingsResponse();
 
-        var favorites = await _unitOfWork.UserFavoritesRepository.GetUserFavoritePaintingsAsync(request.UserId);
+        var favorites = await _unitOfWork.UserFavoritesRepository.GetUserFavoritePaintingsAsync(request.UserId!);
 
         response.FavoritePaintings = _mapper.Map<List<PaintingDto>>(favorites.Select(f => f.Painting));
         response.Count = favorites.Count;

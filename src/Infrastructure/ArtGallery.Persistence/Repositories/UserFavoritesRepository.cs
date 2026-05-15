@@ -28,7 +28,9 @@ public class UserFavoritesRepository : IUserFavoritesRepository
         var favoriteExists = await IsPaintingFavoriteAsync(userId, paintingId);
 
         if (favoriteExists)
+        {
             return false;
+        }
 
         var favorite = new UserFavoritePainting
         {
@@ -46,7 +48,9 @@ public class UserFavoritesRepository : IUserFavoritesRepository
             .FirstOrDefaultAsync(ufp => ufp.UserId == userId && ufp.PaintingId == paintingId);
 
         if (favorite == null)
+        {
             return false;
+        }
 
         _context.Set<UserFavoritePainting>().Remove(favorite);
         return await _context.SaveChangesAsync() > 0;
@@ -72,7 +76,9 @@ public class UserFavoritesRepository : IUserFavoritesRepository
         var favoriteExists = await IsArtistFavoriteAsync(userId, artistId);
 
         if (favoriteExists)
+        {
             return false;
+        }
 
         var favorite = new UserFavoriteArtist
         {
@@ -90,7 +96,9 @@ public class UserFavoritesRepository : IUserFavoritesRepository
             .FirstOrDefaultAsync(ufa => ufa.UserId == userId && ufa.ArtistId == artistId);
 
         if (favorite == null)
+        {
             return false;
+        }
 
         _context.Set<UserFavoriteArtist>().Remove(favorite);
         return await _context.SaveChangesAsync() > 0;

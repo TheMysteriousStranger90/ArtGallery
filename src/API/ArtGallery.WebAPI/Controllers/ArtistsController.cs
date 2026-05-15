@@ -144,7 +144,7 @@ public class ArtistsController : ControllerBase
 
         return CreatedAtAction(
             nameof(GetArtist),
-            new { id = response.Artist.Id },
+            new { id = response.Artist!.Id },
             response.Artist
         );
     }

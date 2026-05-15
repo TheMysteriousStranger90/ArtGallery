@@ -13,7 +13,7 @@ public class ArtistSpecParams
     }
 
     public string Sort { get; set; } = "lastName";
-    public string Nationality { get; set; }
+    public string? Nationality { get; set; }
 
     private string _search = "";
     public string Search

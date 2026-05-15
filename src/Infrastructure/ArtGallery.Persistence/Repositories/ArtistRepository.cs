@@ -11,7 +11,7 @@ public class ArtistRepository : GenericRepository<Artist>, IArtistRepository
     {
     }
 
-    public async Task<Artist> GetArtistWithPaintingsAsync(Guid artistId)
+    public async Task<Artist?> GetArtistWithPaintingsAsync(Guid artistId)
     {
         return await _context.Artists
             .Include(a => a.Biography)

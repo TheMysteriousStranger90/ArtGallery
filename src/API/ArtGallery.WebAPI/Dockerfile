@@ -24,6 +24,7 @@ COPY ["src/Core/ArtGallery.Application/ArtGallery.Application.csproj", "src/Core
 COPY ["src/Core/ArtGallery.Domain/ArtGallery.Domain.csproj", "src/Core/ArtGallery.Domain/"]
 COPY ["src/Infrastructure/ArtGallery.Infrastructure/ArtGallery.Infrastructure.csproj", "src/Infrastructure/ArtGallery.Infrastructure/"]
 COPY ["src/Infrastructure/ArtGallery.Identity/ArtGallery.Identity.csproj", "src/Infrastructure/ArtGallery.Identity/"]
+COPY ["Directory.Build.props", "./"]
 COPY ["Directory.Packages.props", "./"]
 RUN dotnet restore "src/API/ArtGallery.WebAPI/ArtGallery.WebAPI.csproj"
 COPY . .

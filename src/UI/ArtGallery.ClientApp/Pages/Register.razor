@@ -1,4 +1,4 @@
-﻿@page "/register"
+@page "/register"
 @using ArtGallery.ClientApp.Exceptions
 @using ArtGallery.ClientApp.ViewModels
 @using ArtGallery.ClientApp.Services.Interfaces
@@ -223,7 +223,6 @@
     [SupplyParameterFromForm] 
     private RegisterViewModel registerViewModel { get; set; } = new();
     
-    private bool showDebugInfo = false;
 
     protected override async Task OnInitializedAsync()
     {

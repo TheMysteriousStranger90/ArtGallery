@@ -5,44 +5,43 @@ using ArtGallery.Application.Exceptions;
 using AutoMapper;
 using MediatR;
 
-namespace ArtGallery.Application.Features.Users.Queries
+namespace ArtGallery.Application.Features.Users.Queries;
+
+public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDetailDto>
 {
-    public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDetailDto>
+    private readonly IUserManagerService _userManagerService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public GetUserByIdQueryHandler(
+        IUserManagerService userManagerService,
+        IUnitOfWork unitOfWork,
+        IMapper mapper)
     {
-        private readonly IUserManagerService _userManagerService;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        _userManagerService = userManagerService;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
 
-        public GetUserByIdQueryHandler(
-            IUserManagerService userManagerService,
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+    public async Task<UserDetailDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+    {
+        var user = await _userManagerService.GetUserByIdAsync(request.Id!);
+        if (user == null)
         {
-            _userManagerService = userManagerService;
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            throw new NotFoundException("User not found");
         }
 
-        public async Task<UserDetailDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
-        {
-            var user = await _userManagerService.GetUserByIdAsync(request.Id);
-            if (user == null)
-            {
-                throw new NotFoundException("User not found");
-            }
+        var roles = await _userManagerService.GetUserRolesAsync(user);
+        var favoritePaintings = await _unitOfWork.UserFavoritesRepository.GetUserFavoritePaintingsAsync(request.Id!);
+        var favoriteArtists = await _unitOfWork.UserFavoritesRepository.GetUserFavoriteArtistsAsync(request.Id!);
 
-            var roles = await _userManagerService.GetUserRolesAsync(user);
-            var favoritePaintings = await _unitOfWork.UserFavoritesRepository.GetUserFavoritePaintingsAsync(request.Id);
-            var favoriteArtists = await _unitOfWork.UserFavoritesRepository.GetUserFavoriteArtistsAsync(request.Id);
+        var userDetail = _mapper.Map<UserDetailDto>(user);
+        userDetail.Roles = roles.ToList();
+        userDetail.FavoritePaintings = _mapper.Map<List<PaintingBriefDto>>(favoritePaintings);
+        userDetail.FavoriteArtists = _mapper.Map<List<ArtistBriefDto>>(favoriteArtists);
+        userDetail.FavoritePaintingsCount = favoritePaintings.Count;
+        userDetail.FavoriteArtistsCount = favoriteArtists.Count;
 
-            var userDetail = _mapper.Map<UserDetailDto>(user);
-            userDetail.Roles = roles.ToList();
-            userDetail.FavoritePaintings = _mapper.Map<List<PaintingBriefDto>>(favoritePaintings);
-            userDetail.FavoriteArtists = _mapper.Map<List<ArtistBriefDto>>(favoriteArtists);
-            userDetail.FavoritePaintingsCount = favoritePaintings.Count;
-            userDetail.FavoriteArtistsCount = favoriteArtists.Count;
-
-            return userDetail;
-        }
+        return userDetail;
     }
 }

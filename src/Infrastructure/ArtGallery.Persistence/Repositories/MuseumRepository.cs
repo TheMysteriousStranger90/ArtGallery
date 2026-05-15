@@ -11,7 +11,7 @@ public class MuseumRepository : GenericRepository<Museum>, IMuseumRepository
     {
     }
 
-    public async Task<Museum> GetMuseumWithPaintingsAsync(Guid museumId)
+    public async Task<Museum?> GetMuseumWithPaintingsAsync(Guid museumId)
     {
         return await _context.Museums
             .Include(m => m.City)

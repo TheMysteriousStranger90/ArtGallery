@@ -64,8 +64,10 @@
     <PackageVersion Include="AspNetCore.HealthChecks.Elasticsearch" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.0.2" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.6.1" />
+    <!-- Transitive dependency pin: CVE-2024-21907 (Newtonsoft.Json ReDoS) -->
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <!-- Testing -->
-    <PackageVersion Include="coverlet.collector" Version="6.0.0" />
+    <PackageVersion Include="coverlet.collector" Version="10.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageVersion Include="System.Net.Http.Json" Version="8.0.1" />
     <PackageVersion Include="TlsCertificateLoader" Version="2.3.1" />

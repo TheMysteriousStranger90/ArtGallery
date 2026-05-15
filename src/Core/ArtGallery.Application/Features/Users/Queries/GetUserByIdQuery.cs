@@ -5,5 +5,5 @@ namespace ArtGallery.Application.Features.Users.Queries;
 
 public class GetUserByIdQuery : IRequest<UserDetailDto>
 {
-    public string Id { get; set; }
+    public string? Id { get; set; }
 }

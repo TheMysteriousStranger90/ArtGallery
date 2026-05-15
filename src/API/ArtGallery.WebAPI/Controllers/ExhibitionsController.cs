@@ -146,7 +146,7 @@ public class ExhibitionsController : ControllerBase
             throw new BadRequestException(response.Message ?? "Failed to create exhibition");
         }
 
-        return CreatedAtAction(nameof(GetExhibitionById), new { id = response.Exhibition.Id }, response.Exhibition);
+        return CreatedAtAction(nameof(GetExhibitionById), new { id = response.Exhibition!.Id }, response.Exhibition);
     }
 
     /// <summary>

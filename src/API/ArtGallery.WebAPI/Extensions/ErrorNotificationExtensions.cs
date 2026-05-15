@@ -9,7 +9,7 @@ public static class ErrorNotificationExtensions
 {
     public static LoggerConfiguration AlertOnError(
         this LoggerSinkConfiguration sinkConfiguration,
-        string webhookUrl = null,
+        string? webhookUrl = null,
         LogEventLevel restrictedToMinimumLevel = LogEventLevel.Error)
     {
         return sinkConfiguration.Sink(new ErrorAlertSink(webhookUrl), restrictedToMinimumLevel);

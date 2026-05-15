@@ -5,10 +5,10 @@ namespace ArtGallery.WebAPI.Errors;
 
 public class ErrorAlertSink : ILogEventSink
 {
-    private readonly string _webhookUrl;
+    private readonly string? _webhookUrl;
     private readonly HttpClient _httpClient;
 
-    public ErrorAlertSink(string webhookUrl)
+    public ErrorAlertSink(string? webhookUrl)
     {
         _webhookUrl = webhookUrl;
         _httpClient = new HttpClient();
@@ -17,7 +17,9 @@ public class ErrorAlertSink : ILogEventSink
     public void Emit(LogEvent logEvent)
     {
         if (string.IsNullOrEmpty(_webhookUrl) || logEvent.Level < LogEventLevel.Error)
+        {
             return;
+        }
 
         try
         {

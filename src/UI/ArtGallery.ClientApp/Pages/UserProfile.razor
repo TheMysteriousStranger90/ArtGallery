@@ -1,4 +1,4 @@
-﻿@page "/profile"
+@page "/profile"
 @using ArtGallery.ClientApp.Services
 @using ArtGallery.ClientApp.Services.Interfaces
 @using Microsoft.AspNetCore.Authorization
@@ -196,9 +196,9 @@
 </div>
 
 @code {
-    private UserProfileDto user;
+    private UserProfileDto? user;
     private bool isLoading = true;
-    private string errorMessage;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {

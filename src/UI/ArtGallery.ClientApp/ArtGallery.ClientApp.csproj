@@ -5,6 +5,7 @@
     <RootNamespace>ArtGallery.ClientApp</RootNamespace>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <NoWarn>$(NoWarn);CA1848;CA1873;CS8618;CS8600;CS8602;CS8604;CS8601;CS8625;CA1716;BL0007</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -14,14 +14,14 @@ public class ImageRepository : IImageRepository
         _context = context;
     }
 
-    public async Task<ArtistImage> GetArtistPhotoByIdAsync(Guid artistImageId)
+    public async Task<ArtistImage?> GetArtistPhotoByIdAsync(Guid artistImageId)
     {
         return await _context.ArtistImages
             .Include(ai => ai.Artist)
             .FirstOrDefaultAsync(ai => ai.Id == artistImageId);
     }
 
-    public async Task<PaintingImage> GetPaintingPhotoByIdAsync(Guid paintingImageId)
+    public async Task<PaintingImage?> GetPaintingPhotoByIdAsync(Guid paintingImageId)
     {
         return await _context.PaintingImages
             .Include(pi => pi.Painting)

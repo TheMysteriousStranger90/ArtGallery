@@ -3,57 +3,56 @@ using ArtGallery.Application.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace ArtGallery.Application.Features.Users.Commands
+namespace ArtGallery.Application.Features.Users.Commands;
+
+public class AssignRoleCommandHandler : IRequestHandler<AssignRoleCommand, AssignRoleCommandResponse>
 {
-    public class AssignRoleCommandHandler : IRequestHandler<AssignRoleCommand, AssignRoleCommandResponse>
+    private readonly IUserManagerService _userManagerService;
+    private readonly ILogger<AssignRoleCommandHandler> _logger;
+
+    public AssignRoleCommandHandler(
+        IUserManagerService userManagerService,
+        ILogger<AssignRoleCommandHandler> logger)
     {
-        private readonly IUserManagerService _userManagerService;
-        private readonly ILogger<AssignRoleCommandHandler> _logger;
+        _userManagerService = userManagerService;
+        _logger = logger;
+    }
 
-        public AssignRoleCommandHandler(
-            IUserManagerService userManagerService,
-            ILogger<AssignRoleCommandHandler> logger)
+    public async Task<AssignRoleCommandResponse> Handle(AssignRoleCommand request, CancellationToken cancellationToken)
+    {
+        var response = new AssignRoleCommandResponse();
+
+        try
         {
-            _userManagerService = userManagerService;
-            _logger = logger;
-        }
+            _logger.LogInformation("Assigning role {RoleName} to user {UserId}", request.RoleName, request.UserId);
 
-        public async Task<AssignRoleCommandResponse> Handle(AssignRoleCommand request, CancellationToken cancellationToken)
-        {
-            var response = new AssignRoleCommandResponse();
-
-            try
+            if (!await _userManagerService.RoleExistsAsync(request.RoleName!))
             {
-                _logger.LogInformation("Assigning role {RoleName} to user {UserId}", request.RoleName, request.UserId);
-
-                if (!await _userManagerService.RoleExistsAsync(request.RoleName))
-                {
-                    throw new NotFoundException($"Role '{request.RoleName}' does not exist");
-                }
-
-                var user = await _userManagerService.GetUserByIdAsync(request.UserId);
-                if (user == null)
-                {
-                    throw new NotFoundException($"User with ID '{request.UserId}' not found");
-                }
-
-                await _userManagerService.AddUserToRoleAsync(user, request.RoleName);
-                var updatedRoles = await _userManagerService.GetUserRolesAsync(user);
-
-                response.Success = true;
-                response.Message = $"Role '{request.RoleName}' assigned successfully";
-                response.Roles = updatedRoles;
-
-                _logger.LogInformation("Role {RoleName} assigned successfully to user {UserId}", request.RoleName, request.UserId);
-            }
-            catch (Exception ex)
-            {
-                response.Success = false;
-                response.Message = ex.Message;
-                _logger.LogError(ex, "Error assigning role {RoleName} to user {UserId}", request.RoleName, request.UserId);
+                throw new NotFoundException($"Role '{request.RoleName}' does not exist");
             }
 
-            return response;
+            var user = await _userManagerService.GetUserByIdAsync(request.UserId!);
+            if (user == null)
+            {
+                throw new NotFoundException($"User with ID '{request.UserId}' not found");
+            }
+
+            await _userManagerService.AddUserToRoleAsync(user, request.RoleName!);
+            var updatedRoles = await _userManagerService.GetUserRolesAsync(user);
+
+            response.Success = true;
+            response.Message = $"Role '{request.RoleName}' assigned successfully";
+            response.Roles = updatedRoles;
+
+            _logger.LogInformation("Role {RoleName} assigned successfully to user {UserId}", request.RoleName, request.UserId);
         }
+        catch (Exception ex)
+        {
+            response.Success = false;
+            response.Message = ex.Message;
+            _logger.LogError(ex, "Error assigning role {RoleName} to user {UserId}", request.RoleName, request.UserId);
+        }
+
+        return response;
     }
 }

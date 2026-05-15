@@ -13,7 +13,7 @@ public class ErrorNotifier : IErrorNotifier
         _logger = logger;
     }
 
-    public async Task NotifyErrorAsync(Exception exception, string context, object additionalData = null)
+    public async Task NotifyErrorAsync(Exception exception, string context, object? additionalData = null)
     {
         try
         {
