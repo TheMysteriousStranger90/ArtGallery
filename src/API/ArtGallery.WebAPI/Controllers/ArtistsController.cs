@@ -276,4 +276,30 @@ public class ArtistsController : ControllerBase
 
         return Ok(result);
     }
+
+    /// <summary>
+    /// Remove an artist from the current user's favorites
+    /// </summary>
+    /// <param name="artistId">ID of the artist to remove from favorites</param>
+    [HttpDelete("artists/{artistId}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> RemoveArtistFromFavorites(Guid artistId)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        _logger.LogInformation("Removing artist {ArtistId} from favorites for user {UserId}", artistId, userId);
+
+        var command = new RemoveArtistFromFavoriteCommand { UserId = userId, ArtistId = artistId };
+        var result = await _mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(new { message = result.Message });
+        }
+
+        return Ok(new { message = result.Message });
+    }
 }
+

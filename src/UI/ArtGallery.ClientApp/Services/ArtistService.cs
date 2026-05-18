@@ -239,4 +239,27 @@ public class ArtistService : IArtistService
             };
         }
     }
+
+    public async Task<bool> RemoveArtistFromFavoritesAsync(Guid artistId, string apiVersion = Const.DefaultApiVersion)
+    {
+        try
+        {
+            _logger.LogInformation("Removing artist ID {ArtistId} from favorites.", artistId);
+            await _client.RemoveArtistFromFavoritesAsync(artistId, apiVersion);
+            return true;
+        }
+        catch (ApiException ex)
+        {
+            _logger.LogError(ex,
+                "API error removing artist ID {ArtistId} from favorites. Status: {StatusCode}, Response: {Response}",
+                artistId, ex.StatusCode, ex.Response);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Generic error removing artist ID {ArtistId} from favorites.", artistId);
+            return false;
+        }
+    }
 }
+

@@ -1,4 +1,4 @@
-@using ArtGallery.ClientApp.Services
+﻿@using ArtGallery.ClientApp.Services
 @using ArtGallery.ClientApp.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthStateProvider
@@ -82,32 +82,53 @@
 
     @if (_isAuthenticated)
     {
-        <button class="btn @(_isFavorite ? "btn-favorite-active" : "btn-outline-primary") btn-sm w-100"
-                @onclick="ToggleFavorite"
-                disabled="@(_isFavoriteLoading || _isFavorite)"
-                aria-label="@(_isFavorite ? "Already in favourites" : "Add to favourites")">
-            @if (_isFavoriteLoading)
-            {
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            }
-            else
-            {
-                <i class="bi @(_isFavorite ? "bi-heart-fill" : "bi-heart") me-1" aria-hidden="true"></i>
-                @(_isFavorite ? "In Favourites" : "Add to Favourites")
-            }
-        </button>
+        @if (OnRemoveFavorite.HasDelegate)
+        {
+            <button class="btn btn-outline-danger btn-sm w-100"
+                    @onclick="RemoveFromFavourites"
+                    disabled="@_isRemoving"
+                    aria-label="Remove from favourites">
+                @if (_isRemoving)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                }
+                else
+                {
+                    <i class="bi bi-heart-break me-1" aria-hidden="true"></i> @("Remove from Favourites")
+                }
+            </button>
+        }
+        else
+        {
+            <button class="btn @(_isFavorite ? "btn-favorite-active" : "btn-outline-primary") btn-sm w-100"
+                    @onclick="ToggleFavorite"
+                    disabled="@(_isFavoriteLoading || _isFavorite)"
+                    aria-label="@(_isFavorite ? "Already in favourites" : "Add to favourites")">
+                @if (_isFavoriteLoading)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                }
+                else
+                {
+                    <i class="bi @(_isFavorite ? "bi-heart-fill" : "bi-heart") me-1" aria-hidden="true"></i>
+                    @(_isFavorite ? "In Favourites" : "Add to Favourites")
+                }
+            </button>
+        }
     }
 </div>
 
 @code {
     [Parameter, EditorRequired] public ArtistDto? Artist { get; set; }
     [Parameter] public EventCallback<Guid> OnArtistDeleted { get; set; }
+    [Parameter] public EventCallback<Guid> OnRemoveFavorite { get; set; }
 
     private bool _isAuthenticated;
     private bool _isAdministrator;
     private bool _isFavorite;
     private bool _isFavoriteLoading;
     private bool _isDeleting;
+    private bool _isRemoving;
 
     protected override async Task OnInitializedAsync()
     {
@@ -147,6 +168,35 @@
         finally
         {
             _isFavoriteLoading = false;
+        }
+    }
+
+    private async Task RemoveFromFavourites()
+    {
+        if (Artist is null || _isRemoving) return;
+        _isRemoving = true;
+        try
+        {
+            var ok = await ArtistService.RemoveArtistFromFavoritesAsync(Artist.Id);
+            if (ok)
+            {
+                FavoritesState.UnmarkArtistFavorite(Artist.Id);
+                Toast.Success($"\"{Artist.FullName}\" removed from favourites.");
+                await OnRemoveFavorite.InvokeAsync(Artist.Id);
+            }
+            else
+            {
+                Toast.Error("Could not remove from favourites. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to remove artist {Id} from favourites", Artist.Id);
+            Toast.Error("An error occurred.");
+        }
+        finally
+        {
+            _isRemoving = false;
         }
     }
 

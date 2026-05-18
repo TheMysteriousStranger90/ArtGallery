@@ -1,4 +1,4 @@
-using ArtGallery.ClientApp.Auth;
+﻿using ArtGallery.ClientApp.Auth;
 using ArtGallery.ClientApp.Constants;
 using ArtGallery.ClientApp.Services;
 using ArtGallery.ClientApp.Services.Interfaces;
@@ -52,6 +52,7 @@ public static class Program
         builder.Services.AddScoped<IArtistService, ArtistService>();
         builder.Services.AddScoped<IUsersService, UsersService>();
         builder.Services.AddScoped<IExhibitionsService, ExhibitionsService>();
+        builder.Services.AddScoped<ITagService, TagService>();
 
         // UI state services
         builder.Services.AddScoped<FavoritesStateService>();

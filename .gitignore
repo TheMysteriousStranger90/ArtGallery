@@ -125,3 +125,4 @@ dist/
 paket-files/
 
 lscache/
+*.lscache

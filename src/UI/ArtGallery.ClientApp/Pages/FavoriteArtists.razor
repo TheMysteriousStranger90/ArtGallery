@@ -67,7 +67,7 @@
                 {
                     <div class="col">
                         <div class="painting-card">
-                            <ArtistCard Artist="artist" OnArtistDeleted="RefreshFavorites"/>
+                            <ArtistCard Artist="artist" OnArtistDeleted="RefreshFavorites" OnRemoveFavorite="RemoveFromFavorites"/>
                         </div>
                     </div>
                 }
@@ -119,6 +119,11 @@
     }
 
     private async Task RefreshFavorites(Guid artistId)
+    {
+        await LoadFavorites();
+    }
+
+    private async Task RemoveFromFavorites(Guid artistId)
     {
         await LoadFavorites();
     }

@@ -12,6 +12,7 @@ public interface IUnitOfWork : IDisposable
     IMuseumRepository MuseumRepository { get; }
     IImageRepository ImageRepository { get; }
     IUserFavoritesRepository UserFavoritesRepository { get; }
+    ITagRepository TagRepository { get; }
     Task<int> Complete();
     Task ExecuteWithTransactionAsync(Func<Task> operation);
     Task<T> ExecuteWithTransactionAsync<T>(Func<Task<T>> operation);

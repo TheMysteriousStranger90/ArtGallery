@@ -90,6 +90,18 @@ public class FavoritesStateService
         OnChange?.Invoke();
     }
 
+
+    public void UnmarkPaintingFavorite(Guid id)
+    {
+        _favoritePaintingIds.Remove(id);
+        OnChange?.Invoke();
+    }
+
+    public void UnmarkArtistFavorite(Guid id)
+    {
+        _favoriteArtistIds.Remove(id);
+        OnChange?.Invoke();
+    }
     /// <summary>Call after logout so stale data is not shown on next login.</summary>
     public void Clear()
     {
@@ -100,3 +112,4 @@ public class FavoritesStateService
         OnChange?.Invoke();
     }
 }
+

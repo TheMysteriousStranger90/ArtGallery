@@ -50,6 +50,7 @@ public class ArtistMappingProfile : Profile
 
         CreateMap<PaintingImage, PaintingImageDto>();
         CreateMap<Tag, PaintingTagDto>();
+        CreateMap<Tag, TagDto>();
         CreateMap<CreatePaintingCommand, Painting>();
         CreateMap<UpdatePaintingCommand, Painting>();
 
@@ -136,3 +137,4 @@ public class ArtistMappingProfile : Profile
             .ForMember(dest => dest.Nationality, opt => opt.MapFrom(src => src.Artist.Nationality));
     }
 }
+

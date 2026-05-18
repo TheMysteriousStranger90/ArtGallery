@@ -210,4 +210,27 @@ public class PaintingService : IPaintingService
             };
         }
     }
+
+    public async Task<bool> RemovePaintingFromFavoritesAsync(Guid paintingId, string apiVersion = Const.DefaultApiVersion)
+    {
+        try
+        {
+            _logger.LogInformation("Removing painting ID {PaintingId} from favorites.", paintingId);
+            await _client.RemovePaintingFromFavoritesAsync(paintingId, apiVersion);
+            return true;
+        }
+        catch (ApiException ex)
+        {
+            _logger.LogError(ex,
+                "API error removing painting ID {PaintingId} from favorites. Status: {StatusCode}, Response: {Response}",
+                paintingId, ex.StatusCode, ex.Response);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Generic error removing painting ID {PaintingId} from favorites.", paintingId);
+            return false;
+        }
+    }
 }
+

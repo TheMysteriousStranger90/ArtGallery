@@ -1,0 +1,254 @@
+﻿@page "/tags"
+@using ArtGallery.ClientApp.Services
+@using ArtGallery.ClientApp.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ITagService TagService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ToastService Toast
+@inject ILogger<Tags> Logger
+
+<PageTitle>Tags</PageTitle>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title mb-0">Tags</h1>
+        @if (_isAdministrator)
+        {
+            <button class="btn btn-primary" @onclick="ShowCreateForm">
+                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> New Tag
+            </button>
+        }
+    </div>
+
+    @if (_showCreateForm && _isAdministrator)
+    {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Create New Tag</h5>
+                <div class="input-group">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Tag name"
+                           @bind="_newTagName"
+                           @bind:event="oninput"
+                           maxlength="50"
+                           aria-label="New tag name"/>
+                    <button class="btn btn-success"
+                            @onclick="CreateTag"
+                            disabled="@(string.IsNullOrWhiteSpace(_newTagName) || _isSaving)">
+                        @if (_isSaving)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <span>Save</span>
+                        }
+                    </button>
+                    <button class="btn btn-outline-secondary" @onclick="HideCreateForm">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (_isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (_tags.Count == 0)
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-tags fs-1 d-block mb-3"></i>
+            <p>No tags found.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var tag in _tags.OrderBy(t => t.Name))
+            {
+                <div class="col-auto">
+                    @if (_editingId == tag.Id && _isAdministrator)
+                    {
+                        <div class="input-group input-group-sm">
+                            <input type="text"
+                                   class="form-control"
+                                   @bind="_editName"
+                                   @bind:event="oninput"
+                                   maxlength="50"
+                                   aria-label="Edit tag name"/>
+                            <button class="btn btn-success btn-sm"
+                                    @onclick="() => SaveEdit(tag.Id)"
+                                    disabled="@(string.IsNullOrWhiteSpace(_editName) || _isSaving)">
+                                <i class="bi bi-check" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" @onclick="CancelEdit">
+                                <i class="bi bi-x" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center gap-1">
+                            <span class="badge bg-secondary fs-6 px-3 py-2">@tag.Name</span>
+                            @if (_isAdministrator)
+                            {
+                                <button class="btn btn-outline-secondary btn-sm"
+                                        @onclick="() => StartEdit(tag)"
+                                        aria-label="Edit @tag.Name">
+                                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm"
+                                        @onclick="() => DeleteTag(tag.Id, tag.Name)"
+                                        aria-label="Delete @tag.Name">
+                                    <i class="bi bi-trash" aria-hidden="true"></i>
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<TagDto> _tags = new();
+    private bool _isLoading = true;
+    private bool _isAdministrator;
+    private bool _isSaving;
+
+    private bool _showCreateForm;
+    private string _newTagName = string.Empty;
+
+    private Guid? _editingId;
+    private string _editName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthStateProvider.GetAuthenticationStateAsync();
+        _isAdministrator = state.User.IsInRole("Administrator");
+        await LoadTags();
+    }
+
+    private async Task LoadTags()
+    {
+        _isLoading = true;
+        try
+        {
+            var result = await TagService.GetTagsAsync();
+            _tags = result.ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to load tags");
+            Toast.Error("Failed to load tags.");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void ShowCreateForm()
+    {
+        _newTagName = string.Empty;
+        _showCreateForm = true;
+    }
+
+    private void HideCreateForm()
+    {
+        _showCreateForm = false;
+        _newTagName = string.Empty;
+    }
+
+    private async Task CreateTag()
+    {
+        if (string.IsNullOrWhiteSpace(_newTagName) || _isSaving) return;
+        _isSaving = true;
+        try
+        {
+            var result = await TagService.CreateTagAsync(_newTagName.Trim());
+            if (result is not null)
+            {
+                _tags.Add(result);
+                Toast.Success($"Tag \"{result.Name}\" created.");
+                HideCreateForm();
+            }
+            else
+            {
+                Toast.Error("Failed to create tag. The name may already exist.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error creating tag");
+            Toast.Error("An error occurred while creating the tag.");
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void StartEdit(TagDto tag)
+    {
+        _editingId = tag.Id;
+        _editName = tag.Name;
+    }
+
+    private void CancelEdit()
+    {
+        _editingId = null;
+        _editName = string.Empty;
+    }
+
+    private async Task SaveEdit(Guid id)
+    {
+        if (string.IsNullOrWhiteSpace(_editName) || _isSaving) return;
+        _isSaving = true;
+        try
+        {
+            var result = await TagService.UpdateTagAsync(id, _editName.Trim());
+            if (result is not null)
+            {
+                var existing = _tags.FirstOrDefault(t => t.Id == id);
+                if (existing is not null) existing.Name = result.Name;
+                Toast.Success($"Tag updated to \"{result.Name}\".");
+                CancelEdit();
+            }
+            else
+            {
+                Toast.Error("Failed to update tag. The name may already exist.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error updating tag {Id}", id);
+            Toast.Error("An error occurred while updating the tag.");
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private async Task DeleteTag(Guid id, string name)
+    {
+        var ok = await TagService.DeleteTagAsync(id);
+        if (ok)
+        {
+            _tags.RemoveAll(t => t.Id == id);
+            Toast.Success($"Tag \"{name}\" deleted.");
+        }
+        else
+        {
+            Toast.Error($"Failed to delete tag \"{name}\".");
+        }
+    }
+}
