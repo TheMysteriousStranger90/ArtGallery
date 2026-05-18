@@ -49,8 +49,10 @@ public class ArtistMappingProfile : Profile
                     : "Unknown Artist"));
 
         CreateMap<PaintingImage, PaintingImageDto>();
-        CreateMap<Tag, PaintingTagDto>();
-        CreateMap<Tag, TagDto>();
+        CreateMap<Tag, PaintingTagDto>()
+            .ForMember(dest => dest.TagId, opt => opt.MapFrom(src => src.Id));
+        CreateMap<Tag, TagDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
         CreateMap<CreatePaintingCommand, Painting>();
         CreateMap<UpdatePaintingCommand, Painting>();
 

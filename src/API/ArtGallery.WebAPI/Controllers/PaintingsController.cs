@@ -264,10 +264,8 @@ public class PaintingsController : ControllerBase
             if (response.ValidationErrors?.Count > 0)
             {
                 var problemDetails = new ValidationProblemDetails();
-                foreach (var error in response.ValidationErrors)
-                {
-                    problemDetails.Errors.Add("Validation", new[] { error });
-                }
+
+                problemDetails.Errors.Add("Validation", response.ValidationErrors.ToArray());
 
                 return BadRequest(problemDetails);
             }

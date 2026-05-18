@@ -1,9 +1,9 @@
 using ArtGallery.Application.Contracts;
 using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.DTOs;
-using ArtGallery.Application.Specifications;
 using ArtGallery.Domain.Entities;
 using AutoMapper;
+using CloudinaryDotNet.Actions;
 using MediatR;
 
 namespace ArtGallery.Application.Features.Paintings.Commands;
@@ -41,28 +41,29 @@ public class UpdatePaintingCommandHandler : IRequestHandler<UpdatePaintingComman
 
         try
         {
+            var painting = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(request.Id);
+
+            if (painting == null)
+            {
+                throw new Exception(nameof(Painting));
+            }
+
+            var existingMainImage = painting.PaintingImages.FirstOrDefault(pi => pi.IsMain);
+
+            ImageUploadResult? imageUploadResult = null;
+            if (request.Image != null)
+            {
+                imageUploadResult = await _imageService.AddImageAsync(request.Image);
+                if (imageUploadResult.Error != null)
+                {
+                    throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
+                }
+            }
+
             await _unitOfWork.ExecuteWithTransactionAsync(async () =>
             {
-                //var painting = await _unitOfWork.Repository<Painting>().GetByIdAsync(request.Id);
-                var painting = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(request.Id);
-
-                if (painting == null)
+                if (request.Image != null && imageUploadResult != null)
                 {
-                    throw new Exception(nameof(Painting));
-                }
-
-                var existingMainImage = await _unitOfWork.Repository<PaintingImage>()
-                    .GetByConditionAsync(pi => pi.PaintingId == request.Id && pi.IsMain);
-
-                if (request.Image != null)
-                {
-                    var imageUploadResult = await _imageService.AddImageAsync(request.Image);
-
-                    if (imageUploadResult.Error != null)
-                    {
-                        throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
-                    }
-
                     painting.ImageUrl = imageUploadResult.SecureUrl.ToString();
 
                     if (existingMainImage != null)
@@ -74,7 +75,6 @@ public class UpdatePaintingCommandHandler : IRequestHandler<UpdatePaintingComman
 
                         existingMainImage.PictureUrl = imageUploadResult.SecureUrl.ToString();
                         existingMainImage.PublicId = imageUploadResult.PublicId;
-                        await _unitOfWork.Repository<PaintingImage>().UpdateAsync(existingMainImage);
                     }
                     else
                     {
@@ -110,11 +110,7 @@ public class UpdatePaintingCommandHandler : IRequestHandler<UpdatePaintingComman
                 painting.GenreId = request.GenreId;
                 painting.MuseumId = request.MuseumId;
 
-                await _unitOfWork.PaintingRepository.UpdateAsync(painting);
-
-                var existingTags = await _unitOfWork.Repository<PaintingTag>()
-                    .ListAsync(new BaseSpecification<PaintingTag>(pt => pt.PaintingId == request.Id));
-
+                var existingTags = painting.Tags.ToList();
                 foreach (var tag in existingTags)
                 {
                     await _unitOfWork.Repository<PaintingTag>().RemoveAsync(tag);
@@ -123,12 +119,10 @@ public class UpdatePaintingCommandHandler : IRequestHandler<UpdatePaintingComman
                 foreach (var tagId in request.TagIds)
                 {
                     var paintingTag = new PaintingTag { PaintingId = painting.Id, TagId = tagId };
-
                     await _unitOfWork.Repository<PaintingTag>().AddAsync(paintingTag);
                 }
 
-                await _unitOfWork
-                    .Complete();
+                await _unitOfWork.Complete();
             });
 
             var updatedPainting = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(request.Id);

@@ -178,15 +178,9 @@ public class ArtistsController : ControllerBase
         {
             if (response.ValidationErrors?.Count > 0)
             {
-                var problemDetails = new ValidationProblemDetails
-                {
-                    Title = "Validation errors occurred", Status = (int)HttpStatusCode.BadRequest
-                };
+                var problemDetails = new ValidationProblemDetails();
 
-                foreach (var error in response.ValidationErrors)
-                {
-                    problemDetails.Errors.Add("Validation", new[] { error });
-                }
+                problemDetails.Errors.Add("Validation", response.ValidationErrors.ToArray());
 
                 return BadRequest(problemDetails);
             }
