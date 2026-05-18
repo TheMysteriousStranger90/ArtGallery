@@ -22,7 +22,7 @@
                     <li class="breadcrumb-item active" aria-current="page">Edit Painting</li>
                 </ol>
             </nav>
-            <h1 class="mb-4" style="color: var(--brand-secondary); font-weight: 300; font-size: 2.5rem; 
+            <h1 class="mb-4" style="color: var(--brand-secondary); font-weight: 300; font-size: 2.5rem;
                         border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
                 Edit Painting
             </h1>
@@ -56,7 +56,9 @@
                         <div class="col-md-8">
                             <div class="card shadow-sm mb-4">
                                 <div class="card-header">
-                                    <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Basic Information</h4>
+                                    <h4 class="mb-0"
+                                        style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">
+                                        Basic Information</h4>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -67,23 +69,27 @@
 
                                     <div class="mb-3">
                                         <label for="description" class="form-label">Description</label>
-                                        <InputTextArea id="description" class="form-control" rows="5" @bind-Value="model.Description"/>
+                                        <InputTextArea id="description" class="form-control" rows="5"
+                                                       @bind-Value="model.Description"/>
                                         <ValidationMessage For="@(() => model.Description)" class="text-danger"/>
                                     </div>
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="creationYear" class="form-label">Creation Year</label>
-                                            <InputNumber id="creationYear" class="form-control" @bind-Value="model.CreationYear"/>
+                                            <InputNumber id="creationYear" class="form-control"
+                                                         @bind-Value="model.CreationYear"/>
                                             <ValidationMessage For="@(() => model.CreationYear)" class="text-danger"/>
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <label for="paintType" class="form-label">Paint Type</label>
-                                            <InputSelect id="paintType" class="form-select" @bind-Value="model.PaintType">
+                                            <InputSelect id="paintType" class="form-select"
+                                                         @bind-Value="model.PaintType">
                                                 @foreach (var paintType in Enum.GetValues(typeof(PaintType)))
                                                 {
-                                                    <option value="@paintType">@GetPaintTypeName((PaintType)paintType)</option>
+                                                    <option
+                                                        value="@paintType">@GetPaintTypeName((PaintType)paintType)</option>
                                                 }
                                             </InputSelect>
                                             <ValidationMessage For="@(() => model.PaintType)" class="text-danger"/>
@@ -99,7 +105,8 @@
 
                                         <div class="col-md-6 mb-3">
                                             <label for="dimensions" class="form-label">Dimensions</label>
-                                            <InputText id="dimensions" class="form-control" @bind-Value="model.Dimensions"/>
+                                            <InputText id="dimensions" class="form-control"
+                                                       @bind-Value="model.Dimensions"/>
                                             <ValidationMessage For="@(() => model.Dimensions)" class="text-danger"/>
                                         </div>
                                     </div>
@@ -108,7 +115,9 @@
 
                             <div class="card shadow-sm mb-4">
                                 <div class="card-header">
-                                    <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Classification</h4>
+                                    <h4 class="mb-0"
+                                        style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">
+                                        Classification</h4>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -160,13 +169,15 @@
                                     {
                                         <div class="mb-3">
                                             <label class="form-label d-block">Current Tags</label>
-                                            <div class="tags-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                                            <div class="tags-container"
+                                                 style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
                                                 @foreach (var tag in painting.Tags)
                                                 {
                                                     <span class="tag-badge">@tag.Name</span>
                                                 }
                                             </div>
-                                            <small class="form-text text-light">Tags can only be updated through the API directly.</small>
+                                            <small class="form-text text-light">Tags can only be updated through the API
+                                                directly.</small>
                                         </div>
                                     }
                                 </div>
@@ -176,7 +187,9 @@
                         <div class="col-md-4">
                             <div class="card shadow-sm mb-4">
                                 <div class="card-header">
-                                    <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Image</h4>
+                                    <h4 class="mb-0"
+                                        style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">
+                                        Image</h4>
                                 </div>
                                 <div class="card-body">
                                     @if (!string.IsNullOrEmpty(painting?.ImageUrl))
@@ -186,7 +199,8 @@
                                                  style="width: 100%; height: auto; border-radius: 0.5rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);"
                                                  alt="@painting.Title"/>
                                             <div class="form-check">
-                                                <InputCheckbox id="keepExistingImage" class="form-check-input" @bind-Value="model.KeepExistingImage"/>
+                                                <InputCheckbox id="keepExistingImage" class="form-check-input"
+                                                               @bind-Value="model.KeepExistingImage"/>
                                                 <label class="form-check-label" for="keepExistingImage">
                                                     Keep existing image
                                                 </label>
@@ -196,14 +210,17 @@
 
                                     <div class="mb-3">
                                         <label for="imageFile" class="form-label">Upload new image</label>
-                                        <InputFile id="imageFile" OnChange="HandleFileSelected" class="form-control" accept="image/*"/>
-                                        <small class="form-text text-light">Recommended size: 1200x800px. Max file size: 5MB.</small>
+                                        <InputFile id="imageFile" OnChange="HandleFileSelected" class="form-control"
+                                                   accept="image/*"/>
+                                        <small class="form-text text-light">Recommended size: 1200x800px. Max file size:
+                                            5MB.</small>
 
                                         @if (selectedFile != null)
                                         {
-                                        <div class="mt-2">
-                                            <span class="badge bg-info">Selected: @selectedFile.Name (@FormatFileSize(selectedFile.Size))</span>
-                                        </div>
+                                            <div class="mt-2">
+                                                <span
+                                                    class="badge bg-info">Selected: @selectedFile.Name (@FormatFileSize(selectedFile.Size))</span>
+                                            </div>
                                         }
                                     </div>
 
@@ -211,17 +228,20 @@
                                     {
                                         <div class="text-center mt-3">
                                             <h6>Preview:</h6>
-                                            <img src="@imagePreviewUrl" class="img-fluid painting-preview border" alt="Preview"/>
+                                            <img src="@imagePreviewUrl" class="img-fluid painting-preview border"
+                                                 alt="Preview"/>
                                         </div>
                                     }
                                 </div>
                             </div>
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-outline-secondary flex-grow-1" disabled="@isSaving">
+                                <button type="submit" class="btn btn-outline-secondary flex-grow-1"
+                                        disabled="@isSaving">
                                     @if (isSaving)
                                     {
-                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"
+                                              aria-hidden="true"></span>
                                         <span>Saving...</span>
                                     }
                                     else
@@ -436,7 +456,7 @@
 
                 imageFile = new FileParameter(ms, selectedFile.Name, selectedFile.ContentType);
             }
-            
+
             var tagIds = painting.Tags?.Select(t => t.TagId)?.ToList() ?? new List<Guid>();
 
             var result = await PaintingService.UpdatePaintingAsync(

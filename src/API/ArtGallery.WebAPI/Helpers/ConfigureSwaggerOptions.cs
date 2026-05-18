@@ -37,8 +37,7 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
             },
             License = new OpenApiLicense
             {
-                Name = "MIT License",
-                Url = new Uri("https://opensource.org/licenses/MIT")
+                Name = "MIT License", Url = new Uri("https://opensource.org/licenses/MIT")
             }
         };
 

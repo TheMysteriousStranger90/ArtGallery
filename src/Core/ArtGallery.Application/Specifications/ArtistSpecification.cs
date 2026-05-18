@@ -48,4 +48,3 @@ public class ArtistSpecification : BaseSpecification<Artist>
         AddInclude(a => a.Paintings);
     }
 }
-

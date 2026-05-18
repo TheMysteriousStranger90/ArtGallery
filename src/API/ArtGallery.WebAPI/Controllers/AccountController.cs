@@ -177,7 +177,9 @@ public class AccountController : ControllerBase
             {
                 _logger.LogError("Could not extract email from Microsoft response");
                 return BadRequest(new ErrorResponse
-                { Errors = new[] { "Could not retrieve email from Microsoft account" } });
+                {
+                    Errors = new[] { "Could not retrieve email from Microsoft account" }
+                });
             }
 
             var command = new ExternalAuthCommand

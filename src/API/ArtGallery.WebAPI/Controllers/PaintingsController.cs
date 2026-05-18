@@ -245,7 +245,8 @@ public class PaintingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<PaintingDto>> UpdatePainting(Guid paintingId, [FromForm] UpdatePaintingCommand command)
+    public async Task<ActionResult<PaintingDto>> UpdatePainting(Guid paintingId,
+        [FromForm] UpdatePaintingCommand command)
     {
         if (paintingId != command.Id)
         {
@@ -342,11 +343,7 @@ public class PaintingsController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         _logger.LogInformation("Adding painting {PaintingId} to favorites for user {UserId}", paintingId, userId);
 
-        var command = new AddPaintingToFavoriteCommand
-        {
-            UserId = userId,
-            PaintingId = paintingId
-        };
+        var command = new AddPaintingToFavoriteCommand { UserId = userId, PaintingId = paintingId };
 
         var result = await _mediator.Send(command);
 
@@ -355,11 +352,7 @@ public class PaintingsController : ControllerBase
             return BadRequest(new { message = result.Message });
         }
 
-        return Ok(new
-        {
-            isFavorite = result.IsFavorite,
-            message = result.Message
-        });
+        return Ok(new { isFavorite = result.IsFavorite, message = result.Message });
     }
 
 

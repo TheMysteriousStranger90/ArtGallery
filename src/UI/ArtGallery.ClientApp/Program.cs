@@ -58,10 +58,7 @@ public static class Program
         builder.Services.AddScoped<ToastService>();
 
         // Default HttpClient for app assets
-        builder.Services.AddScoped(_ => new HttpClient
-        {
-            BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
-        });
+        builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
         var app = builder.Build();
         var jsRuntime = app.Services.GetRequiredService<IJSRuntime>();

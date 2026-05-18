@@ -14,9 +14,10 @@ public class ArtistService : IArtistService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> GetArtistsAsync(
-        int pageIndex = 1, int pageSize = 10, string search = "", string nationality = "", string sort = "lastName",
-        string apiVersion = Const.DefaultApiVersion)
+    public async Task<Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>
+        GetArtistsAsync(
+            int pageIndex = 1, int pageSize = 10, string search = "", string nationality = "", string sort = "lastName",
+            string apiVersion = Const.DefaultApiVersion)
     {
         try
         {
@@ -33,10 +34,7 @@ public class ArtistService : IArtistService
 
             return new Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
             {
-                Data = new List<ArtistDto>(),
-                Count = 0,
-                PageIndex = pageIndex,
-                PageSize = pageSize
+                Data = new List<ArtistDto>(), Count = 0, PageIndex = pageIndex, PageSize = pageSize
             };
         }
         catch (Exception ex)
@@ -44,10 +42,7 @@ public class ArtistService : IArtistService
             _logger.LogError(ex, "Generic error fetching artists.");
             return new Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
             {
-                Data = new List<ArtistDto>(),
-                Count = 0,
-                PageIndex = pageIndex,
-                PageSize = pageSize
+                Data = new List<ArtistDto>(), Count = 0, PageIndex = pageIndex, PageSize = pageSize
             };
         }
     }
@@ -232,9 +227,7 @@ public class ArtistService : IArtistService
                 ex.Response);
             return new UserFavoriteArtistsResponse
             {
-                Success = false,
-                Message = "API error occurred.",
-                FavoriteArtists = new List<ArtistDto>()
+                Success = false, Message = "API error occurred.", FavoriteArtists = new List<ArtistDto>()
             };
         }
         catch (Exception ex)
@@ -242,9 +235,7 @@ public class ArtistService : IArtistService
             _logger.LogError(ex, "Generic error fetching favorite artists.");
             return new UserFavoriteArtistsResponse
             {
-                Success = false,
-                Message = "An unexpected error occurred.",
-                FavoriteArtists = new List<ArtistDto>()
+                Success = false, Message = "An unexpected error occurred.", FavoriteArtists = new List<ArtistDto>()
             };
         }
     }

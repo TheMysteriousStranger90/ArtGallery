@@ -18,7 +18,7 @@ public class UserFavoritesRepository : IUserFavoritesRepository
     {
         return await _context.Set<UserFavoritePainting>()
             .Include(ufp => ufp.Painting)
-                .ThenInclude(p => p.Artist)
+            .ThenInclude(p => p.Artist)
             .Where(ufp => ufp.UserId == userId)
             .ToListAsync();
     }
@@ -32,11 +32,7 @@ public class UserFavoritesRepository : IUserFavoritesRepository
             return false;
         }
 
-        var favorite = new UserFavoritePainting
-        {
-            UserId = userId,
-            PaintingId = paintingId
-        };
+        var favorite = new UserFavoritePainting { UserId = userId, PaintingId = paintingId };
 
         await _context.Set<UserFavoritePainting>().AddAsync(favorite);
         return await _context.SaveChangesAsync() > 0;
@@ -66,7 +62,7 @@ public class UserFavoritesRepository : IUserFavoritesRepository
     {
         return await _context.Set<UserFavoriteArtist>()
             .Include(ufa => ufa.Artist)
-                .ThenInclude(a => a.ArtistImage.Where(ai => ai.IsMain))
+            .ThenInclude(a => a.ArtistImage.Where(ai => ai.IsMain))
             .Where(ufa => ufa.UserId == userId)
             .ToListAsync();
     }
@@ -80,11 +76,7 @@ public class UserFavoritesRepository : IUserFavoritesRepository
             return false;
         }
 
-        var favorite = new UserFavoriteArtist
-        {
-            UserId = userId,
-            ArtistId = artistId
-        };
+        var favorite = new UserFavoriteArtist { UserId = userId, ArtistId = artistId };
 
         await _context.Set<UserFavoriteArtist>().AddAsync(favorite);
         return await _context.SaveChangesAsync() > 0;

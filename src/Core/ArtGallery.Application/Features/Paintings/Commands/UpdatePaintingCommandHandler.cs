@@ -122,11 +122,7 @@ public class UpdatePaintingCommandHandler : IRequestHandler<UpdatePaintingComman
 
                 foreach (var tagId in request.TagIds)
                 {
-                    var paintingTag = new PaintingTag
-                    {
-                        PaintingId = painting.Id,
-                        TagId = tagId
-                    };
+                    var paintingTag = new PaintingTag { PaintingId = painting.Id, TagId = tagId };
 
                     await _unitOfWork.Repository<PaintingTag>().AddAsync(paintingTag);
                 }

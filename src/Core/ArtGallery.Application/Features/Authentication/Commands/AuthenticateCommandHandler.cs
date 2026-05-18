@@ -58,10 +58,7 @@ public class AuthenticateCommandHandler : IRequestHandler<AuthenticateCommand, A
 
         return new AuthenticationResponse
         {
-            Id = user.Id,
-            Token = jwtToken,
-            Email = user.Email!,
-            UserName = user.UserName!
+            Id = user.Id, Token = jwtToken, Email = user.Email!, UserName = user.UserName!
         };
     }
 
@@ -81,10 +78,8 @@ public class AuthenticateCommandHandler : IRequestHandler<AuthenticateCommand, A
             {
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!),
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                new Claim("uid", user.Id),
-                new Claim("first_name", user.FirstName),
-                new Claim("last_name", user.LastName)
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!), new Claim("uid", user.Id),
+                new Claim("first_name", user.FirstName), new Claim("last_name", user.LastName)
             }
             .Union(userClaims)
             .Union(roleClaims);

@@ -29,7 +29,8 @@ public class UpdateExhibitionCommandValidator : AbstractValidator<UpdateExhibiti
         RuleFor(e => e.EndDate)
             .NotEmpty().WithMessage("{PropertyName} is required.")
             .Must(BeAValidDate).WithMessage("{PropertyName} must be a valid date.")
-            .GreaterThanOrEqualTo(e => e.StartDate).WithMessage("{PropertyName} must be after or equal to the start date.");
+            .GreaterThanOrEqualTo(e => e.StartDate)
+            .WithMessage("{PropertyName} must be after or equal to the start date.");
 
         RuleFor(e => e)
             .Must(e => !string.IsNullOrEmpty(e.ExternalVenueAddress) || e.MuseumId.HasValue)

@@ -32,7 +32,7 @@ public static class OpenTelemetryExtensions
                     try
                     {
                         var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ??
-                                        "http://localhost:4317";
+                                           "http://localhost:4317";
                         tracing.AddOtlpExporter(opts =>
                         {
                             opts.Endpoint = new Uri(otlpEndpoint);
@@ -55,7 +55,7 @@ public static class OpenTelemetryExtensions
                     try
                     {
                         var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ??
-                                        "http://localhost:4317";
+                                           "http://localhost:4317";
                         metrics.AddOtlpExporter(opts =>
                         {
                             opts.Endpoint = new Uri(otlpEndpoint);

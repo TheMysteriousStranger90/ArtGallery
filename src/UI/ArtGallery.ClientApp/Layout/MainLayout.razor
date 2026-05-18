@@ -31,9 +31,13 @@
             <nav id="mainNav"
                  class="header-nav @(_navOpen ? "nav-open" : "")"
                  aria-label="Main navigation">
-                <NavLink href="/gallery"     class="nav-link" ActiveClass="active" Match="NavLinkMatch.Prefix">Gallery</NavLink>
-                <NavLink href="/artists"     class="nav-link" ActiveClass="active" Match="NavLinkMatch.Prefix">Artists</NavLink>
-                <NavLink href="/exhibitions" class="nav-link" ActiveClass="active" Match="NavLinkMatch.Prefix">Exhibitions</NavLink>
+                <NavLink href="/gallery" class="nav-link" ActiveClass="active" Match="NavLinkMatch.Prefix">Gallery
+                </NavLink>
+                <NavLink href="/artists" class="nav-link" ActiveClass="active" Match="NavLinkMatch.Prefix">Artists
+                </NavLink>
+                <NavLink href="/exhibitions" class="nav-link" ActiveClass="active" Match="NavLinkMatch.Prefix">
+                    Exhibitions
+                </NavLink>
             </nav>
 
             <!-- Right: auth -->
@@ -54,7 +58,9 @@
                                 <li class="dropdown-header small text-muted px-3 py-1">
                                     @(context.User.Identity?.Name)
                                 </li>
-                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <hr class="dropdown-divider my-1">
+                                </li>
                                 <li>
                                     <a class="dropdown-item" href="/favorite-paintings">
                                         <i class="bi bi-image-fill me-2" aria-hidden="true"></i>Favourite Paintings
@@ -67,7 +73,9 @@
                                 </li>
                                 <AuthorizeView Roles="Administrator">
                                     <Authorized Context="adminCtx">
-                                        <li><hr class="dropdown-divider my-1"></li>
+                                        <li>
+                                            <hr class="dropdown-divider my-1">
+                                        </li>
                                         <li>
                                             <a class="dropdown-item text-warning" href="/admin/users">
                                                 <i class="bi bi-people-fill me-2" aria-hidden="true"></i>User Management
@@ -75,7 +83,9 @@
                                         </li>
                                     </Authorized>
                                 </AuthorizeView>
-                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <hr class="dropdown-divider my-1">
+                                </li>
                                 <li>
                                     <a class="dropdown-item" href="/profile">
                                         <i class="bi bi-person me-2" aria-hidden="true"></i>My Profile
@@ -91,7 +101,7 @@
                     </Authorized>
                     <NotAuthorized>
                         <div class="d-flex gap-2">
-                            <a href="/login"    class="btn btn-sm btn-outline-light">Sign In</a>
+                            <a href="/login" class="btn btn-sm btn-outline-light">Sign In</a>
                             <a href="/register" class="btn btn-sm btn-primary">Register</a>
                         </div>
                     </NotAuthorized>
@@ -125,11 +135,11 @@
         </ErrorBoundary>
     </main>
 
-    <AppFooter />
+    <AppFooter/>
 </div>
 
 <!-- Global toast notifications -->
-<Toast />
+<Toast/>
 
 @code {
     private bool _navOpen;

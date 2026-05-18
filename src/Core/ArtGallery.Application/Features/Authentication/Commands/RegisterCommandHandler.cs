@@ -56,11 +56,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Registrat
 
         await _userManagerService.AddUserToRoleAsync(user, "User");
 
-        var authenticateCommand = new AuthenticateCommand
-        {
-            Email = request.Email,
-            Password = request.Password
-        };
+        var authenticateCommand = new AuthenticateCommand { Email = request.Email, Password = request.Password };
 
         var authResponse = await _mediator.Send(authenticateCommand, cancellationToken);
 
@@ -68,10 +64,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Registrat
 
         return new RegistrationResponse
         {
-            Id = user.Id,
-            Token = authResponse.Token,
-            Email = user.Email!,
-            UserName = user.UserName!
+            Id = user.Id, Token = authResponse.Token, Email = user.Email!, UserName = user.UserName!
         };
     }
 

@@ -33,15 +33,16 @@
                 <!-- Left side - Image -->
                 <div class="col-lg-7">
                     <div class="painting-image-container">
-                        <img src="@painting.ImageUrl" alt="@painting.Title" class="painting-main-image" />
-                        
+                        <img src="@painting.ImageUrl" alt="@painting.Title" class="painting-main-image"/>
+
                         @if (painting.Images != null && painting.Images.Count > 1)
                         {
                             <div class="painting-image-thumbnails mt-3">
                                 @foreach (var image in painting.Images)
                                 {
-                                    <div class="thumbnail @(image.IsMain ? "active" : "")" @onclick="() => SwitchMainImage(image.PictureUrl)">
-                                        <img src="@image.PictureUrl" alt="@painting.Title" />
+                                    <div class="thumbnail @(image.IsMain ? "active" : "")"
+                                         @onclick="() => SwitchMainImage(image.PictureUrl)">
+                                        <img src="@image.PictureUrl" alt="@painting.Title"/>
                                     </div>
                                 }
                             </div>
@@ -53,7 +54,7 @@
                 <div class="col-lg-5">
                     <div class="painting-info">
                         <h1 class="painting-title">@painting.Title</h1>
-                        
+
                         <div class="artist-info mt-3">
                             <h5>Artist</h5>
                             <a href="/artists/@painting.Artist.Id" class="artist-link">
@@ -131,15 +132,18 @@
                             </a>
                             @if (isAuthenticated)
                             {
-                                <button class="btn @(isFavoriteProcessing ? "btn-outline-secondary disabled" : "btn-outline-primary") favorite-btn ms-2"
-                                        @onclick="AddToFavorites" disabled="@(isFavoriteProcessing || isAddedToFavorites)">
+                                <button
+                                    class="btn @(isFavoriteProcessing ? "btn-outline-secondary disabled" : "btn-outline-primary") favorite-btn ms-2"
+                                    @onclick="AddToFavorites" disabled="@(isFavoriteProcessing || isAddedToFavorites)">
                                     @if (isFavoriteProcessing)
                                     {
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        <span class="spinner-border spinner-border-sm" role="status"
+                                              aria-hidden="true"></span>
                                     }
                                     else
                                     {
-                                        <i class="bi bi-heart@(isAddedToFavorites ? "-fill" : "") heart-icon @(isAddedToFavorites ? "heart-filled" : "")" aria-hidden="true"></i>
+                                        <i class="bi bi-heart@(isAddedToFavorites ? "-fill" : "") heart-icon @(isAddedToFavorites ? "heart-filled" : "")"
+                                           aria-hidden="true"></i>
                                     }
                                     @(isAddedToFavorites ? "Added to Favorites" : "Add to Favorites")
                                 </button>
@@ -168,7 +172,6 @@
                     <div class="exhibition-list">
                         @foreach (var exhibition in painting.Exhibitions.OrderBy(e => e.StartDate))
                         {
-      
                         }
                     </div>
                 </div>
@@ -233,11 +236,11 @@
         try
         {
             painting = await PaintingService.GetPaintingAsync(Id);
-            
+
             if (painting != null)
             {
                 currentMainImage = painting.ImageUrl;
-                
+
                 if (isAuthenticated)
                 {
                     await CheckIfInFavorites();
@@ -246,7 +249,7 @@
         }
         catch (ApiException ex)
         {
-            Logger.LogError(ex, "API Error loading painting details. Status: {StatusCode}, Response: {Response}", 
+            Logger.LogError(ex, "API Error loading painting details. Status: {StatusCode}, Response: {Response}",
                 ex.StatusCode, ex.Response);
             errorMessage = $"Error loading painting details. {ex.Message}";
         }
@@ -321,4 +324,5 @@
             StateHasChanged();
         }
     }
+
 }

@@ -336,7 +336,7 @@ select:-webkit-autofill:focus {
 }
 
 /* ==========================================================================
-   5. Button Components - Additional Specificity 
+   5. Button Components - Additional Specificity
    ========================================================================== */
 
 /* General button styling */
@@ -4345,8 +4345,6 @@ thead.table-dark {
 }
 
 
-
-
 /* ==========================================================================
    ExhibitionEdit Page Specific Styles
    ========================================================================== */
@@ -4702,20 +4700,25 @@ thead.table-dark {
         font-size: 0.7rem !important;
     }
 }
+
 /* ==========================================================================
    NEW: Skeleton Card / Shimmer Loading
    ========================================================================== */
 
 @keyframes skeleton-shimmer {
-    0%   { background-position: -200% 0; }
-    100% { background-position:  200% 0; }
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
 }
 
 .shimmer {
     background: linear-gradient(90deg,
-        rgba(255,255,255,0.04) 25%,
-        rgba(255,255,255,0.10) 50%,
-        rgba(255,255,255,0.04) 75%);
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.10) 50%,
+    rgba(255, 255, 255, 0.04) 75%);
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.6s ease-in-out infinite;
     border-radius: 4px;
@@ -4774,14 +4777,14 @@ thead.table-dark {
 
 .btn-favorite-active {
     background-color: var(--brand-primary) !important;
-    color:           var(--text-light)    !important;
-    border-color:    var(--brand-primary) !important;
+    color: var(--text-light) !important;
+    border-color: var(--brand-primary) !important;
 }
 
 .btn-favorite-active:hover,
 .btn-favorite-active:focus {
     background-color: #4E342E !important;
-    border-color:     #4E342E !important;
+    border-color: #4E342E !important;
 }
 
 /* ==========================================================================
@@ -4789,12 +4792,12 @@ thead.table-dark {
    ========================================================================== */
 
 .genre-badge {
-    background:   rgba(93, 64, 55, 0.3);
-    color:        var(--brand-secondary);
-    border:       1px solid var(--border-color);
-    font-size:    0.78rem;
-    font-weight:  500;
-    padding:      0.2rem 0.55rem;
+    background: rgba(93, 64, 55, 0.3);
+    color: var(--brand-secondary);
+    border: 1px solid var(--border-color);
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.2rem 0.55rem;
     border-radius: 1rem;
 }
 
@@ -4819,7 +4822,7 @@ thead.table-dark {
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     margin: 2rem 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .empty-state-icon {

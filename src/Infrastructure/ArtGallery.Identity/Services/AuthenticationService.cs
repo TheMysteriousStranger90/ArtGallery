@@ -16,11 +16,7 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
     {
-        var command = new AuthenticateCommand
-        {
-            Email = request.Email,
-            Password = request.Password
-        };
+        var command = new AuthenticateCommand { Email = request.Email, Password = request.Password };
 
         return await _mediator.Send(command);
     }

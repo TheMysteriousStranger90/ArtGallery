@@ -128,11 +128,7 @@ public class UsersController : ControllerBase
     {
         _logger.LogInformation("Assigning role {RoleName} to user {UserId}", request.RoleName, id);
 
-        var command = new AssignRoleCommand
-        {
-            UserId = id,
-            RoleName = request.RoleName
-        };
+        var command = new AssignRoleCommand { UserId = id, RoleName = request.RoleName };
 
         var result = await _mediator.Send(command);
 
@@ -141,11 +137,7 @@ public class UsersController : ControllerBase
             return BadRequest(new { message = result.Message });
         }
 
-        return Ok(new
-        {
-            message = result.Message,
-            roles = result.Roles
-        });
+        return Ok(new { message = result.Message, roles = result.Roles });
     }
 
     /// <summary>
@@ -162,11 +154,7 @@ public class UsersController : ControllerBase
     {
         _logger.LogInformation("Removing role {RoleName} from user {UserId}", roleName, id);
 
-        var command = new RemoveRoleCommand
-        {
-            UserId = id,
-            RoleName = roleName
-        };
+        var command = new RemoveRoleCommand { UserId = id, RoleName = roleName };
 
         var result = await _mediator.Send(command);
 
@@ -175,10 +163,6 @@ public class UsersController : ControllerBase
             return BadRequest(new { message = result.Message });
         }
 
-        return Ok(new
-        {
-            message = result.Message,
-            roles = result.Roles
-        });
+        return Ok(new { message = result.Message, roles = result.Roles });
     }
 }

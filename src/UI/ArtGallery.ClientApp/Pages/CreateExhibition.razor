@@ -35,7 +35,7 @@
     {
         <div class="painting-edit-form">
             <EditForm Model="@exhibition" OnValidSubmit="HandleValidSubmit">
-                <DataAnnotationsValidator />
+                <DataAnnotationsValidator/>
 
                 <div class="card mb-4">
                     <div class="card-header">
@@ -46,8 +46,8 @@
                             <div class="col-md-8">
                                 <div class="mb-3">
                                     <label for="title" class="form-label">Exhibition Title</label>
-                                    <InputText id="title" class="form-control" @bind-Value="exhibition.Title" />
-                                    <ValidationMessage For="@(() => exhibition.Title)" class="text-danger" />
+                                    <InputText id="title" class="form-control" @bind-Value="exhibition.Title"/>
+                                    <ValidationMessage For="@(() => exhibition.Title)" class="text-danger"/>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -59,42 +59,48 @@
                                         {
                                             @foreach (var museum in museums)
                                             {
-                                                <option value="@museum.Id">@museum.Name (@museum.City, @museum.Country)</option>
+                                                <option
+                                                    value="@museum.Id">@museum.Name (@museum.City, @museum.Country)
+                                                </option>
                                             }
                                         }
                                     </InputSelect>
-                                    <ValidationMessage For="@(() => exhibition.MuseumId)" class="text-danger" />
+                                    <ValidationMessage For="@(() => exhibition.MuseumId)" class="text-danger"/>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
-                            <InputTextArea id="description" class="form-control" @bind-Value="exhibition.Description" rows="4" />
-                            <ValidationMessage For="@(() => exhibition.Description)" class="text-danger" />
+                            <InputTextArea id="description" class="form-control" @bind-Value="exhibition.Description"
+                                           rows="4"/>
+                            <ValidationMessage For="@(() => exhibition.Description)" class="text-danger"/>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="startDate" class="form-label">Start Date</label>
-                                    <InputDate id="startDate" class="form-control" @bind-Value="exhibition.StartDate" />
-                                    <ValidationMessage For="@(() => exhibition.StartDate)" class="text-danger" />
+                                    <InputDate id="startDate" class="form-control" @bind-Value="exhibition.StartDate"/>
+                                    <ValidationMessage For="@(() => exhibition.StartDate)" class="text-danger"/>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="endDate" class="form-label">End Date</label>
-                                    <InputDate id="endDate" class="form-control" @bind-Value="exhibition.EndDate" />
-                                    <ValidationMessage For="@(() => exhibition.EndDate)" class="text-danger" />
+                                    <InputDate id="endDate" class="form-control" @bind-Value="exhibition.EndDate"/>
+                                    <ValidationMessage For="@(() => exhibition.EndDate)" class="text-danger"/>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="externalVenueAddress" class="form-label">External Venue Address (Optional)</label>
-                            <InputText id="externalVenueAddress" class="form-control" @bind-Value="exhibition.ExternalVenueAddress" placeholder="e.g. 123 Art Street, New York, NY 10001" />
-                            <ValidationMessage For="@(() => exhibition.ExternalVenueAddress)" class="text-danger" />
+                            <label for="externalVenueAddress" class="form-label">External Venue Address
+                                (Optional)</label>
+                            <InputText id="externalVenueAddress" class="form-control"
+                                       @bind-Value="exhibition.ExternalVenueAddress"
+                                       placeholder="e.g. 123 Art Street, New York, NY 10001"/>
+                            <ValidationMessage For="@(() => exhibition.ExternalVenueAddress)" class="text-danger"/>
                             <div class="form-text">Leave empty if the exhibition is held at the selected museum</div>
                         </div>
                     </div>
@@ -115,13 +121,16 @@
                                         {
                                             @foreach (var painting in availablePaintings.Where(p => !exhibition.PaintingIds.Contains(p.Id)))
                                             {
-                                                <option value="@painting.Id">@painting.Title (@painting.Artist?.FullName, @painting.CreationYear)</option>
+                                                <option
+                                                    value="@painting.Id">@painting.Title (@painting.Artist?.FullName, @painting.CreationYear)
+                                                </option>
                                             }
                                         }
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <button type="button" class="btn btn-outline-primary w-100" @onclick="AddPainting" disabled="@string.IsNullOrEmpty(selectedPaintingId?.ToString())">
+                                    <button type="button" class="btn btn-outline-primary w-100" @onclick="AddPainting"
+                                            disabled="@string.IsNullOrEmpty(selectedPaintingId?.ToString())">
                                         <i class="bi bi-plus-lg me-1"></i> Add Painting
                                     </button>
                                 </div>
@@ -138,7 +147,9 @@
                                         <div class="col">
                                             <div class="card h-100">
                                                 <div class="painting-image-container">
-                                                    <img src="@painting.ImageUrl" class="card-img-top" alt="@painting.Title" style="height: 150px; object-fit: cover;" />
+                                                    <img src="@painting.ImageUrl" class="card-img-top"
+                                                         alt="@painting.Title"
+                                                         style="height: 150px; object-fit: cover;"/>
                                                 </div>
                                                 <div class="card-body p-2">
                                                     <h6 class="card-title mb-1">@painting.Title</h6>
@@ -146,7 +157,8 @@
                                                     <p class="card-text small text-muted">@painting.CreationYear</p>
                                                 </div>
                                                 <div class="card-footer bg-transparent border-top-0 p-2">
-                                                    <button type="button" class="btn btn-outline-danger btn-sm w-100" @onclick="() => RemovePainting(painting.Id)">
+                                                    <button type="button" class="btn btn-outline-danger btn-sm w-100"
+                                                            @onclick="() => RemovePainting(painting.Id)">
                                                         <i class="bi bi-x-lg me-1"></i> Remove
                                                     </button>
                                                 </div>
@@ -311,6 +323,7 @@
             {
                 errorMessage += $" Details: {ex.Response}";
             }
+
             Logger.LogError(ex, "Error creating new exhibition");
         }
         catch (Exception ex)
@@ -323,5 +336,5 @@
             isSubmitting = false;
         }
     }
-    
+
 }

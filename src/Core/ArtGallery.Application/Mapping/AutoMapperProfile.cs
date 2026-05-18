@@ -82,11 +82,15 @@ public class ArtistMappingProfile : Profile
         CreateMap<Genre, GenreDto>();
         CreateMap<Museum, MuseumBriefDto>()
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City != null ? src.City.Name : string.Empty))
-            .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.City != null && src.City.Country != null ? src.City.Country.Name : string.Empty));
+            .ForMember(dest => dest.Country,
+                opt => opt.MapFrom(src =>
+                    src.City != null && src.City.Country != null ? src.City.Country.Name : string.Empty));
 
         CreateMap<Museum, MuseumDetailDto>()
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City != null ? src.City.Name : string.Empty))
-            .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.City != null && src.City.Country != null ? src.City.Country.Name : string.Empty))
+            .ForMember(dest => dest.Country,
+                opt => opt.MapFrom(src =>
+                    src.City != null && src.City.Country != null ? src.City.Country.Name : string.Empty))
             .ForMember(dest => dest.Paintings, opt => opt.MapFrom(src => src.Paintings));
 
         // User mappings

@@ -36,7 +36,7 @@
     {
         <div class="painting-edit-form">
             <EditForm Model="@painting" OnValidSubmit="HandleValidSubmit">
-                <DataAnnotationsValidator />
+                <DataAnnotationsValidator/>
 
                 <div class="card mb-4">
                     <div class="card-header">
@@ -47,23 +47,25 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="title" class="form-label">Title</label>
-                                    <InputText id="title" class="form-control" @bind-Value="painting.Title" />
-                                    <ValidationMessage For="@(() => painting.Title)" class="text-danger" />
+                                    <InputText id="title" class="form-control" @bind-Value="painting.Title"/>
+                                    <ValidationMessage For="@(() => painting.Title)" class="text-danger"/>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="creationYear" class="form-label">Creation Year</label>
-                                    <InputNumber id="creationYear" class="form-control" @bind-Value="painting.CreationYear" />
-                                    <ValidationMessage For="@(() => painting.CreationYear)" class="text-danger" />
+                                    <InputNumber id="creationYear" class="form-control"
+                                                 @bind-Value="painting.CreationYear"/>
+                                    <ValidationMessage For="@(() => painting.CreationYear)" class="text-danger"/>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
-                            <InputTextArea id="description" class="form-control" @bind-Value="painting.Description" rows="4" />
-                            <ValidationMessage For="@(() => painting.Description)" class="text-danger" />
+                            <InputTextArea id="description" class="form-control" @bind-Value="painting.Description"
+                                           rows="4"/>
+                            <ValidationMessage For="@(() => painting.Description)" class="text-danger"/>
                         </div>
 
                         <div class="row mb-3">
@@ -80,7 +82,7 @@
                                             }
                                         }
                                     </InputSelect>
-                                    <ValidationMessage For="@(() => painting.ArtistId)" class="text-danger" />
+                                    <ValidationMessage For="@(() => painting.ArtistId)" class="text-danger"/>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -96,7 +98,7 @@
                                             }
                                         }
                                     </InputSelect>
-                                    <ValidationMessage For="@(() => painting.GenreId)" class="text-danger" />
+                                    <ValidationMessage For="@(() => painting.GenreId)" class="text-danger"/>
                                 </div>
                             </div>
                         </div>
@@ -112,15 +114,16 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="medium" class="form-label">Medium</label>
-                                    <InputText id="medium" class="form-control" @bind-Value="painting.Medium" />
-                                    <ValidationMessage For="@(() => painting.Medium)" class="text-danger" />
+                                    <InputText id="medium" class="form-control" @bind-Value="painting.Medium"/>
+                                    <ValidationMessage For="@(() => painting.Medium)" class="text-danger"/>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="dimensions" class="form-label">Dimensions</label>
-                                    <InputText id="dimensions" class="form-control" @bind-Value="painting.Dimensions" placeholder="e.g. 24 × 36 inches" />
-                                    <ValidationMessage For="@(() => painting.Dimensions)" class="text-danger" />
+                                    <InputText id="dimensions" class="form-control" @bind-Value="painting.Dimensions"
+                                               placeholder="e.g. 24 × 36 inches"/>
+                                    <ValidationMessage For="@(() => painting.Dimensions)" class="text-danger"/>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -141,7 +144,7 @@
                                         <option value="@PaintType._10">Mixed Media</option>
                                         <option value="@PaintType._11">Other</option>
                                     </InputSelect>
-                                    <ValidationMessage For="@(() => painting.PaintType)" class="text-danger" />
+                                    <ValidationMessage For="@(() => painting.PaintType)" class="text-danger"/>
                                 </div>
                             </div>
                         </div>
@@ -158,7 +161,7 @@
                                     }
                                 }
                             </InputSelect>
-                            <ValidationMessage For="@(() => painting.MuseumId)" class="text-danger" />
+                            <ValidationMessage For="@(() => painting.MuseumId)" class="text-danger"/>
                         </div>
                     </div>
                 </div>
@@ -170,14 +173,14 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="imageFile" class="form-label">Upload Image</label>
-                            <InputFile id="imageFile" OnChange="OnFileChange" class="form-control" accept="image/*" />
+                            <InputFile id="imageFile" OnChange="OnFileChange" class="form-control" accept="image/*"/>
                             <div class="form-text">Upload an image of the painting (JPG, PNG, or GIF, max 10MB)</div>
                         </div>
 
                         @if (imageDataUrl != null)
                         {
                             <div class="text-center mt-3 mb-2">
-                                <img src="@imageDataUrl" class="painting-preview mb-2" alt="Image preview" />
+                                <img src="@imageDataUrl" class="painting-preview mb-2" alt="Image preview"/>
                                 <div>
                                     <button type="button" class="btn btn-outline-danger" @onclick="ClearImage">
                                         <i class="bi bi-x-circle me-1"></i> Remove Image
@@ -320,7 +323,7 @@
     private async Task OnFileChange(InputFileChangeEventArgs e)
     {
         selectedFile = e.File;
-        
+
         try
         {
             var format = "image/jpeg";
@@ -388,6 +391,7 @@
             {
                 errorMessage += $" Details: {ex.Response}";
             }
+
             Logger.LogError(ex, "Error creating new painting");
         }
         catch (Exception ex)
@@ -400,5 +404,5 @@
             isSubmitting = false;
         }
     }
-    
+
 }

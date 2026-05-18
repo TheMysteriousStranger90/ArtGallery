@@ -44,7 +44,8 @@
             </div>
             <h4 class="mb-3">You haven't added any artists to your favorites yet</h4>
             <p class="text-muted mb-4">
-                Explore the artists directory and click the "Add to Favorites" button on artists whose work inspires you!
+                Explore the artists directory and click the "Add to Favorites" button on artists whose work inspires
+                you!
             </p>
             <a href="/artists" class="btn btn-primary">
                 <i class="bi bi-people me-2"></i>Browse Artists
@@ -66,7 +67,7 @@
                 {
                     <div class="col">
                         <div class="painting-card">
-                            <ArtistCard Artist="artist" OnArtistDeleted="RefreshFavorites" />
+                            <ArtistCard Artist="artist" OnArtistDeleted="RefreshFavorites"/>
                         </div>
                     </div>
                 }
@@ -121,4 +122,5 @@
     {
         await LoadFavorites();
     }
+
 }

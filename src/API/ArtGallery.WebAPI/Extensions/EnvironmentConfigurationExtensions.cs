@@ -24,7 +24,8 @@ public static class EnvironmentConfigurationExtensions
             possiblePaths.Add(Path.Combine(solutionLevelPath, envFileName));
             possiblePaths.Add(Path.Combine(AppContext.BaseDirectory, envFileName));
             possiblePaths.Add(envFileName);
-            Console.WriteLine($"Running in {environmentName ?? "Unknown (assuming Development)"}. Will check multiple locations for {envFileName}");
+            Console.WriteLine(
+                $"Running in {environmentName ?? "Unknown (assuming Development)"}. Will check multiple locations for {envFileName}");
         }
 
         bool fileLoaded = false;

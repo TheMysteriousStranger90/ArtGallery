@@ -126,11 +126,7 @@ app.Use(async (context, next) =>
         context.Response.StatusCode = 400;
         context.Response.ContentType = "application/json";
 
-        var errorResponse = new
-        {
-            errors = new[] { "Invalid JSON format in request body" },
-            details = ex.Message
-        };
+        var errorResponse = new { errors = new[] { "Invalid JSON format in request body" }, details = ex.Message };
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
         return;
@@ -143,11 +139,7 @@ app.Use(async (context, next) =>
         context.Response.StatusCode = 400;
         context.Response.ContentType = "application/json";
 
-        var errorResponse = new
-        {
-            errors = new[] { "Invalid request model" },
-            details = ex.Message
-        };
+        var errorResponse = new { errors = new[] { "Invalid request model" }, details = ex.Message };
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
         return;

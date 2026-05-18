@@ -34,7 +34,7 @@ services:
     networks:
       - art-gallery-network
     restart: unless-stopped
-  
+
   artgallery.clientapp:
     image: artgallery.clientapp
     build:
@@ -70,7 +70,7 @@ services:
       timeout: 3s
       retries: 20
       start_period: 30s
-  
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
     environment:
@@ -130,7 +130,7 @@ services:
     image: otel/opentelemetry-collector-contrib:0.91.0
     volumes:
       - ./src/API/ArtGallery.WebAPI/otelcol-contrib/otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    command: ["--config=/etc/otel-collector-config.yaml"]
+    command: [ "--config=/etc/otel-collector-config.yaml" ]
     ports:
       - "4317:4317"
       - "8889:8889"

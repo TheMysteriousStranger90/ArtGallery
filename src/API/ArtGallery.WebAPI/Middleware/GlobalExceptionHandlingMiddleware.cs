@@ -51,15 +51,8 @@ public class GlobalExceptionHandlingMiddleware
             response.StatusCode = StatusCodes.Status500InternalServerError;
 
             var errorResponse = _env.IsDevelopment()
-                ? new ErrorResponse
-                {
-                    Errors = new List<string> { ex.Message },
-                    StackTrace = ex.StackTrace
-                }
-                : new ErrorResponse
-                {
-                    Errors = new List<string> { "An unexpected error occurred" }
-                };
+                ? new ErrorResponse { Errors = new List<string> { ex.Message }, StackTrace = ex.StackTrace }
+                : new ErrorResponse { Errors = new List<string> { "An unexpected error occurred" } };
 
             await response.WriteAsJsonAsync(errorResponse);
         }

@@ -13,7 +13,8 @@ public class DeleteExhibitionCommandHandler : IRequestHandler<DeleteExhibitionCo
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<DeleteExhibitionCommandResponse> Handle(DeleteExhibitionCommand request, CancellationToken cancellationToken)
+    public async Task<DeleteExhibitionCommandResponse> Handle(DeleteExhibitionCommand request,
+        CancellationToken cancellationToken)
     {
         var response = new DeleteExhibitionCommandResponse();
 

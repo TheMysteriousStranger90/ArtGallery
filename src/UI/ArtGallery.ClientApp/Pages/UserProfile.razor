@@ -116,7 +116,7 @@
                                         <p>Favorite Paintings</p>
                                     </div>
                                 </div>
-                                
+
                                 <div class="stat-item">
                                     <div class="stat-icon">
                                         <i class="bi bi-person-heart"></i>
@@ -126,7 +126,7 @@
                                         <p>Favorite Artists</p>
                                     </div>
                                 </div>
-                                
+
                                 <div class="stat-item">
                                     <div class="stat-icon">
                                         <i class="bi bi-calendar-check"></i>
@@ -152,13 +152,14 @@
                                     @foreach (var role in user.Roles)
                                     {
                                         <div class="role-item">
-                                            <span class="badge @(role == "Administrator" ? "bg-danger" : "bg-secondary") me-2">
+                                            <span
+                                                class="badge @(role == "Administrator" ? "bg-danger" : "bg-secondary") me-2">
                                                 @role
                                             </span>
                                         </div>
                                     }
                                 </div>
-                                
+
                                 @if (user.Roles.Contains("Administrator"))
                                 {
                                     <div class="mt-3">
@@ -256,4 +257,5 @@
             errorMessage = "Cannot edit profile at this time. Please try again later.";
         }
     }
+
 }

@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ArtGallery.ClientApp.ViewModels;
 
-
 public class CreateArtistModel
 {
     [Required(ErrorMessage = "First name is required")]

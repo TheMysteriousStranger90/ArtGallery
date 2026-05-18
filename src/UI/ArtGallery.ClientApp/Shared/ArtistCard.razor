@@ -16,7 +16,7 @@
                  class="card-img-top"
                  alt="@Artist!.FullName"
                  loading="lazy"
-                 width="400" height="300" />
+                 width="400" height="300"/>
         }
         else
         {
@@ -44,7 +44,10 @@
         <p class="card-text small text-muted mb-1">
             <i class="bi bi-calendar3 me-1" aria-hidden="true"></i>
             @Artist.BirthDate.Value.Year
-            @if (Artist.DeathDate.HasValue) { <span> – @Artist.DeathDate.Value.Year</span> }
+            @if (Artist.DeathDate.HasValue)
+            {
+                <span> – @Artist.DeathDate.Value.Year</span>
+            }
         </p>
     }
 </div>
@@ -109,7 +112,7 @@
     protected override async Task OnInitializedAsync()
     {
         var state = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user  = state.User;
+        var user = state.User;
         _isAuthenticated = user.Identity?.IsAuthenticated ?? false;
         _isAdministrator = user.IsInRole("Administrator");
 
@@ -174,4 +177,5 @@
             _isDeleting = false;
         }
     }
+
 }

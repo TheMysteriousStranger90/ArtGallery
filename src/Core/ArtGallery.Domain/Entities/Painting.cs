@@ -21,7 +21,10 @@ public class Painting : BaseEntity
     public virtual Genre Genre { get; set; } = null!;
     public virtual Museum Museum { get; set; } = null!;
     public virtual ICollection<PaintingExhibition> Exhibitions { get; set; } = new List<PaintingExhibition>();
-    public virtual ICollection<UserFavoritePainting> UserFavoritePaintings { get; set; } = new List<UserFavoritePainting>();
+
+    public virtual ICollection<UserFavoritePainting> UserFavoritePaintings { get; set; } =
+        new List<UserFavoritePainting>();
+
     public virtual ICollection<PaintingTag> Tags { get; set; } = new List<PaintingTag>();
     public virtual ICollection<PaintingImage> PaintingImages { get; set; } = new List<PaintingImage>();
 }

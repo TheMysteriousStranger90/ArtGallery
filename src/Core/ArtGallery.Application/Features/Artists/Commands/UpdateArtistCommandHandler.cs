@@ -23,7 +23,8 @@ public class UpdateArtistCommandHandler : IRequestHandler<UpdateArtistCommand, U
         _imageService = imageService;
     }
 
-    public async Task<UpdateArtistCommandResponse> Handle(UpdateArtistCommand request, CancellationToken cancellationToken)
+    public async Task<UpdateArtistCommandResponse> Handle(UpdateArtistCommand request,
+        CancellationToken cancellationToken)
     {
         var response = new UpdateArtistCommandResponse();
 

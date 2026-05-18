@@ -140,6 +140,7 @@ public class ExhibitionsController : ControllerBase
                 {
                     problemDetails.Errors.Add("Validation", new[] { error });
                 }
+
                 return BadRequest(problemDetails);
             }
 
@@ -182,6 +183,7 @@ public class ExhibitionsController : ControllerBase
                 {
                     problemDetails.Errors.Add("Validation", new[] { error });
                 }
+
                 return BadRequest(problemDetails);
             }
 
@@ -244,11 +246,7 @@ public class ExhibitionsController : ControllerBase
     {
         _logger.LogInformation("Adding painting {PaintingId} to exhibition {ExhibitionId}", paintingId, exhibitionId);
 
-        var command = new AddPaintingToExhibitionCommand
-        {
-            ExhibitionId = exhibitionId,
-            PaintingId = paintingId
-        };
+        var command = new AddPaintingToExhibitionCommand { ExhibitionId = exhibitionId, PaintingId = paintingId };
 
         var response = await _mediator.Send(command);
 
@@ -284,13 +282,10 @@ public class ExhibitionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> RemovePaintingFromExhibition(Guid exhibitionId, Guid paintingId)
     {
-        _logger.LogInformation("Removing painting {PaintingId} from exhibition {ExhibitionId}", paintingId, exhibitionId);
+        _logger.LogInformation("Removing painting {PaintingId} from exhibition {ExhibitionId}", paintingId,
+            exhibitionId);
 
-        var command = new RemovePaintingFromExhibitionCommand
-        {
-            ExhibitionId = exhibitionId,
-            PaintingId = paintingId
-        };
+        var command = new RemovePaintingFromExhibitionCommand { ExhibitionId = exhibitionId, PaintingId = paintingId };
 
         var response = await _mediator.Send(command);
 

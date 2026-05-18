@@ -24,7 +24,7 @@ public class ToastService
     }
 
     public void Success(string message) => Show(message, ToastLevel.Success);
-    public void Error(string message)   => Show(message, ToastLevel.Error);
+    public void Error(string message) => Show(message, ToastLevel.Error);
     public void Warning(string message) => Show(message, ToastLevel.Warning);
 
     public void Dismiss(string id)

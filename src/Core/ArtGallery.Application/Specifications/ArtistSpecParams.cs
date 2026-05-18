@@ -6,6 +6,7 @@ public class ArtistSpecParams
     public int PageIndex { get; set; } = 1;
 
     private int _pageSize = 10;
+
     public int PageSize
     {
         get => _pageSize;
@@ -16,6 +17,7 @@ public class ArtistSpecParams
     public string? Nationality { get; set; }
 
     private string _search = "";
+
     public string Search
     {
         get => _search;

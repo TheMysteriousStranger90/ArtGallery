@@ -41,12 +41,13 @@ public class HealthCheckMonitorService : BackgroundService
 
                     var unhealthyChecks = result.Entries
                         .Where(e => e.Value.Status != HealthStatus.Healthy)
-                        .ToDictionary(e => e.Key, e => new
-                        {
-                            Status = e.Value.Status.ToString(),
-                            Description = e.Value.Description,
-                            Duration = e.Value.Duration
-                        });
+                        .ToDictionary(e => e.Key,
+                            e => new
+                            {
+                                Status = e.Value.Status.ToString(),
+                                Description = e.Value.Description,
+                                Duration = e.Value.Duration
+                            });
 
                     if (unhealthyChecks.Any())
                     {

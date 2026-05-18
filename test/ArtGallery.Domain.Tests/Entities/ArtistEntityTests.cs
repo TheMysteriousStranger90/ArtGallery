@@ -29,12 +29,7 @@ public class ArtistEntityTests
     [Fact]
     public void Artist_WithAssignedName_ReturnsCorrectValues()
     {
-        var artist = new Artist
-        {
-            FirstName = "Vincent",
-            LastName = "van Gogh",
-            Nationality = "Dutch"
-        };
+        var artist = new Artist { FirstName = "Vincent", LastName = "van Gogh", Nationality = "Dutch" };
 
         artist.FirstName.Should().Be("Vincent");
         artist.LastName.Should().Be("van Gogh");
@@ -49,10 +44,7 @@ public class ArtistEntityTests
 
         var artist = new Artist
         {
-            FirstName = "Vincent",
-            LastName = "van Gogh",
-            BirthDate = birthDate,
-            DeathDate = deathDate
+            FirstName = "Vincent", LastName = "van Gogh", BirthDate = birthDate, DeathDate = deathDate
         };
 
         artist.BirthDate.Should().Be(birthDate);

@@ -47,8 +47,8 @@ public class ArtistsController : ControllerBase
         [FromQuery] string sort = "lastName")
     {
         _logger.LogInformation("Getting artists list with pageIndex: {PageIndex}, pageSize: {PageSize}, " +
-                              "search: {Search}, nationality: {Nationality}, sort: {Sort}",
-                              pageIndex, pageSize, search, nationality, sort);
+                               "search: {Search}, nationality: {Nationality}, sort: {Sort}",
+            pageIndex, pageSize, search, nationality, sort);
 
         var query = new GetArtistsListQuery
         {
@@ -127,8 +127,7 @@ public class ArtistsController : ControllerBase
                 // Return validation errors
                 var problemDetails = new ValidationProblemDetails
                 {
-                    Title = "Validation errors occurred",
-                    Status = (int)HttpStatusCode.BadRequest
+                    Title = "Validation errors occurred", Status = (int)HttpStatusCode.BadRequest
                 };
 
                 foreach (var error in response.ValidationErrors)
@@ -181,8 +180,7 @@ public class ArtistsController : ControllerBase
             {
                 var problemDetails = new ValidationProblemDetails
                 {
-                    Title = "Validation errors occurred",
-                    Status = (int)HttpStatusCode.BadRequest
+                    Title = "Validation errors occurred", Status = (int)HttpStatusCode.BadRequest
                 };
 
                 foreach (var error in response.ValidationErrors)
@@ -248,11 +246,7 @@ public class ArtistsController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         _logger.LogInformation("Adding artist {ArtistId} to favorites for user {UserId}", artistId, userId);
 
-        var command = new AddArtistToFavoriteCommand
-        {
-            UserId = userId,
-            ArtistId = artistId
-        };
+        var command = new AddArtistToFavoriteCommand { UserId = userId, ArtistId = artistId };
 
         var result = await _mediator.Send(command);
 
@@ -261,11 +255,7 @@ public class ArtistsController : ControllerBase
             return BadRequest(new { message = result.Message });
         }
 
-        return Ok(new
-        {
-            isFavorite = result.IsFavorite,
-            message = result.Message
-        });
+        return Ok(new { isFavorite = result.IsFavorite, message = result.Message });
     }
 
 

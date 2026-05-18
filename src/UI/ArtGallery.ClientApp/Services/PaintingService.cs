@@ -36,10 +36,7 @@ public class PaintingService : IPaintingService
 
             return new Pagination_1OfOfPaintingDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
             {
-                Data = new List<PaintingDto>(),
-                Count = 0,
-                PageIndex = pageIndex,
-                PageSize = pageSize
+                Data = new List<PaintingDto>(), Count = 0, PageIndex = pageIndex, PageSize = pageSize
             };
         }
         catch (Exception ex)
@@ -47,10 +44,7 @@ public class PaintingService : IPaintingService
             _logger.LogError(ex, "Generic error fetching paintings.");
             return new Pagination_1OfOfPaintingDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
             {
-                Data = new List<PaintingDto>(),
-                Count = 0,
-                PageIndex = pageIndex,
-                PageSize = pageSize
+                Data = new List<PaintingDto>(), Count = 0, PageIndex = pageIndex, PageSize = pageSize
             };
         }
     }
@@ -201,7 +195,9 @@ public class PaintingService : IPaintingService
                 "API error fetching favorite paintings. Status: {StatusCode}, Response: {Response}", ex.StatusCode,
                 ex.Response);
             return new UserFavoritePaintingsResponse
-            { Success = false, Message = "API error occurred.", FavoritePaintings = new List<PaintingDto>() };
+            {
+                Success = false, Message = "API error occurred.", FavoritePaintings = new List<PaintingDto>()
+            };
         }
         catch (Exception ex)
         {

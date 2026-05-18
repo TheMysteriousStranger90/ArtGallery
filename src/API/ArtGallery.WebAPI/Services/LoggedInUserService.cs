@@ -13,10 +13,10 @@ public class LoggedInUserService : ILoggedInUserService
     }
 
     public string? UserId => _contextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier)
-                            ?? _contextAccessor.HttpContext?.User?.FindFirstValue("uid");
+                             ?? _contextAccessor.HttpContext?.User?.FindFirstValue("uid");
 
     public string? UserName => _contextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name)
-                              ?? _contextAccessor.HttpContext?.User?.Identity?.Name;
+                               ?? _contextAccessor.HttpContext?.User?.Identity?.Name;
 
     public string? Email => _contextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
 

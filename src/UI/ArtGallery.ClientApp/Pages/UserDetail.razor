@@ -100,7 +100,8 @@
                                             }
                                             else
                                             {
-                                                <span class="badge bg-warning"><i class="bi bi-exclamation-circle me-1"></i>Not Verified</span>
+                                                <span class="badge bg-warning"><i
+                                                        class="bi bi-exclamation-circle me-1"></i>Not Verified</span>
                                             }
                                         </p>
                                     </div>
@@ -125,7 +126,7 @@
                                         <p>Favorite Paintings</p>
                                     </div>
                                 </div>
-                                
+
                                 <div class="stat-item">
                                     <div class="stat-icon">
                                         <i class="bi bi-person-heart"></i>
@@ -135,7 +136,7 @@
                                         <p>Favorite Artists</p>
                                     </div>
                                 </div>
-                                
+
                                 <div class="stat-item">
                                     <div class="stat-icon">
                                         <i class="bi bi-calendar-check"></i>
@@ -161,12 +162,14 @@
                                     @foreach (var role in user.Roles)
                                     {
                                         <div class="role-item">
-                                            <span class="badge @(role == "Administrator" ? "bg-danger" : "bg-secondary") me-2">
+                                            <span
+                                                class="badge @(role == "Administrator" ? "bg-danger" : "bg-secondary") me-2">
                                                 @role
                                             </span>
                                             @if (role != "Administrator" || user.Roles.Count > 1)
                                             {
-                                                <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveRole(role)">
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                        @onclick="() => RemoveRole(role)">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             }
@@ -218,7 +221,7 @@
                                         <div class="favorite-item painting-item">
                                             <a href="/paintings/@painting.Id" class="favorite-link">
                                                 <div class="favorite-image">
-                                                    <img src="@painting.ImageUrl" alt="@painting.Title" />
+                                                    <img src="@painting.ImageUrl" alt="@painting.Title"/>
                                                 </div>
                                                 <div class="favorite-info">
                                                     <h5 class="favorite-title">@painting.Title</h5>

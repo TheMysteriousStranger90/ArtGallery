@@ -17,7 +17,7 @@
                  class="card-img-top"
                  alt="@Painting!.Title"
                  loading="lazy"
-                 width="400" height="300" />
+                 width="400" height="300"/>
         }
         else
         {
@@ -111,7 +111,7 @@
     protected override async Task OnInitializedAsync()
     {
         var state = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user  = state.User;
+        var user = state.User;
         _isAuthenticated = user.Identity?.IsAuthenticated ?? false;
         _isAdministrator = user.IsInRole("Administrator");
 
@@ -176,4 +176,5 @@
             _isDeleting = false;
         }
     }
+
 }

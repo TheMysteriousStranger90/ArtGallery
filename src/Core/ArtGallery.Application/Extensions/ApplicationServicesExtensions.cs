@@ -11,7 +11,6 @@ public static class ApplicationServicesExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services,
         IConfiguration config)
     {
-
         services.AddAutoMapper(cfg => cfg.AddProfile<ArtistMappingProfile>());
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 
