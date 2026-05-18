@@ -4,7 +4,9 @@ using MediatR;
 
 namespace ArtGallery.Application.Features.Exhibitions.Commands;
 
-public class RemovePaintingFromExhibitionCommandHandler : IRequestHandler<RemovePaintingFromExhibitionCommand, ManagePaintingCommandResponse>
+public class
+    RemovePaintingFromExhibitionCommandHandler : IRequestHandler<RemovePaintingFromExhibitionCommand,
+    ManagePaintingCommandResponse>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -13,7 +15,8 @@ public class RemovePaintingFromExhibitionCommandHandler : IRequestHandler<Remove
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
-    public async Task<ManagePaintingCommandResponse> Handle(RemovePaintingFromExhibitionCommand request, CancellationToken cancellationToken)
+    public async Task<ManagePaintingCommandResponse> Handle(RemovePaintingFromExhibitionCommand request,
+        CancellationToken cancellationToken)
     {
         var response = new ManagePaintingCommandResponse();
 
@@ -46,7 +49,8 @@ public class RemovePaintingFromExhibitionCommandHandler : IRequestHandler<Remove
             if (existingRelation == null)
             {
                 response.Success = false;
-                response.Message = $"Painting with ID {request.PaintingId} is not part of exhibition with ID {request.ExhibitionId}";
+                response.Message =
+                    $"Painting with ID {request.PaintingId} is not part of exhibition with ID {request.ExhibitionId}";
                 return response;
             }
 
@@ -57,7 +61,8 @@ public class RemovePaintingFromExhibitionCommandHandler : IRequestHandler<Remove
             });
 
             response.Success = true;
-            response.Message = $"Painting '{painting.Title}' was successfully removed from exhibition '{exhibition.Title}'.";
+            response.Message =
+                $"Painting '{painting.Title}' was successfully removed from exhibition '{exhibition.Title}'.";
         }
         catch (Exception ex)
         {

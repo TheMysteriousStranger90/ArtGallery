@@ -43,7 +43,8 @@
                         }
                         else
                         {
-                            <div class="card-img-placeholder d-flex flex-column align-items-center justify-content-center">
+                            <div
+                                class="card-img-placeholder d-flex flex-column align-items-center justify-content-center">
                                 <i class="bi bi-person-circle text-muted"></i>
                                 <small>No Image Available</small>
                             </div>
@@ -54,7 +55,8 @@
                             <div class="painting-image-thumbnails mt-3">
                                 @foreach (var image in artist.Images)
                                 {
-                                    <div class="thumbnail @(image.IsMain ? "active" : "")" @onclick="() => SwitchMainImage(image.PictureUrl)">
+                                    <div class="thumbnail @(image.IsMain ? "active" : "")"
+                                         @onclick="() => SwitchMainImage(image.PictureUrl)">
                                         <img src="@image.PictureUrl" alt="@artist.FullName"/>
                                     </div>
                                 }
@@ -96,15 +98,19 @@
                                 <div class="actions mt-3">
                                     @if (isAuthenticated)
                                     {
-                                        <button class="btn @(isFavoriteProcessing ? "btn-outline-secondary disabled" : "btn-outline-primary") favorite-btn w-100"
-                                                @onclick="AddToFavorites" disabled="@(isFavoriteProcessing || isAddedToFavorites)">
+                                        <button
+                                            class="btn @(isFavoriteProcessing ? "btn-outline-secondary disabled" : "btn-outline-primary") favorite-btn w-100"
+                                            @onclick="AddToFavorites"
+                                            disabled="@(isFavoriteProcessing || isAddedToFavorites)">
                                             @if (isFavoriteProcessing)
                                             {
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                <span class="spinner-border spinner-border-sm" role="status"
+                                                      aria-hidden="true"></span>
                                             }
                                             else
                                             {
-                                                <i class="bi bi-heart@(isAddedToFavorites ? "-fill" : "") heart-icon @(isAddedToFavorites ? "heart-filled" : "")" aria-hidden="true"></i>
+                                                <i class="bi bi-heart@(isAddedToFavorites ? "-fill" : "") heart-icon @(isAddedToFavorites ? "heart-filled" : "")"
+                                                   aria-hidden="true"></i>
                                             }
                                             @(isAddedToFavorites ? "Added to Favorites" : "Add to Favorites")
                                         </button>
@@ -156,12 +162,14 @@
                                                     @if (!string.IsNullOrEmpty(painting.ImageUrl))
                                                     {
                                                         <a href="/paintings/@painting.Id">
-                                                            <img src="@painting.ImageUrl" class="card-img-top" alt="@painting.Title">
+                                                            <img src="@painting.ImageUrl" class="card-img-top"
+                                                                 alt="@painting.Title">
                                                         </a>
                                                     }
                                                     else
                                                     {
-                                                        <div class="card-img-placeholder d-flex flex-column align-items-center justify-content-center">
+                                                        <div
+                                                            class="card-img-placeholder d-flex flex-column align-items-center justify-content-center">
                                                             <i class="bi bi-image text-muted"></i>
                                                             <small>No Image Available</small>
                                                         </div>
@@ -248,50 +256,50 @@
         border: 1px solid var(--border-color) !important;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
     }
-    
+
     .artist-info-card .card-title {
         color: var(--brand-secondary) !important;
         font-weight: 500 !important;
     }
-    
+
     .artist-info-card .card-body {
         background-color: var(--bg-dark-card) !important;
         color: var(--text-light) !important;
     }
-    
+
     .section-title {
         color: var(--brand-secondary) !important;
         font-size: 1.75rem !important;
         margin-bottom: 1.5rem !important;
         font-weight: 300 !important;
     }
-    
+
     .info-row {
         display: flex !important;
         align-items: flex-start !important;
         color: var(--text-light) !important;
     }
-    
+
     .info-row i {
         color: var(--brand-secondary) !important;
         width: 20px !important;
         text-align: center !important;
     }
-    
+
     .info-row .fw-bold {
         margin-right: 0.5rem !important;
         color: var(--brand-secondary) !important;
     }
-    
+
     .text-muted {
         color: #B0BEC5 !important;
     }
-    
+
     .painting-card .card-body {
         background-color: var(--bg-dark-card) !important;
         color: var(--text-light) !important;
     }
-    
+
     .painting-card .card-text {
         color: var(--text-light) !important;
     }
@@ -417,4 +425,5 @@
             StateHasChanged();
         }
     }
+
 }

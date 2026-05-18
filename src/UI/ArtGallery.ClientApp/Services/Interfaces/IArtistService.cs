@@ -35,4 +35,6 @@ public interface IArtistService
     Task<bool> AddArtistToFavoritesAsync(Guid artistId, string apiVersion = Const.DefaultApiVersion);
 
     Task<UserFavoriteArtistsResponse> GetFavoriteArtistsAsync(string apiVersion = Const.DefaultApiVersion);
+    Task<bool> RemoveArtistFromFavoritesAsync(Guid artistId, string apiVersion = Const.DefaultApiVersion);
 }
+

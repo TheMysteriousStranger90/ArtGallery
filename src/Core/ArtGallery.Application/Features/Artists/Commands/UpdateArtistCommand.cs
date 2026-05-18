@@ -8,8 +8,8 @@ public class UpdateArtistCommand : IRequest<UpdateArtistCommandResponse>
     public Guid Id { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
-    public DateTime? BirthDate { get; set; }
-    public DateTime? DeathDate { get; set; }
+    public DateTimeOffset? BirthDate { get; set; }
+    public DateTimeOffset? DeathDate { get; set; }
     public string? Nationality { get; set; }
     public IFormFile? Image { get; set; }
     public bool KeepExistingImage { get; set; } = true;

@@ -245,7 +245,8 @@ public class PaintingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<PaintingDto>> UpdatePainting(Guid paintingId, [FromForm] UpdatePaintingCommand command)
+    public async Task<ActionResult<PaintingDto>> UpdatePainting(Guid paintingId,
+        [FromForm] UpdatePaintingCommand command)
     {
         if (paintingId != command.Id)
         {
@@ -263,10 +264,8 @@ public class PaintingsController : ControllerBase
             if (response.ValidationErrors?.Count > 0)
             {
                 var problemDetails = new ValidationProblemDetails();
-                foreach (var error in response.ValidationErrors)
-                {
-                    problemDetails.Errors.Add("Validation", new[] { error });
-                }
+
+                problemDetails.Errors.Add("Validation", response.ValidationErrors.ToArray());
 
                 return BadRequest(problemDetails);
             }
@@ -342,11 +341,7 @@ public class PaintingsController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         _logger.LogInformation("Adding painting {PaintingId} to favorites for user {UserId}", paintingId, userId);
 
-        var command = new AddPaintingToFavoriteCommand
-        {
-            UserId = userId,
-            PaintingId = paintingId
-        };
+        var command = new AddPaintingToFavoriteCommand { UserId = userId, PaintingId = paintingId };
 
         var result = await _mediator.Send(command);
 
@@ -355,11 +350,7 @@ public class PaintingsController : ControllerBase
             return BadRequest(new { message = result.Message });
         }
 
-        return Ok(new
-        {
-            isFavorite = result.IsFavorite,
-            message = result.Message
-        });
+        return Ok(new { isFavorite = result.IsFavorite, message = result.Message });
     }
 
 
@@ -380,6 +371,31 @@ public class PaintingsController : ControllerBase
 
         return Ok(result);
     }
+    /// <summary>
+    /// Remove a painting from the current user's favorites
+    /// </summary>
+    /// <param name="paintingId">ID of the painting to remove from favorites</param>
+    [HttpDelete("paintings/{paintingId}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> RemovePaintingFromFavorites(Guid paintingId)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        _logger.LogInformation("Removing painting {PaintingId} from favorites for user {UserId}", paintingId, userId);
+
+        var command = new RemovePaintingFromFavoriteCommand { UserId = userId, PaintingId = paintingId };
+        var result = await _mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(new { message = result.Message });
+        }
+
+        return Ok(new { message = result.Message });
+    }
+
 
     /// <summary>
     /// Invalidates all paintings-related cache entries
@@ -397,3 +413,4 @@ public class PaintingsController : ControllerBase
         _logger.LogInformation("Invalidated {Count} painting cache entries", keysToRemove.Count());
     }
 }
+

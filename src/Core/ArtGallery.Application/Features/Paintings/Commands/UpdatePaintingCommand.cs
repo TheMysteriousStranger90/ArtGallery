@@ -7,8 +7,7 @@ namespace ArtGallery.Application.Features.Paintings.Commands;
 
 public class UpdatePaintingCommand : IRequest<UpdatePaintingCommandResponse>
 {
-    [JsonIgnore]
-    public Guid Id { get; set; }
+    [JsonIgnore] public Guid Id { get; set; }
     public string? Title { get; set; }
     public string? Description { get; set; }
     public int CreationYear { get; set; }

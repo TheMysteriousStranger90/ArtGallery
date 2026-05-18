@@ -9,5 +9,7 @@
     &lt;/TestAncestor&gt;&#xD;
     &lt;ProjectFile&gt;8763266E-65A0-4BA9-93A7-538BD142BA95/f:PaintingsControllerTests.cs&lt;/ProjectFile&gt;&#xD;
     &lt;ProjectFile&gt;8763266E-65A0-4BA9-93A7-538BD142BA95/f:ExhibitionsControllerTests.cs&lt;/ProjectFile&gt;&#xD;
+    &lt;Project Location="D:\MyProjects\ArtGallery\test\ArtGallery.Application.Tests" Presentation="&amp;lt;test&amp;gt;\&amp;lt;ArtGallery.Application.Tests&amp;gt;" /&gt;&#xD;
+    &lt;Project Location="D:\MyProjects\ArtGallery\test\ArtGallery.Domain.Tests" Presentation="&amp;lt;test&amp;gt;\&amp;lt;ArtGallery.Domain.Tests&amp;gt;" /&gt;&#xD;
   &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

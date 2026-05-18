@@ -92,99 +92,100 @@
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead class="table-dark">
-                        <tr>
-                            <th>User</th>
-                            <th>Email</th>
-                            <th>Roles</th>
-                            <th>Favorite Paintings</th>
-                            <th>Favorite Artists</th>
-                            <th>Last Login</th>
-                            <th>Actions</th>
-                        </tr>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Favorite Paintings</th>
+                        <th>Favorite Artists</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        @foreach (var user in users.OrderBy(u => u.LastName).ThenBy(u => u.FirstName))
-                        {
-                            <tr>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">
-                                            <i class="bi bi-person-circle text-muted"></i>
-                                        </div>
-                                        <div class="user-details">
-                                            <div class="user-name">@user.FirstName @user.LastName</div>
-                                            <small class="text-muted">ID: @user.Id</small>
-                                        </div>
+                    @foreach (var user in users.OrderBy(u => u.LastName).ThenBy(u => u.FirstName))
+                    {
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        <i class="bi bi-person-circle text-muted"></i>
                                     </div>
-                                </td>
-                                <td>
-                                    <span class="user-email">@user.Email</span>
-                                </td>
-                                <td>
-                                    <div class="user-roles">
-                                        @if (user.Roles?.Any() == true)
+                                    <div class="user-details">
+                                        <div class="user-name">@user.FirstName @user.LastName</div>
+                                        <small class="text-muted">ID: @user.Id</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="user-email">@user.Email</span>
+                            </td>
+                            <td>
+                                <div class="user-roles">
+                                    @if (user.Roles?.Any() == true)
+                                    {
+                                        @foreach (var role in user.Roles)
                                         {
-                                            @foreach (var role in user.Roles)
-                                            {
-                                                <span class="badge @(role == "Administrator" ? "bg-danger" : "bg-secondary") me-1">
+                                            <span
+                                                class="badge @(role == "Administrator" ? "bg-danger" : "bg-secondary") me-1">
                                                     @role
                                                 </span>
-                                            }
                                         }
-                                        else
-                                        {
-                                            <span class="text-muted">No roles</span>
-                                        }
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="favorites-count">
-                                        <i class="bi bi-image-fill text-primary me-1"></i>
-                                        <span class="badge bg-primary">@user.FavoritePaintingsCount</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="favorites-count">
-                                        <i class="bi bi-person-heart text-success me-1"></i>
-                                        <span class="badge bg-success">@user.FavoriteArtistsCount</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    @if (user.LastActive.HasValue)
-                                    {
-                                        <span class="last-login">@user.LastActive.Value.ToString("MMM dd, yyyy")</span>
-                                        <br />
-                                        <small class="text-muted">@user.LastActive.Value.ToString("HH:mm")</small>
                                     }
                                     else
                                     {
-                                        <span class="text-muted">Never</span>
+                                        <span class="text-muted">No roles</span>
                                     }
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <button class="btn btn-outline-primary" 
-                                                @onclick="() => ViewUserDetails(user.Id)" 
-                                                title="View Details">
-                                            <i class="bi bi-eye"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="favorites-count">
+                                    <i class="bi bi-image-fill text-primary me-1"></i>
+                                    <span class="badge bg-primary">@user.FavoritePaintingsCount</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="favorites-count">
+                                    <i class="bi bi-person-heart text-success me-1"></i>
+                                    <span class="badge bg-success">@user.FavoriteArtistsCount</span>
+                                </div>
+                            </td>
+                            <td>
+                                @if (user.LastActive.HasValue)
+                                {
+                                    <span class="last-login">@user.LastActive.Value.ToString("MMM dd, yyyy")</span>
+                                    <br/>
+                                    <small class="text-muted">@user.LastActive.Value.ToString("HH:mm")</small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Never</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-primary"
+                                            @onclick="() => ViewUserDetails(user.Id)"
+                                            title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-warning"
+                                            @onclick="() => EditUser(user.Id)"
+                                            title="Edit User">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    @if (!user.Roles?.Contains("Administrator") == true)
+                                    {
+                                        <button class="btn btn-outline-success"
+                                                @onclick="() => PromoteToAdmin(user.Id)"
+                                                title="Make Administrator">
+                                            <i class="bi bi-shield-plus"></i>
                                         </button>
-                                        <button class="btn btn-outline-warning" 
-                                                @onclick="() => EditUser(user.Id)" 
-                                                title="Edit User">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        @if (!user.Roles?.Contains("Administrator") == true)
-                                        {
-                                            <button class="btn btn-outline-success" 
-                                                    @onclick="() => PromoteToAdmin(user.Id)" 
-                                                    title="Make Administrator">
-                                                <i class="bi bi-shield-plus"></i>
-                                            </button>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
                     </tbody>
                 </table>
             </div>
@@ -224,7 +225,7 @@
         try
         {
             users = await UsersService.GetAllUsersAsync();
-            
+
             if (users == null)
             {
                 errorMessage = "Failed to load users. Please try again later.";
@@ -266,7 +267,7 @@
         {
             var request = new AssignRoleRequest { RoleName = "Administrator" };
             var success = await UsersService.AssignRoleToUserAsync(userId, request);
-            
+
             if (success)
             {
                 Logger.LogInformation("Successfully promoted user {UserId} to Administrator", userId);
@@ -284,4 +285,5 @@
             errorMessage = "An error occurred while promoting the user.";
         }
     }
+
 }

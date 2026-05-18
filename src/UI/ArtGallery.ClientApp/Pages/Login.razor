@@ -25,19 +25,25 @@
                         <!-- Alert Messages -->
                         @if (!string.IsNullOrEmpty(loginViewModel.ErrorMessage))
                         {
-                            <div class="alert alert-danger alert-dismissible fade show animate__animated animate__shakeX" role="alert">
+                            <div
+                                class="alert alert-danger alert-dismissible fade show animate__animated animate__shakeX"
+                                role="alert">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
                                 @loginViewModel.ErrorMessage
-                                <button type="button" class="btn-close" @onclick="() => loginViewModel.ErrorMessage = string.Empty"></button>
+                                <button type="button" class="btn-close"
+                                        @onclick="() => loginViewModel.ErrorMessage = string.Empty"></button>
                             </div>
                         }
 
                         @if (!string.IsNullOrEmpty(loginViewModel.SuccessMessage))
                         {
-                            <div class="alert alert-success alert-dismissible fade show animate__animated animate__fadeInDown" role="alert">
+                            <div
+                                class="alert alert-success alert-dismissible fade show animate__animated animate__fadeInDown"
+                                role="alert">
                                 <i class="fas fa-check-circle me-2"></i>
                                 @loginViewModel.SuccessMessage
-                                <button type="button" class="btn-close" @onclick="() => loginViewModel.SuccessMessage = string.Empty"></button>
+                                <button type="button" class="btn-close"
+                                        @onclick="() => loginViewModel.SuccessMessage = string.Empty"></button>
                             </div>
                         }
 
@@ -151,7 +157,8 @@
                             <div class="mt-3 text-center">
                                 <small class="text-warning">
                                     <i class="fas fa-exclamation-triangle me-1"></i>
-                                    @loginViewModel.LoginAttempts failed attempt@(loginViewModel.LoginAttempts > 1 ? "s" : "")
+                                    @loginViewModel.LoginAttempts failed
+                                    attempt@(loginViewModel.LoginAttempts > 1 ? "s" : "")
                                     (@(5 - loginViewModel.LoginAttempts) remaining)
                                 </small>
                             </div>

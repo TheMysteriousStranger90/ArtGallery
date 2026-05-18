@@ -30,21 +30,25 @@ public static class TlsCertificateExtensions
 
         if (!string.IsNullOrEmpty(certificateEnvVarPath))
         {
-            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", certificateEnvVarPath));
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..",
+                certificateEnvVarPath));
         }
 
         return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "certificates"));
     }
 
-    private static TlsCertificateLoader.TlsCertificateLoader? LoadCertificates(string certificatePath, WebApplicationBuilder builder)
+    private static TlsCertificateLoader.TlsCertificateLoader? LoadCertificates(string certificatePath,
+        WebApplicationBuilder builder)
     {
         var fullChainPath = Path.Combine(certificatePath, "fullchain.pem");
         var privateKeyPath = Path.Combine(certificatePath, "privkey.pem");
 
         Console.WriteLine($"Effective certificate path: {certificatePath}");
         Console.WriteLine($"Checking for certificate files:");
-        Console.WriteLine($"  - fullchain.pem: {(File.Exists(fullChainPath) ? "FOUND" : "NOT FOUND")} at {fullChainPath}");
-        Console.WriteLine($"  - privkey.pem: {(File.Exists(privateKeyPath) ? "FOUND" : "NOT FOUND")} at {privateKeyPath}");
+        Console.WriteLine(
+            $"  - fullchain.pem: {(File.Exists(fullChainPath) ? "FOUND" : "NOT FOUND")} at {fullChainPath}");
+        Console.WriteLine(
+            $"  - privkey.pem: {(File.Exists(privateKeyPath) ? "FOUND" : "NOT FOUND")} at {privateKeyPath}");
 
         if (File.Exists(fullChainPath) && File.Exists(privateKeyPath))
         {
@@ -75,11 +79,13 @@ public static class TlsCertificateExtensions
         return null;
     }
 
-    private static void ConfigureKestrelWithDiagnostics(WebApplicationBuilder builder, TlsCertificateLoader.TlsCertificateLoader? tlsCertificateLoader)
+    private static void ConfigureKestrelWithDiagnostics(WebApplicationBuilder builder,
+        TlsCertificateLoader.TlsCertificateLoader? tlsCertificateLoader)
     {
         if (builder.Environment.IsDevelopment() && tlsCertificateLoader == null)
         {
-            Console.WriteLine("🔧 Development mode: using ASP.NET Core dev certificate (run 'dotnet dev-certs https --trust' if not trusted)");
+            Console.WriteLine(
+                "🔧 Development mode: using ASP.NET Core dev certificate (run 'dotnet dev-certs https --trust' if not trusted)");
             return;
         }
 
@@ -118,7 +124,8 @@ public static class TlsCertificateExtensions
 
                     Console.WriteLine($"✅ HTTPS endpoint configured: https://localhost:{httpsPort}");
                     Console.WriteLine($"✅ Try accessing: https://localhost:{httpsPort}/docs/index.html");
-                    Console.WriteLine($"⚠️  If browser shows security warning, click 'Advanced' -> 'Proceed to localhost (unsafe)'");
+                    Console.WriteLine(
+                        $"⚠️  If browser shows security warning, click 'Advanced' -> 'Proceed to localhost (unsafe)'");
                 }
                 catch (Exception ex)
                 {
@@ -133,7 +140,8 @@ public static class TlsCertificateExtensions
         });
     }
 
-    private static void ConfigureCertificateWatcher(string certificatePath, TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader)
+    private static void ConfigureCertificateWatcher(string certificatePath,
+        TlsCertificateLoader.TlsCertificateLoader tlsCertificateLoader)
     {
         try
         {
@@ -145,9 +153,7 @@ public static class TlsCertificateExtensions
 
             var certificateWatcher = new FileSystemWatcher(certificatePath)
             {
-                NotifyFilter = NotifyFilters.LastWrite,
-                Filter = "*.pem",
-                EnableRaisingEvents = true
+                NotifyFilter = NotifyFilters.LastWrite, Filter = "*.pem", EnableRaisingEvents = true
             };
 
             certificateWatcher.Changed += (sender, e) =>

@@ -44,7 +44,8 @@ public class AssignRoleCommandHandler : IRequestHandler<AssignRoleCommand, Assig
             response.Message = $"Role '{request.RoleName}' assigned successfully";
             response.Roles = updatedRoles;
 
-            _logger.LogInformation("Role {RoleName} assigned successfully to user {UserId}", request.RoleName, request.UserId);
+            _logger.LogInformation("Role {RoleName} assigned successfully to user {UserId}", request.RoleName,
+                request.UserId);
         }
         catch (Exception ex)
         {

@@ -126,10 +126,7 @@ public class GetArtistsListQueryHandlerTests
     public async Task Handle_MapsArtistsToDto_UsingMapper()
     {
         // Arrange
-        var artists = new List<Artist>
-        {
-            new() { Id = Guid.NewGuid(), FirstName = "Claude", LastName = "Monet" }
-        };
+        var artists = new List<Artist> { new() { Id = Guid.NewGuid(), FirstName = "Claude", LastName = "Monet" } };
         var expectedDto = new ArtistDto { FirstName = "Claude", LastName = "Monet" };
 
         _mockArtistRepo.Setup(x => x.ListAsync(It.IsAny<ISpecification<Artist>>()))

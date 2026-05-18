@@ -3,6 +3,7 @@ using ArtGallery.Application.Contracts.Infrastructure;
 using ArtGallery.Application.DTOs;
 using ArtGallery.Domain.Entities;
 using AutoMapper;
+using CloudinaryDotNet.Actions;
 using MediatR;
 
 namespace ArtGallery.Application.Features.Artists.Commands;
@@ -23,7 +24,8 @@ public class UpdateArtistCommandHandler : IRequestHandler<UpdateArtistCommand, U
         _imageService = imageService;
     }
 
-    public async Task<UpdateArtistCommandResponse> Handle(UpdateArtistCommand request, CancellationToken cancellationToken)
+    public async Task<UpdateArtistCommandResponse> Handle(UpdateArtistCommand request,
+        CancellationToken cancellationToken)
     {
         var response = new UpdateArtistCommandResponse();
 
@@ -39,28 +41,31 @@ public class UpdateArtistCommandHandler : IRequestHandler<UpdateArtistCommand, U
 
         try
         {
+            var artistToUpdate = await _unitOfWork.ArtistRepository.GetArtistWithPaintingsAsync(request.Id);
+
+            if (artistToUpdate == null)
+            {
+                throw new Exception(nameof(Artist));
+            }
+
+            var existingMainImage = await _unitOfWork.Repository<ArtistImage>()
+                .GetByConditionAsync(ai => ai.ArtistId == request.Id && ai.IsMain);
+
+            ImageUploadResult? imageUploadResult = null;
+            if (request.Image != null)
+            {
+                imageUploadResult = await _imageService.AddImageAsync(request.Image);
+
+                if (imageUploadResult.Error != null)
+                {
+                    throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
+                }
+            }
+
             await _unitOfWork.ExecuteWithTransactionAsync(async () =>
             {
-                //var artistToUpdate = await _unitOfWork.Repository<Artist>().GetByIdAsync(request.Id);
-                var artistToUpdate = await _unitOfWork.ArtistRepository.GetArtistWithPaintingsAsync(request.Id);
-
-                if (artistToUpdate == null)
+                if (request.Image != null && imageUploadResult != null)
                 {
-                    throw new Exception(nameof(Artist));
-                }
-
-                var existingMainImage = await _unitOfWork.Repository<ArtistImage>()
-                    .GetByConditionAsync(ai => ai.ArtistId == request.Id && ai.IsMain);
-
-                if (request.Image != null)
-                {
-                    var imageUploadResult = await _imageService.AddImageAsync(request.Image);
-
-                    if (imageUploadResult.Error != null)
-                    {
-                        throw new Exception($"Image upload failed: {imageUploadResult.Error.Message}");
-                    }
-
                     if (existingMainImage != null)
                     {
                         if (!string.IsNullOrEmpty(existingMainImage.PublicId))
@@ -97,8 +102,8 @@ public class UpdateArtistCommandHandler : IRequestHandler<UpdateArtistCommand, U
 
                 artistToUpdate.FirstName = request.FirstName!;
                 artistToUpdate.LastName = request.LastName!;
-                artistToUpdate.BirthDate = request.BirthDate;
-                artistToUpdate.DeathDate = request.DeathDate;
+                artistToUpdate.BirthDate = request.BirthDate?.DateTime;
+                artistToUpdate.DeathDate = request.DeathDate?.DateTime;
                 artistToUpdate.Nationality = request.Nationality!;
 
                 await _unitOfWork.ArtistRepository.UpdateAsync(artistToUpdate);

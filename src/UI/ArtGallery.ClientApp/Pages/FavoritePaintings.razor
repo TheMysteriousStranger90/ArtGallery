@@ -66,7 +66,7 @@
                 {
                     <div class="col">
                         <div class="painting-card">
-                            <PaintingCard Painting="painting" OnPaintingDeleted="RefreshFavorites" />
+                            <PaintingCard Painting="painting" OnPaintingDeleted="RefreshFavorites" OnRemoveFavorite="RemoveFromFavorites"/>
                         </div>
                     </div>
                 }
@@ -93,7 +93,7 @@
         try
         {
             favorites = await PaintingService.GetFavoritePaintingsAsync();
-            
+
             if (!favorites.Success)
             {
                 errorMessage = favorites.Message ?? "Failed to load your favorite paintings. Please try again later.";
@@ -102,7 +102,7 @@
         }
         catch (ApiException ex)
         {
-            Logger.LogError(ex, "API Error getting favorite paintings. Status: {StatusCode}, Response: {Response}", 
+            Logger.LogError(ex, "API Error getting favorite paintings. Status: {StatusCode}, Response: {Response}",
                 ex.StatusCode, ex.Response);
             errorMessage = $"Error retrieving your favorites: {ex.Message}";
         }
@@ -121,4 +121,10 @@
     {
         await LoadFavorites();
     }
+
+    private async Task RemoveFromFavorites(Guid paintingId)
+    {
+        await LoadFavorites();
+    }
+
 }

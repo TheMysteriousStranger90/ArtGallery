@@ -178,9 +178,7 @@ namespace ArtGallery.WebAPI.Tests
             var exhibitionId = Guid.NewGuid();
             var expectedExhibition = new ExhibitionDetailDto
             {
-                Id = exhibitionId,
-                Title = "Test Exhibition",
-                Description = "Exhibition Description"
+                Id = exhibitionId, Title = "Test Exhibition", Description = "Exhibition Description"
             };
 
             _mockMediator
@@ -235,9 +233,7 @@ namespace ArtGallery.WebAPI.Tests
                 Success = true,
                 Exhibition = new ExhibitionDto
                 {
-                    Id = exhibitionId,
-                    Title = "New Exhibition",
-                    Description = "New Exhibition Description"
+                    Id = exhibitionId, Title = "New Exhibition", Description = "New Exhibition Description"
                 }
             };
 
@@ -286,15 +282,11 @@ namespace ArtGallery.WebAPI.Tests
         public async Task CreateExhibition_ThrowsBadRequestException_WhenCommandFails()
         {
             // Arrange
-            var command = new CreateExhibitionCommand
-            {
-                Title = "New Exhibition"
-            };
+            var command = new CreateExhibitionCommand { Title = "New Exhibition" };
 
             var response = new CreateExhibitionCommandResponse
             {
-                Success = false,
-                Message = "Failed due to database constraint"
+                Success = false, Message = "Failed due to database constraint"
             };
 
             _mockMediator
@@ -316,9 +308,7 @@ namespace ArtGallery.WebAPI.Tests
             var exhibitionId = Guid.NewGuid();
             var command = new UpdateExhibitionCommand
             {
-                Id = exhibitionId,
-                Title = "Updated Exhibition",
-                Description = "Updated Description"
+                Id = exhibitionId, Title = "Updated Exhibition", Description = "Updated Description"
             };
 
             var response = new UpdateExhibitionCommandResponse
@@ -326,9 +316,7 @@ namespace ArtGallery.WebAPI.Tests
                 Success = true,
                 Exhibition = new ExhibitionDto
                 {
-                    Id = exhibitionId,
-                    Title = "Updated Exhibition",
-                    Description = "Updated Description"
+                    Id = exhibitionId, Title = "Updated Exhibition", Description = "Updated Description"
                 }
             };
 
@@ -352,11 +340,7 @@ namespace ArtGallery.WebAPI.Tests
             // Arrange
             var exhibitionId = Guid.NewGuid();
             var differentId = Guid.NewGuid();
-            var command = new UpdateExhibitionCommand
-            {
-                Id = differentId,
-                Title = "Updated Exhibition"
-            };
+            var command = new UpdateExhibitionCommand { Id = differentId, Title = "Updated Exhibition" };
 
             // Act
             var result = await _controller.UpdateExhibition(exhibitionId, command);
@@ -370,16 +354,11 @@ namespace ArtGallery.WebAPI.Tests
         {
             // Arrange
             var exhibitionId = Guid.NewGuid();
-            var command = new UpdateExhibitionCommand
-            {
-                Id = exhibitionId,
-                Title = "Updated Exhibition"
-            };
+            var command = new UpdateExhibitionCommand { Id = exhibitionId, Title = "Updated Exhibition" };
 
             var response = new UpdateExhibitionCommandResponse
             {
-                Success = false,
-                Message = $"{nameof(Exhibition)} not found"
+                Success = false, Message = $"{nameof(Exhibition)} not found"
             };
 
             _mockMediator
@@ -401,8 +380,7 @@ namespace ArtGallery.WebAPI.Tests
             var exhibitionId = Guid.NewGuid();
             var response = new DeleteExhibitionCommandResponse
             {
-                Success = true,
-                Message = "Exhibition deleted successfully"
+                Success = true, Message = "Exhibition deleted successfully"
             };
 
             _mockMediator
@@ -429,8 +407,7 @@ namespace ArtGallery.WebAPI.Tests
             var exhibitionId = Guid.NewGuid();
             var response = new DeleteExhibitionCommandResponse
             {
-                Success = false,
-                Message = $"{nameof(Exhibition)} not found"
+                Success = false, Message = $"{nameof(Exhibition)} not found"
             };
 
             _mockMediator

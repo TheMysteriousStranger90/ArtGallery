@@ -47,7 +47,8 @@ public class LoginViewModel
         if (LoginAttempts >= 5)
         {
             IsAccountLocked = true;
-            ErrorMessage = "Account temporarily locked due to multiple failed login attempts. Please try again in 15 minutes.";
+            ErrorMessage =
+                "Account temporarily locked due to multiple failed login attempts. Please try again in 15 minutes.";
         }
     }
 

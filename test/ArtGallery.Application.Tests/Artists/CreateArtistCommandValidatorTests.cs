@@ -12,10 +12,7 @@ public class CreateArtistCommandValidatorTests
     {
         var command = new CreateArtistCommand
         {
-            FirstName = "Claude",
-            LastName = "Monet",
-            Nationality = "French",
-            BirthDate = new DateTime(1840, 11, 14)
+            FirstName = "Claude", LastName = "Monet", Nationality = "French", BirthDate = new DateTime(1840, 11, 14)
         };
 
         var result = await _validator.ValidateAsync(command);
@@ -49,11 +46,7 @@ public class CreateArtistCommandValidatorTests
     [Fact]
     public async Task Validate_WithFirstNameExceedingMaxLength_FailsValidation()
     {
-        var command = new CreateArtistCommand
-        {
-            FirstName = new string('A', 101),
-            LastName = "Monet"
-        };
+        var command = new CreateArtistCommand { FirstName = new string('A', 101), LastName = "Monet" };
 
         var result = await _validator.ValidateAsync(command);
 
@@ -81,12 +74,7 @@ public class CreateArtistCommandValidatorTests
     [Fact]
     public async Task Validate_WithNullBiography_PassesValidation()
     {
-        var command = new CreateArtistCommand
-        {
-            FirstName = "Vincent",
-            LastName = "van Gogh",
-            Biography = null
-        };
+        var command = new CreateArtistCommand { FirstName = "Vincent", LastName = "van Gogh", Biography = null };
 
         var result = await _validator.ValidateAsync(command);
 

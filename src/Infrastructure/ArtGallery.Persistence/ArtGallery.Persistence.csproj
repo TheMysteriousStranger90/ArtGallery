@@ -6,21 +6,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\ArtGallery.Application\ArtGallery.Application.csproj" />
+    <ProjectReference Include="..\..\Core\ArtGallery.Application\ArtGallery.Application.csproj"/>
   </ItemGroup>
 
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn);CA1861;CS0649;CA1051</NoWarn>
+    <NoWarn>$(NoWarn);CA1861;CS0649;CA1051;IDE0005;IDE0161</NoWarn>
   </PropertyGroup>
 </Project>

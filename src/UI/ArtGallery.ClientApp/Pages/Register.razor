@@ -22,23 +22,29 @@
                             <h2 class="fw-bold mb-1">Create Your Account</h2>
                             <p class="text-muted">Join our Art Gallery community</p>
                         </div>
-                        
+
                         <!-- Alert Messages -->
                         @if (!string.IsNullOrEmpty(registerViewModel.ErrorMessage))
                         {
-                            <div class="alert alert-danger alert-dismissible fade show animate__animated animate__shakeX" role="alert">
+                            <div
+                                class="alert alert-danger alert-dismissible fade show animate__animated animate__shakeX"
+                                role="alert">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
                                 @registerViewModel.ErrorMessage
-                                <button type="button" class="btn-close" @onclick="() => registerViewModel.ErrorMessage = string.Empty"></button>
+                                <button type="button" class="btn-close"
+                                        @onclick="() => registerViewModel.ErrorMessage = string.Empty"></button>
                             </div>
                         }
 
                         @if (!string.IsNullOrEmpty(registerViewModel.SuccessMessage))
                         {
-                            <div class="alert alert-success alert-dismissible fade show animate__animated animate__fadeInDown" role="alert">
+                            <div
+                                class="alert alert-success alert-dismissible fade show animate__animated animate__fadeInDown"
+                                role="alert">
                                 <i class="fas fa-check-circle me-2"></i>
                                 @registerViewModel.SuccessMessage
-                                <button type="button" class="btn-close" @onclick="() => registerViewModel.SuccessMessage = string.Empty"></button>
+                                <button type="button" class="btn-close"
+                                        @onclick="() => registerViewModel.SuccessMessage = string.Empty"></button>
                             </div>
                         }
 
@@ -60,7 +66,8 @@
                                                    id="firstName"
                                                    placeholder="First Name"
                                                    disabled="@registerViewModel.IsLoading"/>
-                                        <ValidationMessage For="() => registerViewModel.FirstName" class="invalid-feedback"/>
+                                        <ValidationMessage For="() => registerViewModel.FirstName"
+                                                           class="invalid-feedback"/>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -71,7 +78,8 @@
                                                    id="lastName"
                                                    placeholder="Last Name"
                                                    disabled="@registerViewModel.IsLoading"/>
-                                        <ValidationMessage For="() => registerViewModel.LastName" class="invalid-feedback"/>
+                                        <ValidationMessage For="() => registerViewModel.LastName"
+                                                           class="invalid-feedback"/>
                                     </div>
                                 </div>
                             </div>
@@ -114,8 +122,9 @@
                                             </small>
                                         </div>
                                         <div class="password-strength-meter">
-                                            <div class="password-strength-bar @registerViewModel.GetPasswordStrengthCssClass()"
-                                                 style="width: @(registerViewModel.GetPasswordStrengthPercentage())%; background-color: @registerViewModel.GetPasswordStrengthColor();">
+                                            <div
+                                                class="password-strength-bar @registerViewModel.GetPasswordStrengthCssClass()"
+                                                style="width: @(registerViewModel.GetPasswordStrengthPercentage())%; background-color: @registerViewModel.GetPasswordStrengthColor();">
                                             </div>
                                         </div>
                                         @if (registerViewModel.PasswordRequirements.Any())
@@ -150,7 +159,8 @@
                                         disabled="@registerViewModel.IsLoading">
                                     <i class="fas @(registerViewModel.ShowConfirmPassword ? "fa-eye-slash" : "fa-eye")"></i>
                                 </button>
-                                <ValidationMessage For="() => registerViewModel.ConfirmPassword" class="invalid-feedback"/>
+                                <ValidationMessage For="() => registerViewModel.ConfirmPassword"
+                                                   class="invalid-feedback"/>
                             </div>
 
                             <!-- Terms and Conditions -->
@@ -162,10 +172,12 @@
                                                    id="acceptTerms"
                                                    disabled="@registerViewModel.IsLoading"/>
                                     <label class="form-check-label" for="acceptTerms">
-                                        I agree to the <a href="/terms" target="_blank" class="text-decoration-none">Terms of Service</a>
+                                        I agree to the <a href="/terms" target="_blank" class="text-decoration-none">Terms
+                                            of Service</a>
                                         <span class="text-danger">*</span>
                                     </label>
-                                    <ValidationMessage For="() => registerViewModel.AcceptTerms" class="invalid-feedback"/>
+                                    <ValidationMessage For="() => registerViewModel.AcceptTerms"
+                                                       class="invalid-feedback"/>
                                 </div>
 
                                 <div class="form-check mb-2">
@@ -174,7 +186,8 @@
                                                    id="acceptPrivacy"
                                                    disabled="@registerViewModel.IsLoading"/>
                                     <label class="form-check-label" for="acceptPrivacy">
-                                        I agree to the <a href="/privacy" target="_blank" class="text-decoration-none">Privacy Policy</a>
+                                        I agree to the <a href="/privacy" target="_blank" class="text-decoration-none">Privacy
+                                            Policy</a>
                                     </label>
                                 </div>
                             </div>
@@ -194,7 +207,7 @@
                                     <span>Create Account</span>
                                 }
                             </button>
-                            
+
                             <div class="text-center">
                                 <p class="mb-0 text-muted">
                                     Already have an account?
@@ -220,16 +233,15 @@
 </div>
 
 @code {
-    [SupplyParameterFromForm] 
-    private RegisterViewModel registerViewModel { get; set; } = new();
-    
+    [SupplyParameterFromForm] private RegisterViewModel registerViewModel { get; set; } = new();
+
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             Console.WriteLine("Register page initialized");
-            
+
             if (await AuthService.IsAuthenticatedAsync())
             {
                 Console.WriteLine("User already authenticated, redirecting to home");
@@ -247,12 +259,12 @@
     private async Task HandleRegister()
     {
         Console.WriteLine("HandleRegister called");
-        
+
         try
         {
             Console.WriteLine("Starting registration process...");
             Console.WriteLine($"Form valid: {IsFormValid()}");
-            
+
             registerViewModel.SetLoading(true);
             StateHasChanged();
 
@@ -263,9 +275,9 @@
                 Console.WriteLine("Registration successful!");
                 registerViewModel.SetSuccess("Registration successful! Welcome to Art Gallery!");
                 StateHasChanged();
-                
+
                 await Task.Delay(2000);
-                
+
                 Console.WriteLine("Redirecting to home page...");
                 Navigation.NavigateTo("/", forceLoad: true);
             }
@@ -328,18 +340,18 @@
     {
         var firstNameValid = !string.IsNullOrWhiteSpace(registerViewModel.FirstName);
         var lastNameValid = !string.IsNullOrWhiteSpace(registerViewModel.LastName);
-        var emailValid = !string.IsNullOrWhiteSpace(registerViewModel.Email) && 
-                        new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(registerViewModel.Email);
-        var passwordValid = !string.IsNullOrWhiteSpace(registerViewModel.Password) && 
-                           registerViewModel.Password.Length >= 6;
+        var emailValid = !string.IsNullOrWhiteSpace(registerViewModel.Email) &&
+                         new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(registerViewModel.Email);
+        var passwordValid = !string.IsNullOrWhiteSpace(registerViewModel.Password) &&
+                            registerViewModel.Password.Length >= 6;
         var confirmPasswordValid = !string.IsNullOrWhiteSpace(registerViewModel.ConfirmPassword) &&
-                                  registerViewModel.Password == registerViewModel.ConfirmPassword;
+                                   registerViewModel.Password == registerViewModel.ConfirmPassword;
         var termsValid = registerViewModel.AcceptTerms;
 
         var result = firstNameValid && lastNameValid && emailValid && passwordValid && confirmPasswordValid && termsValid;
-        
+
         Console.WriteLine($"Form validation: FirstName={firstNameValid}, LastName={lastNameValid}, Email={emailValid}, Password={passwordValid}, ConfirmPassword={confirmPasswordValid}, Terms={termsValid}, Result={result}");
-        
+
         return result;
     }
 
@@ -395,4 +407,5 @@
     {
         return registerViewModel.AcceptTerms ? "form-check-input is-valid" : "form-check-input is-invalid";
     }
+
 }

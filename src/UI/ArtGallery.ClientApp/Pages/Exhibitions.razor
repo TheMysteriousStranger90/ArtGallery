@@ -43,16 +43,16 @@
                 </select>
             </div>
         </div>
-        
+
         @if (isAdministrator)
         {
-        <div class="row mt-3">
-            <div class="col-12">
-                <a href="/admin/exhibitions/create" class="btn btn-primary w-100">
-                    <i class="bi bi-plus-circle me-2"></i> Create New Exhibition
-                </a>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <a href="/admin/exhibitions/create" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-circle me-2"></i> Create New Exhibition
+                    </a>
+                </div>
             </div>
-        </div>
         }
     </div>
 
@@ -120,7 +120,8 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <h5 class="card-title">@exhibition.Title</h5>
-                                        <span class="badge @GetStatusBadgeClass(exhibition.Status)">@exhibition.Status</span>
+                                        <span
+                                            class="badge @GetStatusBadgeClass(exhibition.Status)">@exhibition.Status</span>
                                     </div>
                                     <p class="card-text text-muted mb-2">
                                         <i class="bi bi-calendar-event me-1"></i> @exhibition.FormattedDateRange
@@ -138,10 +139,12 @@
                                         @if (isAdministrator)
                                         {
                                             <div>
-                                                <a href="/admin/exhibitions/edit/@exhibition.Id" class="btn btn-outline-secondary btn-sm me-1">
+                                                <a href="/admin/exhibitions/edit/@exhibition.Id"
+                                                   class="btn btn-outline-secondary btn-sm me-1">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <button @onclick="() => DeleteExhibition(exhibition.Id)" class="btn btn-outline-danger btn-sm">
+                                                <button @onclick="() => DeleteExhibition(exhibition.Id)"
+                                                        class="btn btn-outline-danger btn-sm">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </div>
@@ -165,7 +168,7 @@
             else
             {
                 <EmptyState Icon="bi bi-building-x fs-1" Title="No Exhibitions Found"
-                            Message="Try adjusting your search or filter parameters." />
+                            Message="Try adjusting your search or filter parameters."/>
             }
         </div>
     </div>
@@ -179,20 +182,20 @@
     private bool isAdministrator;
 
     private List<MuseumBriefDto> museums = new();
-    
+
     private bool HasActiveFilters =>
-        MuseumId.HasValue || 
+        MuseumId.HasValue ||
         !string.IsNullOrEmpty(CurrentStatus) ||
         !string.IsNullOrEmpty(ActiveSearch);
-    
+
     [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
 
     [Parameter] [SupplyParameterFromQuery] public Guid? MuseumId { get; set; }
 
     [Parameter] [SupplyParameterFromQuery] public string? CurrentStatus { get; set; }
-    
+
     [Parameter] [SupplyParameterFromQuery] public DateTime? StartDate { get; set; }
-    
+
     [Parameter] [SupplyParameterFromQuery] public DateTime? EndDate { get; set; }
 
     public string? CurrentSearch { get; set; }
@@ -215,16 +218,16 @@
         try
         {
             Logger.LogInformation("Loading museums from exhibitions...");
-            
+
             var allExhibitionsForMuseums = await ExhibitionsService.GetAllExhibitionsAsync(null);
-            
+
             museums = allExhibitionsForMuseums
                 .Where(e => e.Museum != null)
                 .GroupBy(e => e.Museum.Id)
                 .Select(g => g.First().Museum)
                 .OrderBy(m => m.Name)
                 .ToList();
-                
+
             Logger.LogInformation("Loaded {MuseumCount} museums from exhibitions", museums.Count);
         }
         catch (Exception ex)
@@ -255,7 +258,7 @@
 
         try
         {
-            Logger.LogInformation("Loading exhibitions with filters - Museum: {MuseumId}, Status: {Status}, Search: {Search}", 
+            Logger.LogInformation("Loading exhibitions with filters - Museum: {MuseumId}, Status: {Status}, Search: {Search}",
                 MuseumId, CurrentStatus, ActiveSearch);
 
             if (!string.IsNullOrEmpty(CurrentStatus))
@@ -288,19 +291,19 @@
                 exhibitions = exhibitions
                     .Where(e => e.Museum?.Id == MuseumId.Value)
                     .ToList();
-                    
+
                 Logger.LogInformation("After museum filter: {Count} exhibitions", exhibitions.Count);
             }
 
             if (!string.IsNullOrEmpty(ActiveSearch))
             {
                 exhibitions = exhibitions
-                    .Where(e => 
-                        e.Title.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase) || 
+                    .Where(e =>
+                        e.Title.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase) ||
                         (e.Description != null && e.Description.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase)) ||
                         (e.Museum?.Name != null && e.Museum.Name.Contains(ActiveSearch, StringComparison.OrdinalIgnoreCase)))
                     .ToList();
-                    
+
                 Logger.LogInformation("After search filter: {Count} exhibitions", exhibitions.Count);
             }
 
@@ -401,17 +404,17 @@
             ApplySearch();
         }
     }
-    
+
     private async Task DeleteExhibition(Guid exhibitionId)
     {
         bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this exhibition?");
-        
+
         if (confirmed)
         {
             try
             {
                 bool success = await ExhibitionsService.DeleteExhibitionAsync(exhibitionId);
-                
+
                 if (success)
                 {
                     Toast.Success("Exhibition deleted successfully.");
@@ -429,7 +432,7 @@
             }
         }
     }
-    
+
     private string GetStatusBadgeClass(string status)
     {
         return status switch
@@ -440,5 +443,6 @@
             _ => "bg-info"
         };
     }
+
 }
 

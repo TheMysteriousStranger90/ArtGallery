@@ -16,7 +16,8 @@ public class GetCurrentExhibitionsQueryHandler : IRequestHandler<GetCurrentExhib
         _mapper = mapper;
     }
 
-    public async Task<List<ExhibitionDto>> Handle(GetCurrentExhibitionsQuery request, CancellationToken cancellationToken)
+    public async Task<List<ExhibitionDto>> Handle(GetCurrentExhibitionsQuery request,
+        CancellationToken cancellationToken)
     {
         var exhibitions = await _unitOfWork.ExhibitionRepository.GetCurrentExhibitionsAsync();
         return _mapper.Map<List<ExhibitionDto>>(exhibitions);

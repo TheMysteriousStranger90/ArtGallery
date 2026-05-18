@@ -23,7 +23,8 @@ public class CreateArtistCommandHandler : IRequestHandler<CreateArtistCommand, C
         _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
 
-    public async Task<CreateArtistCommandResponse> Handle(CreateArtistCommand request, CancellationToken cancellationToken)
+    public async Task<CreateArtistCommandResponse> Handle(CreateArtistCommand request,
+        CancellationToken cancellationToken)
     {
         var response = new CreateArtistCommandResponse();
 
@@ -47,8 +48,8 @@ public class CreateArtistCommandHandler : IRequestHandler<CreateArtistCommand, C
                 {
                     FirstName = request.FirstName!,
                     LastName = request.LastName!,
-                    BirthDate = request.BirthDate,
-                    DeathDate = request.DeathDate,
+                    BirthDate = request.BirthDate?.DateTime,
+                    DeathDate = request.DeathDate?.DateTime,
                     Nationality = request.Nationality!
                 };
 
@@ -94,7 +95,8 @@ public class CreateArtistCommandHandler : IRequestHandler<CreateArtistCommand, C
 
             if (createdArtist != null)
             {
-                var artistWithDetails = await _unitOfWork.ArtistRepository.GetArtistWithPaintingsAsync(createdArtist.Id);
+                var artistWithDetails =
+                    await _unitOfWork.ArtistRepository.GetArtistWithPaintingsAsync(createdArtist.Id);
                 response.Artist = _mapper.Map<CreateArtistDto>(artistWithDetails);
             }
         }

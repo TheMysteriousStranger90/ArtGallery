@@ -18,4 +18,3 @@ public class ArtistWithFiltersForCountSpecification : BaseSpecification<Artist>
     {
     }
 }
-

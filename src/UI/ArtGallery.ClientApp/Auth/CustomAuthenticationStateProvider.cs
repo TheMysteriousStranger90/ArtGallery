@@ -121,6 +121,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
                         }
                     }
                 }
+
                 keyValuePairs.Remove(ClaimTypes.Role);
             }
 
@@ -164,6 +165,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
                 base64 += "=";
                 break;
         }
+
         return Convert.FromBase64String(base64);
     }
 }

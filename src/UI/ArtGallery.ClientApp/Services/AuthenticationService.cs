@@ -31,11 +31,7 @@ public class AuthenticationService : IAuthenticationService
         {
             _logger.LogInformation("Attempting login for email: {Email}", loginViewModel.Email);
 
-            var command = new AuthenticateCommand
-            {
-                Email = loginViewModel.Email,
-                Password = loginViewModel.Password
-            };
+            var command = new AuthenticateCommand { Email = loginViewModel.Email, Password = loginViewModel.Password };
 
             var response = await _client.AuthenticateAsync("1.0", command);
 
@@ -148,9 +144,7 @@ public class AuthenticationService : IAuthenticationService
 
             var request = new ExternalAuthRequest
             {
-                Provider = "Microsoft",
-                AccessToken = accessToken,
-                ReturnUrl = returnUrl
+                Provider = "Microsoft", AccessToken = accessToken, ReturnUrl = returnUrl
             };
 
             _logger.LogInformation("Sending Microsoft auth request to API");

@@ -62,10 +62,13 @@ public class ExternalAuthCommandHandler : IRequestHandler<ExternalAuthCommand, E
             _logger.LogInformation("Created new user via external auth: {Email}", request.Email);
         }
 
-        var existingLogin = await _userManagerService.UserManager.FindByLoginAsync(request.Provider!, request.ExternalId!);
+        var existingLogin =
+            await _userManagerService.UserManager.FindByLoginAsync(request.Provider!, request.ExternalId!);
         if (existingLogin == null)
         {
-            var loginInfo = new Microsoft.AspNetCore.Identity.UserLoginInfo(request.Provider!, request.ExternalId!, request.Provider);
+            var loginInfo =
+                new Microsoft.AspNetCore.Identity.UserLoginInfo(request.Provider!, request.ExternalId!,
+                    request.Provider);
             var addLoginResult = await _userManagerService.UserManager.AddLoginAsync(user, loginInfo);
 
             if (!addLoginResult.Succeeded)
@@ -130,10 +133,8 @@ public class ExternalAuthCommandHandler : IRequestHandler<ExternalAuthCommand, E
             {
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!),
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                new Claim("uid", user.Id),
-                new Claim("first_name", user.FirstName!),
-                new Claim("last_name", user.LastName!)
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!), new Claim("uid", user.Id),
+                new Claim("first_name", user.FirstName!), new Claim("last_name", user.LastName!)
             }
             .Union(userClaims)
             .Union(roleClaims);

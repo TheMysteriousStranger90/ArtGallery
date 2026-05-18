@@ -21,7 +21,7 @@
         </ol>
     </nav>
 
-    <h1 class="mb-4" style="color: var(--brand-secondary); font-weight: 300; font-size: 2.5rem; 
+    <h1 class="mb-4" style="color: var(--brand-secondary); font-weight: 300; font-size: 2.5rem;
                 border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
         Add New Artist
     </h1>
@@ -38,47 +38,49 @@
     else
     {
         <EditForm Model="@artist" OnValidSubmit="HandleValidSubmit" class="artist-create-form">
-            <DataAnnotationsValidator />
+            <DataAnnotationsValidator/>
 
             <div class="row">
                 <div class="col-md-8">
                     <div class="card shadow-sm mb-4">
                         <div class="card-header">
-                            <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Basic Information</h4>
+                            <h4 class="mb-0"
+                                style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Basic
+                                Information</h4>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="firstName" class="form-label">First Name</label>
-                                    <InputText id="firstName" class="form-control" @bind-Value="artist.FirstName" />
-                                    <ValidationMessage For="@(() => artist.FirstName)" class="text-danger" />
+                                    <InputText id="firstName" class="form-control" @bind-Value="artist.FirstName"/>
+                                    <ValidationMessage For="@(() => artist.FirstName)" class="text-danger"/>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label for="lastName" class="form-label">Last Name</label>
-                                    <InputText id="lastName" class="form-control" @bind-Value="artist.LastName" />
-                                    <ValidationMessage For="@(() => artist.LastName)" class="text-danger" />
+                                    <InputText id="lastName" class="form-control" @bind-Value="artist.LastName"/>
+                                    <ValidationMessage For="@(() => artist.LastName)" class="text-danger"/>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="birthDate" class="form-label">Birth Date</label>
-                                    <InputDate id="birthDate" class="form-control" @bind-Value="artist.BirthDate" />
+                                    <InputDate id="birthDate" class="form-control" @bind-Value="artist.BirthDate"/>
                                     <small class="form-text text-light">Optional</small>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label for="deathDate" class="form-label">Death Date</label>
-                                    <InputDate id="deathDate" class="form-control" @bind-Value="artist.DeathDate" />
+                                    <InputDate id="deathDate" class="form-control" @bind-Value="artist.DeathDate"/>
                                     <small class="form-text text-light">Optional</small>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="nationality" class="form-label">Nationality</label>
-                                <InputText id="nationality" class="form-control" @bind-Value="artist.Nationality" />
-                                <ValidationMessage For="@(() => artist.Nationality)" class="text-danger" />
+                                <InputText id="nationality" class="form-control" @bind-Value="artist.Nationality"/>
+                                <ValidationMessage For="@(() => artist.Nationality)" class="text-danger"/>
                                 <small class="form-text text-light">E.g., Italian, French, Russian</small>
                             </div>
                         </div>
@@ -86,26 +88,34 @@
 
                     <div class="card shadow-sm mb-4">
                         <div class="card-header">
-                            <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Biography</h4>
+                            <h4 class="mb-0"
+                                style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">
+                                Biography</h4>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="biographyShortDescription" class="form-label">Short Description</label>
-                                <InputTextArea id="biographyShortDescription" class="form-control" rows="2" @bind-Value="artist.BiographyShortDescription" />
-                                <ValidationMessage For="@(() => artist.BiographyShortDescription)" class="text-danger" />
-                                <small class="form-text text-light">A brief summary of the artist's life and importance (500 characters max)</small>
+                                <InputTextArea id="biographyShortDescription" class="form-control" rows="2"
+                                               @bind-Value="artist.BiographyShortDescription"/>
+                                <ValidationMessage For="@(() => artist.BiographyShortDescription)" class="text-danger"/>
+                                <small class="form-text text-light">A brief summary of the artist's life and importance
+                                    (500 characters max)</small>
                             </div>
 
                             <div class="mb-3">
                                 <label for="biographyContent" class="form-label">Full Biography</label>
-                                <InputTextArea id="biographyContent" class="form-control" rows="10" @bind-Value="artist.BiographyContent" />
-                                <small class="form-text text-light">The detailed biography. You can use line breaks for paragraphs.</small>
+                                <InputTextArea id="biographyContent" class="form-control" rows="10"
+                                               @bind-Value="artist.BiographyContent"/>
+                                <small class="form-text text-light">The detailed biography. You can use line breaks for
+                                    paragraphs.</small>
                             </div>
 
                             <div class="mb-3">
                                 <label for="biographyReferences" class="form-label">References & Further Reading</label>
-                                <InputTextArea id="biographyReferences" class="form-control" rows="4" @bind-Value="artist.BiographyReferences" />
-                                <small class="form-text text-light">Optional. Books, articles or websites about the artist.</small>
+                                <InputTextArea id="biographyReferences" class="form-control" rows="4"
+                                               @bind-Value="artist.BiographyReferences"/>
+                                <small class="form-text text-light">Optional. Books, articles or websites about the
+                                    artist.</small>
                             </div>
                         </div>
                     </div>
@@ -114,18 +124,23 @@
                 <div class="col-md-4">
                     <div class="card shadow-sm mb-4">
                         <div class="card-header">
-                            <h4 class="mb-0" style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Artist Image</h4>
+                            <h4 class="mb-0"
+                                style="color: var(--brand-secondary); font-weight: 300; font-size: 1.75rem;">Artist
+                                Image</h4>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="imageFile" class="form-label">Upload image</label>
-                                <InputFile id="imageFile" OnChange="HandleFileSelected" class="form-control" accept="image/*" />
-                                <small class="form-text text-light">Recommended size: 800x1200px portrait. Max file size: 5MB.</small>
+                                <InputFile id="imageFile" OnChange="HandleFileSelected" class="form-control"
+                                           accept="image/*"/>
+                                <small class="form-text text-light">Recommended size: 800x1200px portrait. Max file
+                                    size: 5MB.</small>
 
                                 @if (selectedFile != null)
                                 {
                                     <div class="mt-2">
-                                        <span class="badge bg-info">Selected: @selectedFile.Name (@FormatFileSize(selectedFile.Size))</span>
+                                        <span
+                                            class="badge bg-info">Selected: @selectedFile.Name (@FormatFileSize(selectedFile.Size))</span>
                                     </div>
                                 }
                             </div>
@@ -134,10 +149,11 @@
                             {
                                 <div class="text-center mt-3">
                                     <h6>Preview:</h6>
-                                    <img src="@imagePreviewUrl" class="img-fluid border" alt="Preview" 
-                                         style="max-height: 300px; width: auto; border-radius: 0.5rem;" />
+                                    <img src="@imagePreviewUrl" class="img-fluid border" alt="Preview"
+                                         style="max-height: 300px; width: auto; border-radius: 0.5rem;"/>
                                     <div class="mt-2">
-                                        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="ClearImage">
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                                @onclick="ClearImage">
                                             <i class="bi bi-x-circle me-1"></i> Remove Image
                                         </button>
                                     </div>
@@ -150,7 +166,8 @@
                         <button type="submit" class="btn btn-primary flex-grow-1" disabled="@isSaving">
                             @if (isSaving)
                             {
-                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span class="spinner-border spinner-border-sm me-2" role="status"
+                                      aria-hidden="true"></span>
                                 <span>Creating...</span>
                             }
                             else
@@ -299,4 +316,5 @@
             isSaving = false;
         }
     }
+
 }

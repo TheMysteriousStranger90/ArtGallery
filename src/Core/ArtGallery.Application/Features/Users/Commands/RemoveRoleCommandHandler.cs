@@ -31,7 +31,8 @@ public class RemoveRoleCommandHandler : IRequestHandler<RemoveRoleCommand, Remov
             response.Message = $"Role '{request.RoleName}' removed successfully";
             response.Roles = updatedRoles;
 
-            _logger.LogInformation("Role {RoleName} removed successfully from user {UserId}", request.RoleName, request.UserId);
+            _logger.LogInformation("Role {RoleName} removed successfully from user {UserId}", request.RoleName,
+                request.UserId);
         }
         catch (Exception ex)
         {

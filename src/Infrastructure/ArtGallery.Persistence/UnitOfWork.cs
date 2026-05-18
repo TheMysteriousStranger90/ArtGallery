@@ -22,6 +22,7 @@ public class UnitOfWork : IUnitOfWork
     private IMuseumRepository? _museumRepository;
     private IImageRepository? _imageRepository;
     private IUserFavoritesRepository? _userFavoritesRepository;
+    private ITagRepository? _tagRepository;
 
     public UnitOfWork(ArtGalleryDbContext context)
     {
@@ -45,6 +46,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IUserFavoritesRepository UserFavoritesRepository =>
         _userFavoritesRepository ??= new UserFavoritesRepository(_context);
+
+    public ITagRepository TagRepository =>
+        _tagRepository ??= new TagRepository(_context);
 
     public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity
     {
@@ -133,3 +137,5 @@ public class UnitOfWork : IUnitOfWork
         _disposed = true;
     }
 }
+
+

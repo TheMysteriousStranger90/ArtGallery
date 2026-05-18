@@ -40,8 +40,8 @@
 }
 
 @code {
-    [Parameter, EditorRequired] public int CurrentPage  { get; set; }
-    [Parameter, EditorRequired] public int TotalPages   { get; set; }
+    [Parameter, EditorRequired] public int CurrentPage { get; set; }
+    [Parameter, EditorRequired] public int TotalPages { get; set; }
     [Parameter, EditorRequired] public EventCallback<int> OnPageChanged { get; set; }
     [Parameter] public string AriaLabel { get; set; } = "Page navigation";
 
@@ -49,16 +49,21 @@
 
     private IEnumerable<int> GetPageNumbers()
     {
-        if (TotalPages <= 7) { for (int i = 1; i <= TotalPages; i++) yield return i; yield break; }
+        if (TotalPages <= 7)
+        {
+            for (int i = 1; i <= TotalPages; i++) yield return i;
+            yield break;
+        }
 
         yield return 1;
         if (CurrentPage > 3) yield return -1; // ellipsis
 
         int start = Math.Max(2, CurrentPage - 1);
-        int end   = Math.Min(TotalPages - 1, CurrentPage + 1);
+        int end = Math.Min(TotalPages - 1, CurrentPage + 1);
         for (int i = start; i <= end; i++) yield return i;
 
         if (CurrentPage < TotalPages - 2) yield return -1; // ellipsis
         yield return TotalPages;
     }
+
 }

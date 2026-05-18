@@ -6,6 +6,7 @@ public class BaseResponse
     {
         Success = true;
     }
+
     public BaseResponse(string message)
     {
         Success = true;

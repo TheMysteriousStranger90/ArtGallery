@@ -19,7 +19,8 @@ public class GetPaintingsListQueryHandler : IRequestHandler<GetPaintingsListQuer
         _mapper = mapper;
     }
 
-    public async Task<Pagination<PaintingDto>> Handle(GetPaintingsListQuery request, CancellationToken cancellationToken)
+    public async Task<Pagination<PaintingDto>> Handle(GetPaintingsListQuery request,
+        CancellationToken cancellationToken)
     {
         var paintingParams = new PaintingSpecParams
         {

@@ -34,14 +34,14 @@
                 </nav>
             </div>
         </div>
-        
+
         <div class="row mb-4">
             <div class="col-md-8">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h1 class="exhibition-title">@exhibition.Title</h1>
                     <span class="badge @GetStatusBadgeClass(exhibition.Status) fs-6">@exhibition.Status</span>
                 </div>
-                
+
                 <div class="exhibition-details mb-4">
                     <p class="text-muted">
                         <i class="bi bi-calendar-event me-2"></i>@exhibition.FormattedDateRange
@@ -54,14 +54,14 @@
                         }
                     </p>
                 </div>
-                
+
                 <div class="exhibition-description mb-4">
                     <h3>About this Exhibition</h3>
                     <p>@exhibition.Description</p>
                 </div>
             </div>
         </div>
-        
+
         @if (exhibition.Paintings != null && exhibition.Paintings.Any())
         {
             <div class="row mb-5">
@@ -72,12 +72,14 @@
                             <div class="col">
                                 <div class="card h-100 painting-card">
                                     <div class="painting-image-container">
-                                        <img src="@painting.ImageUrl" class="card-img-top painting-image" alt="@painting.Title" />
+                                        <img src="@painting.ImageUrl" class="card-img-top painting-image"
+                                             alt="@painting.Title"/>
                                     </div>
                                     <div class="card-body">
                                         <h5 class="card-title">@painting.Title</h5>
                                         <p class="card-text text-muted">@painting.ArtistName</p>
-                                        <p class="card-text"><small class="text-muted">@painting.CreationYear</small></p>
+                                        <p class="card-text"><small class="text-muted">@painting.CreationYear</small>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -85,7 +87,7 @@
                     </div>
                 </div>
             </div>
-            
+
             @if (isAdministrator)
             {
                 <div class="row mt-4 mb-5">
@@ -100,11 +102,14 @@
                                         {
                                             @foreach (var painting in availablePaintings)
                                             {
-                                                <option value="@painting.Id">@painting.Title (@painting.Artist?.FullName)</option>
+                                                <option
+                                                    value="@painting.Id">@painting.Title (@painting.Artist?.FullName)
+                                                </option>
                                             }
                                         }
                                     </select>
-                                    <button class="btn btn-primary" type="button" @onclick="AddPaintingToExhibition" disabled="@string.IsNullOrEmpty(selectedPaintingId?.ToString())">
+                                    <button class="btn btn-primary" type="button" @onclick="AddPaintingToExhibition"
+                                            disabled="@string.IsNullOrEmpty(selectedPaintingId?.ToString())">
                                         <i class="bi bi-plus-lg me-1"></i> Add
                                     </button>
                                 </div>
@@ -122,7 +127,7 @@
                         <i class="bi bi-info-circle-fill me-2"></i>
                         No paintings have been added to this exhibition yet.
                     </div>
-                    
+
                     @if (isAdministrator)
                     {
                         <div class="card mt-4">
@@ -135,11 +140,14 @@
                                         {
                                             @foreach (var painting in availablePaintings)
                                             {
-                                                <option value="@painting.Id">@painting.Title (@painting.Artist?.FullName)</option>
+                                                <option
+                                                    value="@painting.Id">@painting.Title (@painting.Artist?.FullName)
+                                                </option>
                                             }
                                         }
                                     </select>
-                                    <button class="btn btn-primary" type="button" @onclick="AddPaintingToExhibition" disabled="@string.IsNullOrEmpty(selectedPaintingId?.ToString())">
+                                    <button class="btn btn-primary" type="button" @onclick="AddPaintingToExhibition"
+                                            disabled="@string.IsNullOrEmpty(selectedPaintingId?.ToString())">
                                         <i class="bi bi-plus-lg me-1"></i> Add
                                     </button>
                                 </div>
@@ -177,7 +185,7 @@
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         isAdministrator = authState.User.IsInRole("Administrator");
-        
+
         if (isAdministrator)
         {
             await LoadAvailablePaintings();
@@ -197,7 +205,7 @@
         try
         {
             exhibition = await ExhibitionsService.GetExhibitionByIdAsync(Id);
-        
+
             if (exhibition == null)
             {
                 errorMessage = "Exhibition not found";
@@ -218,21 +226,21 @@
             isLoading = false;
         }
     }
-    
+
     private async Task LoadAvailablePaintings()
     {
         try
         {
             var paginatedResult = await PaintingService.GetPaintingsAsync(
-                pageIndex: 1, 
-                pageSize: 100, 
-                search: "", 
-                artistId: null, 
-                genreId: null, 
-                museumId: null, 
-                paintType: null, 
-                fromYear: null, 
-                toYear: null, 
+                pageIndex: 1,
+                pageSize: 100,
+                search: "",
+                artistId: null,
+                genreId: null,
+                museumId: null,
+                paintType: null,
+                fromYear: null,
+                toYear: null,
                 sort: "title"
             );
             availablePaintings = paginatedResult.Data.ToList();
@@ -243,22 +251,22 @@
             availablePaintings = new List<PaintingDto>();
         }
     }
-    
+
     private async Task AddPaintingToExhibition()
     {
         if (!selectedPaintingId.HasValue)
             return;
-        
+
         try
         {
             bool success = await ExhibitionsService.AddPaintingToExhibitionAsync(Id, selectedPaintingId.Value);
-        
+
             if (success)
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Painting added to exhibition successfully");
                 selectedPaintingId = null;
                 await LoadExhibition();
-            
+
                 if (availablePaintings != null)
                 {
                     availablePaintings.RemoveAll(p => p.Id == selectedPaintingId);
@@ -275,7 +283,7 @@
             await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
         }
     }
-    
+
     private string GetStatusBadgeClass(string status)
     {
         return status switch
@@ -286,4 +294,5 @@
             _ => "bg-info"
         };
     }
+
 }

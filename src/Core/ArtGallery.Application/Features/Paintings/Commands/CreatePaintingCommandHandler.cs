@@ -82,10 +82,7 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
                 {
                     var paintingImage = new PaintingImage
                     {
-                        PictureUrl = imageUrl!,
-                        PublicId = publicId!,
-                        IsMain = true,
-                        PaintingId = painting.Id
+                        PictureUrl = imageUrl!, PublicId = publicId!, IsMain = true, PaintingId = painting.Id
                     };
 
                     await _unitOfWork.Repository<PaintingImage>().AddAsync(paintingImage);
@@ -95,11 +92,7 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
                 {
                     foreach (var tagId in request.TagIds)
                     {
-                        var paintingTag = new PaintingTag
-                        {
-                            PaintingId = painting.Id,
-                            TagId = tagId
-                        };
+                        var paintingTag = new PaintingTag { PaintingId = painting.Id, TagId = tagId };
                         await _unitOfWork.Repository<PaintingTag>().AddAsync(paintingTag);
                     }
                 }
@@ -111,7 +104,8 @@ public class CreatePaintingCommandHandler : IRequestHandler<CreatePaintingComman
 
             if (createdPainting != null)
             {
-                var paintingWithDetails = await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(createdPainting.Id);
+                var paintingWithDetails =
+                    await _unitOfWork.PaintingRepository.GetPaintingWithDetailsAsync(createdPainting.Id);
                 response.Painting = _mapper.Map<PaintingDto>(paintingWithDetails);
             }
         }

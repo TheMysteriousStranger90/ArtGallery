@@ -17,13 +17,13 @@ public class PaintingRepository : GenericRepository<Painting>, IPaintingReposito
             .Include(p => p.Artist)
             .Include(p => p.Genre)
             .Include(p => p.Museum)
-                .ThenInclude(m => m.City)
-                    .ThenInclude(c => c.Country)
+            .ThenInclude(m => m.City)
+            .ThenInclude(c => c.Country)
             .Include(p => p.PaintingImages)
             .Include(p => p.Tags)
-                .ThenInclude(pt => pt.Tag)
+            .ThenInclude(pt => pt.Tag)
             .Include(p => p.Exhibitions)
-                .ThenInclude(pe => pe.Exhibition)
+            .ThenInclude(pe => pe.Exhibition)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 }

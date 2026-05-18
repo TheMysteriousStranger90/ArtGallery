@@ -251,11 +251,17 @@ else
     }
 
     @@keyframes gradientShift {
-         0% { background-position: 0% 50%; }
-         50% { background-position: 100% 50%; }
-         100% { background-position: 0% 50%; }
-     }
-     
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
     .hero-section {
         position: relative;
         min-height: 100vh;
@@ -315,7 +321,7 @@ else
     .scroll-arrow:hover {
         color: rgba(255, 255, 255, 1);
     }
-    
+
     .features-section {
         background-color: var(--bg-light);
     }
@@ -413,10 +419,10 @@ else
 </style>
 
 <script>
-    window.initializeIndexPage = function() {
+    window.initializeIndexPage = function () {
         console.log('Initializing Index page client-side features');
 
-        setTimeout(function() {
+        setTimeout(function () {
             const counters = document.querySelectorAll('.stat-number');
             if (counters.length > 0) {
                 counters.forEach(counter => {
@@ -427,7 +433,7 @@ else
                 });
             }
         }, 1000);
-        
+
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -10% 0px'
@@ -503,7 +509,7 @@ else
     };
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             window.initializeIndexPage();
         });
     } else {
@@ -585,7 +591,7 @@ else
         try
         {
             await JS.InvokeVoidAsync("initializeIndexPage");
-        
+
             await Task.Delay(500);
             await JS.InvokeVoidAsync("initializeIndexPage");
         }
@@ -594,4 +600,5 @@ else
             Console.WriteLine($"Failed to initialize client-side features: {ex.Message}");
         }
     }
+
 }

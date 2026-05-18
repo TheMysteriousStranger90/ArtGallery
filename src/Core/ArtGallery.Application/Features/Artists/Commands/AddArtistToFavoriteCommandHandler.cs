@@ -3,7 +3,8 @@ using MediatR;
 
 namespace ArtGallery.Application.Features.Artists.Commands;
 
-public class AddArtistToFavoriteCommandHandler : IRequestHandler<AddArtistToFavoriteCommand, AddArtistToFavoriteCommandResponse>
+public class
+    AddArtistToFavoriteCommandHandler : IRequestHandler<AddArtistToFavoriteCommand, AddArtistToFavoriteCommandResponse>
 {
     private readonly IUnitOfWork _unitOfWork;
 

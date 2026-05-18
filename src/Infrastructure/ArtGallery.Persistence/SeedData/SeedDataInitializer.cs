@@ -146,7 +146,8 @@ public static class SeedDataInitializer
         {
             Id = Guid.Parse("cc6aeae0-5c40-4085-8993-7d7b5db21205"),
             Name = "Renaissance",
-            Description = "Art from the Renaissance period characterized by realistic depiction and classical themes",
+            Description =
+                "Art from the Renaissance period characterized by realistic depiction and classical themes",
             CreatedDate = DateTime.UtcNow
         };
 
@@ -166,7 +167,8 @@ public static class SeedDataInitializer
             CreatedDate = DateTime.UtcNow
         };
 
-        modelBuilder.Entity<Genre>().HasData(mythological, landscape, seascape, symbolism, renaissance, religious, portrait);
+        modelBuilder.Entity<Genre>()
+            .HasData(mythological, landscape, seascape, symbolism, renaissance, religious, portrait);
 
         // Seed Tags
         var tags = new List<Tag>
@@ -331,7 +333,8 @@ public static class SeedDataInitializer
             CreatedDate = DateTime.UtcNow
         };
 
-        modelBuilder.Entity<Artist>().HasData(vasnetsov, vrubel, aivazovsky, savrasov, daVinci, michelangelo, botticelli, caravaggio);
+        modelBuilder.Entity<Artist>().HasData(vasnetsov, vrubel, aivazovsky, savrasov, daVinci, michelangelo,
+            botticelli, caravaggio);
 
         // Seed Biographies (Russian + Italian)
         var biographies = new List<Biography>
@@ -428,7 +431,8 @@ public static class SeedDataInitializer
             new ArtistImage
             {
                 Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21130"),
-                PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/4/4e/Wiktor_Michajlowitsch_Wassnezow_003.jpg",
+                PictureUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/4/4e/Wiktor_Michajlowitsch_Wassnezow_003.jpg",
                 IsMain = true,
                 PublicId = "artist_vasnetsov",
                 ArtistId = vasnetsov.Id,
@@ -437,7 +441,8 @@ public static class SeedDataInitializer
             new ArtistImage
             {
                 Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21131"),
-                PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/f/fb/Mikhail_Vrubel_-_self-portrait_%281904%2C_GTG%29.jpg",
+                PictureUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/f/fb/Mikhail_Vrubel_-_self-portrait_%281904%2C_GTG%29.jpg",
                 IsMain = true,
                 PublicId = "artist_vrubel",
                 ArtistId = vrubel.Id,
@@ -446,7 +451,8 @@ public static class SeedDataInitializer
             new ArtistImage
             {
                 Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21132"),
-                PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c6/Aivazovsky_-_Self-portrait_1874.jpg",
+                PictureUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/c/c6/Aivazovsky_-_Self-portrait_1874.jpg",
                 IsMain = true,
                 PublicId = "artist_aivazovsky",
                 ArtistId = aivazovsky.Id,
@@ -465,7 +471,8 @@ public static class SeedDataInitializer
             new ArtistImage
             {
                 Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21220"),
-                PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Leonardo_self.jpg/256px-Leonardo_self.jpg",
+                PictureUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Leonardo_self.jpg/256px-Leonardo_self.jpg",
                 IsMain = true,
                 PublicId = "artist_davinci",
                 ArtistId = daVinci.Id,
@@ -474,7 +481,8 @@ public static class SeedDataInitializer
             new ArtistImage
             {
                 Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21221"),
-                PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Miguel_%C3%81ngel%2C_por_Daniele_da_Volterra_%28detalle%29.jpg/256px-Miguel_%C3%81ngel%2C_por_Daniele_da_Volterra_%28detalle%29.jpg",
+                PictureUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Miguel_%C3%81ngel%2C_por_Daniele_da_Volterra_%28detalle%29.jpg/256px-Miguel_%C3%81ngel%2C_por_Daniele_da_Volterra_%28detalle%29.jpg",
                 IsMain = true,
                 PublicId = "artist_michelangelo",
                 ArtistId = michelangelo.Id,
@@ -483,7 +491,8 @@ public static class SeedDataInitializer
             new ArtistImage
             {
                 Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21222"),
-                PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Sandro_Botticelli_083.jpg/256px-Sandro_Botticelli_083.jpg",
+                PictureUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Sandro_Botticelli_083.jpg/256px-Sandro_Botticelli_083.jpg",
                 IsMain = true,
                 PublicId = "artist_botticelli",
                 ArtistId = botticelli.Id,
@@ -492,7 +501,8 @@ public static class SeedDataInitializer
             new ArtistImage
             {
                 Id = Guid.Parse("0c6aeae0-5c40-4085-8993-7d7b5db21223"),
-                PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bild-Ottavio_Leoni%2C_Caravaggio.jpg/256px-Bild-Ottavio_Leoni%2C_Caravaggio.jpg",
+                PictureUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bild-Ottavio_Leoni%2C_Caravaggio.jpg/256px-Bild-Ottavio_Leoni%2C_Caravaggio.jpg",
                 IsMain = true,
                 PublicId = "artist_caravaggio",
                 ArtistId = caravaggio.Id,
@@ -515,7 +525,8 @@ public static class SeedDataInitializer
                 CreationYear = 1898,
                 Medium = "Oil on canvas",
                 Dimensions = "295.3 cm × 446 cm (116.3 in × 175.6 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/d/d3/Viktor_Vasnetsov_-_Богатыри_-_Google_Art_Project.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/d/d3/Viktor_Vasnetsov_-_Богатыри_-_Google_Art_Project.jpg",
                 PaintType = PaintType.Oil,
                 ArtistId = vasnetsov.Id,
                 GenreId = mythological.Id,
@@ -579,7 +590,8 @@ public static class SeedDataInitializer
                 CreationYear = 1850,
                 Medium = "Oil on canvas",
                 Dimensions = "221 cm × 332 cm (87.0 in × 130.7 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/54/Aivazovsky%2C_Ivan_-_The_Ninth_Wave.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/5/54/Aivazovsky%2C_Ivan_-_The_Ninth_Wave.jpg",
                 PaintType = PaintType.Oil,
                 ArtistId = aivazovsky.Id,
                 GenreId = seascape.Id,
@@ -595,7 +607,8 @@ public static class SeedDataInitializer
                 CreationYear = 1849,
                 Medium = "Oil on canvas",
                 Dimensions = "100 cm × 141 cm (39.4 in × 55.5 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/70/Ivan_Aivazovsky_-_Ship_in_the_Stormy_Sea.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/7/70/Ivan_Aivazovsky_-_Ship_in_the_Stormy_Sea.jpg",
                 PaintType = PaintType.Oil,
                 ArtistId = aivazovsky.Id,
                 GenreId = seascape.Id,
@@ -627,7 +640,8 @@ public static class SeedDataInitializer
                 CreationYear = 1873,
                 Medium = "Oil on canvas",
                 Dimensions = "58.8 cm × 80.5 cm (23.1 in × 31.7 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7a/Алексей_К._Саврасов_-_Проселок_%281873%29.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/7/7a/Алексей_К._Саврасов_-_Проселок_%281873%29.jpg",
                 PaintType = PaintType.Oil,
                 ArtistId = savrasov.Id,
                 GenreId = landscape.Id,
@@ -646,7 +660,8 @@ public static class SeedDataInitializer
                 CreationYear = 1503,
                 Medium = "Oil on poplar panel",
                 Dimensions = "77 cm × 53 cm (30 in × 21 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/687px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/687px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
                 PaintType = PaintType.Oil,
                 ArtistId = daVinci.Id,
                 GenreId = portrait.Id,
@@ -662,7 +677,8 @@ public static class SeedDataInitializer
                 CreationYear = 1498,
                 Medium = "Tempera and oil on gesso",
                 Dimensions = "460 cm × 880 cm (181 in × 346 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/%C3%9Altima_Cena_-_Da_Vinci_5.jpg/800px-%C3%9Altima_Cena_-_Da_Vinci_5.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/%C3%9Altima_Cena_-_Da_Vinci_5.jpg/800px-%C3%9Altima_Cena_-_Da_Vinci_5.jpg",
                 PaintType = PaintType.Tempera,
                 ArtistId = daVinci.Id,
                 GenreId = religious.Id,
@@ -696,7 +712,8 @@ public static class SeedDataInitializer
                 CreationYear = 1541,
                 Medium = "Fresco",
                 Dimensions = "1370 cm × 1200 cm (539 in × 472 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Last_Judgement_%28Michelangelo%29.jpg/600px-Last_Judgement_%28Michelangelo%29.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Last_Judgement_%28Michelangelo%29.jpg/600px-Last_Judgement_%28Michelangelo%29.jpg",
                 PaintType = PaintType.Fresco,
                 ArtistId = michelangelo.Id,
                 GenreId = religious.Id,
@@ -714,7 +731,8 @@ public static class SeedDataInitializer
                 CreationYear = 1485,
                 Medium = "Tempera on canvas",
                 Dimensions = "172.5 cm × 278.9 cm (67.9 in × 109.6 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/800px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/800px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
                 PaintType = PaintType.Tempera,
                 ArtistId = botticelli.Id,
                 GenreId = mythological.Id,
@@ -730,7 +748,8 @@ public static class SeedDataInitializer
                 CreationYear = 1482,
                 Medium = "Tempera on wood",
                 Dimensions = "202 cm × 314 cm (80 in × 124 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Botticelli-primavera.jpg/800px-Botticelli-primavera.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Botticelli-primavera.jpg/800px-Botticelli-primavera.jpg",
                 PaintType = PaintType.Tempera,
                 ArtistId = botticelli.Id,
                 GenreId = mythological.Id,
@@ -748,7 +767,8 @@ public static class SeedDataInitializer
                 CreationYear = 1600,
                 Medium = "Oil on canvas",
                 Dimensions = "322 cm × 340 cm (127 in × 134 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/The_Calling_of_Saint_Matthew-Caravaggo_%281599-1600%29.jpg/800px-The_Calling_of_Saint_Matthew-Caravaggo_%281599-1600%29.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/The_Calling_of_Saint_Matthew-Caravaggo_%281599-1600%29.jpg/800px-The_Calling_of_Saint_Matthew-Caravaggo_%281599-1600%29.jpg",
                 PaintType = PaintType.Oil,
                 ArtistId = caravaggio.Id,
                 GenreId = religious.Id,
@@ -764,7 +784,8 @@ public static class SeedDataInitializer
                 CreationYear = 1602,
                 Medium = "Oil on canvas",
                 Dimensions = "144 cm × 195 cm (57 in × 77 in)",
-                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/d/df/Caravaggio_-_Giuditta_e_Oloferne_%28ca._1599%29.jpg",
+                ImageUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/d/df/Caravaggio_-_Giuditta_e_Oloferne_%28ca._1599%29.jpg",
                 PaintType = PaintType.Oil,
                 ArtistId = caravaggio.Id,
                 GenreId = religious.Id,

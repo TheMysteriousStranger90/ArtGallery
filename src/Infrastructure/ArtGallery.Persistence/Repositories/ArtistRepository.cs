@@ -17,7 +17,7 @@ public class ArtistRepository : GenericRepository<Artist>, IArtistRepository
             .Include(a => a.Biography)
             .Include(a => a.ArtistImage)
             .Include(a => a.Paintings)
-                .ThenInclude(p => p.Genre)
+            .ThenInclude(p => p.Genre)
             .FirstOrDefaultAsync(a => a.Id == artistId);
     }
 

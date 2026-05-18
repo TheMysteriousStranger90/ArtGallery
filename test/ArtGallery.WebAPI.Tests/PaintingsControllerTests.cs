@@ -136,9 +136,7 @@ namespace ArtGallery.WebAPI.Tests
             var paintingId = Guid.NewGuid();
             var cachedPainting = new PaintingDetailDto
             {
-                Id = paintingId,
-                Title = "Starry Night",
-                Description = "A famous painting"
+                Id = paintingId, Title = "Starry Night", Description = "A famous painting"
             };
 
             object expectedValue = cachedPainting;
@@ -166,9 +164,7 @@ namespace ArtGallery.WebAPI.Tests
             var paintingId = Guid.NewGuid();
             var paintingDetail = new PaintingDetailDto
             {
-                Id = paintingId,
-                Title = "Starry Night",
-                Description = "A famous painting"
+                Id = paintingId, Title = "Starry Night", Description = "A famous painting"
             };
 
             object expectedValue = null;
@@ -214,8 +210,7 @@ namespace ArtGallery.WebAPI.Tests
                 .ThrowsAsync(new Exception(nameof(Painting)));
 
             // Act & Assert
-            await Assert.ThrowsAsync<NotFoundException>(
-                () => _controller.GetPainting(paintingId));
+            await Assert.ThrowsAsync<NotFoundException>(() => _controller.GetPainting(paintingId));
         }
 
         #endregion
@@ -229,19 +224,12 @@ namespace ArtGallery.WebAPI.Tests
             var paintingId = Guid.NewGuid();
             var command = new CreatePaintingCommand
             {
-                Title = "New Painting",
-                Description = "A new painting",
-                ArtistId = Guid.NewGuid()
+                Title = "New Painting", Description = "A new painting", ArtistId = Guid.NewGuid()
             };
 
             var response = new CreatePaintingCommandResponse
             {
-                Success = true,
-                Painting = new PaintingDto
-                {
-                    Id = paintingId,
-                    Title = "New Painting"
-                }
+                Success = true, Painting = new PaintingDto { Id = paintingId, Title = "New Painting" }
             };
 
             _mockMediator
@@ -279,8 +267,7 @@ namespace ArtGallery.WebAPI.Tests
 
             var response = new CreatePaintingCommandResponse
             {
-                Success = false,
-                ValidationErrors = new List<string> { "Title is required" }
+                Success = false, ValidationErrors = new List<string> { "Title is required" }
             };
 
             _mockMediator
@@ -307,19 +294,12 @@ namespace ArtGallery.WebAPI.Tests
             var paintingId = Guid.NewGuid();
             var command = new UpdatePaintingCommand
             {
-                Id = paintingId,
-                Title = "Updated Painting",
-                Description = "An updated painting"
+                Id = paintingId, Title = "Updated Painting", Description = "An updated painting"
             };
 
             var response = new UpdatePaintingCommandResponse
             {
-                Success = true,
-                Painting = new PaintingDto
-                {
-                    Id = paintingId,
-                    Title = "Updated Painting"
-                }
+                Success = true, Painting = new PaintingDto { Id = paintingId, Title = "Updated Painting" }
             };
 
             _mockMediator
@@ -349,11 +329,7 @@ namespace ArtGallery.WebAPI.Tests
             // Arrange
             var paintingId = Guid.NewGuid();
             var differentId = Guid.NewGuid();
-            var command = new UpdatePaintingCommand
-            {
-                Id = differentId,
-                Title = "Updated Painting"
-            };
+            var command = new UpdatePaintingCommand { Id = differentId, Title = "Updated Painting" };
 
             // Act
             var result = await _controller.UpdatePainting(paintingId, command);
@@ -367,16 +343,11 @@ namespace ArtGallery.WebAPI.Tests
         {
             // Arrange
             var paintingId = Guid.NewGuid();
-            var command = new UpdatePaintingCommand
-            {
-                Id = paintingId,
-                Title = "Updated Painting"
-            };
+            var command = new UpdatePaintingCommand { Id = paintingId, Title = "Updated Painting" };
 
             var response = new UpdatePaintingCommandResponse
             {
-                Success = false,
-                Message = $"{nameof(Painting)} not found"
+                Success = false, Message = $"{nameof(Painting)} not found"
             };
 
             _mockMediator
@@ -384,8 +355,7 @@ namespace ArtGallery.WebAPI.Tests
                 .ReturnsAsync(response);
 
             // Act & Assert
-            await Assert.ThrowsAsync<NotFoundException>(
-                () => _controller.UpdatePainting(paintingId, command));
+            await Assert.ThrowsAsync<NotFoundException>(() => _controller.UpdatePainting(paintingId, command));
         }
 
         #endregion
@@ -400,8 +370,7 @@ namespace ArtGallery.WebAPI.Tests
 
             var response = new DeletePaintingCommandResponse
             {
-                Success = true,
-                Message = "Painting deleted successfully"
+                Success = true, Message = "Painting deleted successfully"
             };
 
             _mockMediator
@@ -431,8 +400,7 @@ namespace ArtGallery.WebAPI.Tests
 
             var response = new DeletePaintingCommandResponse
             {
-                Success = false,
-                Message = $"{nameof(Painting)} not found"
+                Success = false, Message = $"{nameof(Painting)} not found"
             };
 
             _mockMediator
@@ -441,8 +409,7 @@ namespace ArtGallery.WebAPI.Tests
                 .ReturnsAsync(response);
 
             // Act & Assert
-            await Assert.ThrowsAsync<NotFoundException>(
-                () => _controller.DeletePainting(paintingId));
+            await Assert.ThrowsAsync<NotFoundException>(() => _controller.DeletePainting(paintingId));
         }
 
         #endregion
@@ -457,10 +424,7 @@ namespace ArtGallery.WebAPI.Tests
             var userId = "user123";
 
             // Setup user claims
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId)
-            };
+            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId) };
             var identity = new ClaimsIdentity(claims);
             var claimsPrincipal = new ClaimsPrincipal(identity);
 
@@ -471,14 +435,12 @@ namespace ArtGallery.WebAPI.Tests
 
             var response = new AddPaintingToFavoriteCommandResponse
             {
-                Success = true,
-                IsFavorite = true,
-                Message = "Painting added to favorites"
+                Success = true, IsFavorite = true, Message = "Painting added to favorites"
             };
 
             _mockMediator
-                .Setup(m => m.Send(It.Is<AddPaintingToFavoriteCommand>(
-                        c => c.UserId == userId && c.PaintingId == paintingId),
+                .Setup(m => m.Send(
+                    It.Is<AddPaintingToFavoriteCommand>(c => c.UserId == userId && c.PaintingId == paintingId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(response);
 
@@ -504,10 +466,7 @@ namespace ArtGallery.WebAPI.Tests
             var userId = "user123";
 
             // Setup user claims
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId)
-            };
+            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId) };
             var identity = new ClaimsIdentity(claims);
             var claimsPrincipal = new ClaimsPrincipal(identity);
 

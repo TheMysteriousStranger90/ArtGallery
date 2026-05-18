@@ -53,8 +53,7 @@ public class
 
             var paintingExhibition = new PaintingExhibition
             {
-                ExhibitionId = request.ExhibitionId,
-                PaintingId = request.PaintingId
+                ExhibitionId = request.ExhibitionId, PaintingId = request.PaintingId
             };
 
             await _unitOfWork.Repository<PaintingExhibition>().AddAsync(paintingExhibition);

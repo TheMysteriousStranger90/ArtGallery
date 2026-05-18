@@ -22,13 +22,14 @@
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Search by title…"
                            aria-label="Search paintings"
-                           @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp" />
+                           @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp"/>
                     <button class="btn btn-outline-primary" type="button" @onclick="ApplySearch">
                         <i class="bi bi-search me-1" aria-hidden="true"></i> Search
                     </button>
                     @if (!string.IsNullOrEmpty(ActiveSearch))
                     {
-                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch" aria-label="Clear search">
+                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch"
+                                aria-label="Clear search">
                             <i class="bi bi-x-lg" aria-hidden="true"></i>
                         </button>
                     }
@@ -104,9 +105,10 @@
                 <div class="filter-group">
                     <label class="form-label-sm">Creation Year</label>
                     <div class="d-flex gap-2">
-                        <input type="number" class="form-control form-control-sm" placeholder="From" @bind="FromYear" />
-                        <input type="number" class="form-control form-control-sm" placeholder="To"   @bind="ToYear" />
-                        <button class="btn btn-sm btn-outline-primary" @onclick="ApplyFilters" aria-label="Apply year filter">
+                        <input type="number" class="form-control form-control-sm" placeholder="From" @bind="FromYear"/>
+                        <input type="number" class="form-control form-control-sm" placeholder="To" @bind="ToYear"/>
+                        <button class="btn btn-sm btn-outline-primary" @onclick="ApplyFilters"
+                                aria-label="Apply year filter">
                             <i class="bi bi-sliders" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -130,7 +132,11 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
                     @for (int i = 0; i < PageSize; i++)
                     {
-                        <div class="col"><div class="painting-card"><SkeletonCard /></div></div>
+                        <div class="col">
+                            <div class="painting-card">
+                                <SkeletonCard/>
+                            </div>
+                        </div>
                     }
                 </div>
             }
@@ -138,7 +144,8 @@
             {
                 <div class="gallery-stats-container mb-3">
                     <div class="gallery-stats">
-                        Showing @pagedPaintings.Data.Count of @pagedPaintings.Count paintings &mdash; page @CurrentPage of @TotalPages
+                        Showing @pagedPaintings.Data.Count of @pagedPaintings.Count paintings &mdash;
+                        page @CurrentPage of @TotalPages
                     </div>
                 </div>
 
@@ -147,14 +154,15 @@
                     {
                         <div class="col">
                             <div class="painting-card">
-                                <PaintingCard Painting="painting" OnPaintingDeleted="HandlePaintingDeleted" />
+                                <PaintingCard Painting="painting" OnPaintingDeleted="HandlePaintingDeleted"/>
                             </div>
                         </div>
                     }
                 </div>
 
                 <div class="pagination-container">
-                    <Pagination CurrentPage="CurrentPage" TotalPages="TotalPages" OnPageChanged="ChangePage" AriaLabel="Paintings navigation" />
+                    <Pagination CurrentPage="CurrentPage" TotalPages="TotalPages" OnPageChanged="ChangePage"
+                                AriaLabel="Paintings navigation"/>
                 </div>
             }
             else if (!string.IsNullOrEmpty(errorMessage))
@@ -168,7 +176,7 @@
             else
             {
                 <EmptyState Icon="bi bi-palette fs-1" Title="No Paintings Found"
-                            Message="Try adjusting your search or filter parameters." />
+                            Message="Try adjusting your search or filter parameters."/>
             }
         </div>
     </div>
@@ -189,10 +197,11 @@
         ArtistId.HasValue || GenreId.HasValue || MuseumId.HasValue || FromYear.HasValue || ToYear.HasValue;
 
     [Parameter] [SupplyParameterFromQuery] public int CurrentPage { get; set; } = 1;
-    [Parameter] [SupplyParameterFromQuery] public int PageSize    { get; set; } = 6;
+    [Parameter] [SupplyParameterFromQuery] public int PageSize { get; set; } = 6;
     [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
 
     private string _currentSort = "title";
+
     [Parameter]
     [SupplyParameterFromQuery]
     public string CurrentSort
@@ -200,15 +209,21 @@
         get => _currentSort;
         set
         {
-            if (_currentSort != value)
+            var safeValue = string.IsNullOrEmpty(value) ? "title" : value;
+            if (_currentSort != safeValue)
             {
-                _currentSort = value;
-                if (_hasCompletedInitialParameterSet) { CurrentPage = 1; NavigateToPage(); }
+                _currentSort = safeValue;
+                if (_hasCompletedInitialParameterSet)
+                {
+                    CurrentPage = 1;
+                    NavigateToPage();
+                }
             }
         }
     }
 
     private Guid? _artistId;
+
     [Parameter]
     [SupplyParameterFromQuery]
     public Guid? ArtistId
@@ -225,6 +240,7 @@
     }
 
     private Guid? _genreId;
+
     [Parameter]
     [SupplyParameterFromQuery]
     public Guid? GenreId
@@ -235,7 +251,11 @@
             if (_genreId != value)
             {
                 _genreId = value;
-                if (_hasCompletedInitialParameterSet) { CurrentPage = 1; NavigateToPage(); }
+                if (_hasCompletedInitialParameterSet)
+                {
+                    CurrentPage = 1;
+                    NavigateToPage();
+                }
             }
         }
     }
@@ -254,38 +274,50 @@
             {
                 newPaintType = value.ToLowerInvariant() switch
                 {
-                    "oil"        => Services.PaintType._0,
-                    "acrylic"    => Services.PaintType._1,
+                    "oil" => Services.PaintType._0,
+                    "acrylic" => Services.PaintType._1,
                     "watercolor" => Services.PaintType._2,
-                    "gouache"    => Services.PaintType._3,
-                    "tempera"    => Services.PaintType._4,
-                    "pastel"     => Services.PaintType._5,
-                    "encaustic"  => Services.PaintType._6,
-                    "fresco"     => Services.PaintType._7,
-                    "ink"        => Services.PaintType._8,
-                    "digital"    => Services.PaintType._9,
+                    "gouache" => Services.PaintType._3,
+                    "tempera" => Services.PaintType._4,
+                    "pastel" => Services.PaintType._5,
+                    "encaustic" => Services.PaintType._6,
+                    "fresco" => Services.PaintType._7,
+                    "ink" => Services.PaintType._8,
+                    "digital" => Services.PaintType._9,
                     "mixedmedia" => Services.PaintType._10,
-                    "other"      => Services.PaintType._11,
+                    "other" => Services.PaintType._11,
                     _ => null
                 };
             }
+
             if (_paintType != newPaintType)
             {
                 _paintType = newPaintType;
-                if (_hasCompletedInitialParameterSet) { CurrentPage = 1; NavigateToPage(); }
+                if (_hasCompletedInitialParameterSet)
+                {
+                    CurrentPage = 1;
+                    NavigateToPage();
+                }
             }
         }
     }
+
     private PaintType? _paintType;
-    public PaintType? PaintType { get => _paintType; set => PaintTypeString = value?.ToString(); }
+
+    public PaintType? PaintType
+    {
+        get => _paintType;
+        set => PaintTypeString = value?.ToString();
+    }
 
     [Parameter] [SupplyParameterFromQuery] public int? FromYear { get; set; }
-    [Parameter] [SupplyParameterFromQuery] public int? ToYear   { get; set; }
+    [Parameter] [SupplyParameterFromQuery] public int? ToYear { get; set; }
 
     public string? CurrentSearch { get; set; }
 
     public int TotalPages => (pagedPaintings?.Count > 0 && PageSize > 0)
-        ? (int)Math.Ceiling((double)pagedPaintings.Count / PageSize) : 0;
+        ? (int)Math.Ceiling((double)pagedPaintings.Count / PageSize)
+        : 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -293,8 +325,8 @@
         isAdministrator = authState.User.IsInRole("Administrator");
 
         _currentSort = CurrentSort;
-        _artistId    = ArtistId;
-        _genreId     = GenreId;
+        _artistId = ArtistId;
+        _genreId = GenreId;
 
         if (!string.IsNullOrEmpty(ActiveSearch)) CurrentSearch = ActiveSearch;
 
@@ -332,10 +364,10 @@
         {
             var r = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
             genres = r.Data.Where(p => p.Genre != null)
-                           .GroupBy(p => p.Genre.Id)
-                           .Select(g => g.First().Genre)
-                           .OrderBy(g => g.Name)
-                           .ToList();
+                .GroupBy(p => p.Genre.Id)
+                .Select(g => g.First().Genre)
+                .OrderBy(g => g.Name)
+                .ToList();
         }
         catch (Exception ex)
         {
@@ -350,10 +382,10 @@
         {
             var r = await ApiClient.PaintingsGET2Async(1, 100, "", null, null, null, null, null, null, "title", "1.0");
             museums = r.Data.Where(p => p.Museum != null)
-                            .GroupBy(p => p.Museum.Id)
-                            .Select(g => g.First().Museum)
-                            .OrderBy(m => m.Name)
-                            .ToList();
+                .GroupBy(p => p.Museum.Id)
+                .Select(g => g.First().Museum)
+                .OrderBy(m => m.Name)
+                .ToList();
         }
         catch (Exception ex)
         {
@@ -365,7 +397,7 @@
     protected override async Task OnParametersSetAsync()
     {
         if (CurrentPage < 1) CurrentPage = 1;
-        if (PageSize    < 1) PageSize    = 6;
+        if (PageSize < 1) PageSize = 6;
 
         if (string.IsNullOrEmpty(CurrentSearch) && !string.IsNullOrEmpty(ActiveSearch))
             CurrentSearch = ActiveSearch;
@@ -378,15 +410,15 @@
 
     private async Task LoadPaintings()
     {
-        isLoading    = true;
+        isLoading = true;
         errorMessage = null;
         try
         {
             var sort = CurrentSort switch
             {
+                null or "" => "title",
                 var s when s.StartsWith("-") => $"{s[1..]}_desc",
-                var s when !string.IsNullOrEmpty(s) => s,
-                _ => "title"
+                var s => s
             };
 
             pagedPaintings = await PaintingService.GetPaintingsAsync(
@@ -420,61 +452,66 @@
         {
             isLoading = false;
         }
+
         StateHasChanged();
     }
 
     private void ApplySearch()
     {
         ActiveSearch = CurrentSearch;
-        CurrentPage  = 1;
+        CurrentPage = 1;
         NavigateToPage();
     }
 
-    private void ApplyFilters() { CurrentPage = 1; NavigateToPage(); }
+    private void ApplyFilters()
+    {
+        CurrentPage = 1;
+        NavigateToPage();
+    }
 
     private void ClearAllFilters()
     {
-        ArtistId      = null;
-        GenreId       = null;
-        MuseumId      = null;
+        ArtistId = null;
+        GenreId = null;
+        MuseumId = null;
         PaintTypeString = null;
-        FromYear      = null;
-        ToYear        = null;
-        CurrentPage   = 1;
+        FromYear = null;
+        ToYear = null;
+        CurrentPage = 1;
 
         var q = new Dictionary<string, object?>
         {
             ["currentPage"] = "1",
-            ["pageSize"]    = PageSize.ToString(),
+            ["pageSize"] = PageSize.ToString(),
             ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
             ["currentSort"] = CurrentSort
         };
         var baseUri = NavigationManager.Uri.Split('?')[0];
         NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(baseUri,
-            q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!),
+                q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!),
             forceLoad: false, replace: true);
     }
 
     private void ClearSearch()
     {
         CurrentSearch = string.Empty;
-        ActiveSearch  = null;
-        CurrentPage   = 1;
+        ActiveSearch = null;
+        CurrentPage = 1;
         var q = new Dictionary<string, object?>
         {
             ["currentPage"] = "1",
-            ["pageSize"]    = PageSize.ToString(),
+            ["pageSize"] = PageSize.ToString(),
             ["currentSort"] = CurrentSort,
-            ["artistId"]    = ArtistId?.ToString(),
-            ["genreId"]     = GenreId?.ToString(),
-            ["museumId"]    = MuseumId?.ToString(),
-            ["paintType"]   = PaintTypeString,
-            ["fromYear"]    = FromYear?.ToString(),
-            ["toYear"]      = ToYear?.ToString()
+            ["artistId"] = ArtistId?.ToString(),
+            ["genreId"] = GenreId?.ToString(),
+            ["museumId"] = MuseumId?.ToString(),
+            ["paintType"] = PaintTypeString,
+            ["fromYear"] = FromYear?.ToString(),
+            ["toYear"] = ToYear?.ToString()
         };
         var baseUri = NavigationManager.Uri.Split('?')[0];
         NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(baseUri,
-            q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!),
+                q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!),
             forceLoad: false, replace: true);
     }
 
@@ -490,23 +527,27 @@
         var q = new Dictionary<string, object?>
         {
             ["currentPage"] = CurrentPage.ToString(),
-            ["pageSize"]    = PageSize.ToString(),
+            ["pageSize"] = PageSize.ToString(),
             ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
             ["currentSort"] = CurrentSort,
-            ["artistId"]    = ArtistId?.ToString(),
-            ["genreId"]     = GenreId?.ToString(),
-            ["museumId"]    = MuseumId?.ToString(),
-            ["paintType"]   = PaintTypeString,
-            ["fromYear"]    = FromYear?.ToString(),
-            ["toYear"]      = ToYear?.ToString()
+            ["artistId"] = ArtistId?.ToString(),
+            ["genreId"] = GenreId?.ToString(),
+            ["museumId"] = MuseumId?.ToString(),
+            ["paintType"] = PaintTypeString,
+            ["fromYear"] = FromYear?.ToString(),
+            ["toYear"] = ToYear?.ToString()
         };
-        var newUri = NavigationManager.GetUriWithQueryParameters(
+        var baseUri = NavigationManager.Uri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri,
             q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!);
         if (NavigationManager.Uri != newUri || isPageAdjustment)
             NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
     }
 
-    private void HandleKeyUp(KeyboardEventArgs e) { if (e.Key == "Enter") ApplySearch(); }
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") ApplySearch();
+    }
 
     private async Task HandlePaintingDeleted(Guid paintingId)
     {
@@ -514,4 +555,5 @@
         Toast.Success("Painting deleted successfully.");
         await LoadPaintings();
     }
+
 }

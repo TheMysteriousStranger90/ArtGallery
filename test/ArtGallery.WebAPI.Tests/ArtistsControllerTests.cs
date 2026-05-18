@@ -178,12 +178,7 @@ namespace ArtGallery.WebAPI.Tests
             var response = new CreateArtistCommandResponse
             {
                 Success = true,
-                Artist = new CreateArtistDto
-                {
-                    Id = artistId,
-                    FirstName = "Vincent",
-                    LastName = "Van Gogh"
-                }
+                Artist = new CreateArtistDto { Id = artistId, FirstName = "Vincent", LastName = "Van Gogh" }
             };
 
             _mockMediator
@@ -208,16 +203,11 @@ namespace ArtGallery.WebAPI.Tests
         public async Task CreateArtist_WithInvalidCommand_ReturnsBadRequest()
         {
             // Arrange
-            var command = new CreateArtistCommand
-            {
-                FirstName = "Vincent",
-                LastName = "Van Gogh"
-            };
+            var command = new CreateArtistCommand { FirstName = "Vincent", LastName = "Van Gogh" };
 
             var response = new CreateArtistCommandResponse
             {
-                Success = false,
-                ValidationErrors = new List<string> { "Biography is required" }
+                Success = false, ValidationErrors = new List<string> { "Biography is required" }
             };
 
             _mockMediator
@@ -238,17 +228,9 @@ namespace ArtGallery.WebAPI.Tests
         public async Task CreateArtist_WithErrorResponse_ThrowsBadRequestException()
         {
             // Arrange
-            var command = new CreateArtistCommand
-            {
-                FirstName = "Vincent",
-                LastName = "Van Gogh"
-            };
+            var command = new CreateArtistCommand { FirstName = "Vincent", LastName = "Van Gogh" };
 
-            var response = new CreateArtistCommandResponse
-            {
-                Success = false,
-                Message = "Database error"
-            };
+            var response = new CreateArtistCommandResponse { Success = false, Message = "Database error" };
 
             _mockMediator
                 .Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
@@ -267,11 +249,7 @@ namespace ArtGallery.WebAPI.Tests
         {
             // Arrange
             var artistId = Guid.NewGuid();
-            var response = new DeleteArtistCommandResponse
-            {
-                Success = true,
-                Message = "Artist deleted successfully"
-            };
+            var response = new DeleteArtistCommandResponse { Success = true, Message = "Artist deleted successfully" };
 
             _mockMediator
                 .Setup(m => m.Send(It.Is<DeleteArtistCommand>(c => c.Id == artistId), It.IsAny<CancellationToken>()))
@@ -297,11 +275,7 @@ namespace ArtGallery.WebAPI.Tests
         {
             // Arrange
             var artistId = Guid.NewGuid();
-            var response = new DeleteArtistCommandResponse
-            {
-                Success = false,
-                Message = $"{nameof(Artist)} not found"
-            };
+            var response = new DeleteArtistCommandResponse { Success = false, Message = $"{nameof(Artist)} not found" };
 
             _mockMediator
                 .Setup(m => m.Send(It.Is<DeleteArtistCommand>(c => c.Id == artistId), It.IsAny<CancellationToken>()))
@@ -323,10 +297,7 @@ namespace ArtGallery.WebAPI.Tests
             var userId = "user-123";
 
             // Setup ClaimsPrincipal for the controller
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId)
-            };
+            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId) };
             var identity = new ClaimsIdentity(claims);
             var claimsPrincipal = new ClaimsPrincipal(identity);
 
@@ -338,9 +309,7 @@ namespace ArtGallery.WebAPI.Tests
 
             var response = new AddArtistToFavoriteCommandResponse
             {
-                Success = true,
-                IsFavorite = true,
-                Message = "Artist added to favorites successfully"
+                Success = true, IsFavorite = true, Message = "Artist added to favorites successfully"
             };
 
             _mockMediator
@@ -385,11 +354,7 @@ namespace ArtGallery.WebAPI.Tests
                 HttpContext = new DefaultHttpContext { User = claimsPrincipal }
             };
 
-            var response = new AddArtistToFavoriteCommandResponse
-            {
-                Success = false,
-                Message = "Artist not found"
-            };
+            var response = new AddArtistToFavoriteCommandResponse { Success = false, Message = "Artist not found" };
 
             _mockMediator
                 .Setup(m => m.Send(It.IsAny<AddArtistToFavoriteCommand>(), It.IsAny<CancellationToken>()))

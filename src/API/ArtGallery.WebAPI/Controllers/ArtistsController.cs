@@ -47,8 +47,8 @@ public class ArtistsController : ControllerBase
         [FromQuery] string sort = "lastName")
     {
         _logger.LogInformation("Getting artists list with pageIndex: {PageIndex}, pageSize: {PageSize}, " +
-                              "search: {Search}, nationality: {Nationality}, sort: {Sort}",
-                              pageIndex, pageSize, search, nationality, sort);
+                               "search: {Search}, nationality: {Nationality}, sort: {Sort}",
+            pageIndex, pageSize, search, nationality, sort);
 
         var query = new GetArtistsListQuery
         {
@@ -127,8 +127,7 @@ public class ArtistsController : ControllerBase
                 // Return validation errors
                 var problemDetails = new ValidationProblemDetails
                 {
-                    Title = "Validation errors occurred",
-                    Status = (int)HttpStatusCode.BadRequest
+                    Title = "Validation errors occurred", Status = (int)HttpStatusCode.BadRequest
                 };
 
                 foreach (var error in response.ValidationErrors)
@@ -179,16 +178,9 @@ public class ArtistsController : ControllerBase
         {
             if (response.ValidationErrors?.Count > 0)
             {
-                var problemDetails = new ValidationProblemDetails
-                {
-                    Title = "Validation errors occurred",
-                    Status = (int)HttpStatusCode.BadRequest
-                };
+                var problemDetails = new ValidationProblemDetails();
 
-                foreach (var error in response.ValidationErrors)
-                {
-                    problemDetails.Errors.Add("Validation", new[] { error });
-                }
+                problemDetails.Errors.Add("Validation", response.ValidationErrors.ToArray());
 
                 return BadRequest(problemDetails);
             }
@@ -248,11 +240,7 @@ public class ArtistsController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         _logger.LogInformation("Adding artist {ArtistId} to favorites for user {UserId}", artistId, userId);
 
-        var command = new AddArtistToFavoriteCommand
-        {
-            UserId = userId,
-            ArtistId = artistId
-        };
+        var command = new AddArtistToFavoriteCommand { UserId = userId, ArtistId = artistId };
 
         var result = await _mediator.Send(command);
 
@@ -261,11 +249,7 @@ public class ArtistsController : ControllerBase
             return BadRequest(new { message = result.Message });
         }
 
-        return Ok(new
-        {
-            isFavorite = result.IsFavorite,
-            message = result.Message
-        });
+        return Ok(new { isFavorite = result.IsFavorite, message = result.Message });
     }
 
 
@@ -286,4 +270,30 @@ public class ArtistsController : ControllerBase
 
         return Ok(result);
     }
+
+    /// <summary>
+    /// Remove an artist from the current user's favorites
+    /// </summary>
+    /// <param name="artistId">ID of the artist to remove from favorites</param>
+    [HttpDelete("artists/{artistId}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> RemoveArtistFromFavorites(Guid artistId)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        _logger.LogInformation("Removing artist {ArtistId} from favorites for user {UserId}", artistId, userId);
+
+        var command = new RemoveArtistFromFavoriteCommand { UserId = userId, ArtistId = artistId };
+        var result = await _mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(new { message = result.Message });
+        }
+
+        return Ok(new { message = result.Message });
+    }
 }
+

@@ -21,13 +21,14 @@
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Search by name…"
                            aria-label="Search artists"
-                           @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp" />
+                           @bind="CurrentSearch" @bind:event="oninput" @onkeyup="HandleKeyUp"/>
                     <button class="btn btn-outline-primary" type="button" @onclick="ApplySearch">
                         <i class="bi bi-search me-1" aria-hidden="true"></i> Search
                     </button>
                     @if (!string.IsNullOrEmpty(ActiveSearch))
                     {
-                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch" aria-label="Clear search">
+                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearch"
+                                aria-label="Clear search">
                             <i class="bi bi-x-lg" aria-hidden="true"></i>
                         </button>
                     }
@@ -90,7 +91,11 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-3">
                     @for (int i = 0; i < PageSize; i++)
                     {
-                        <div class="col"><div class="painting-card"><SkeletonCard /></div></div>
+                        <div class="col">
+                            <div class="painting-card">
+                                <SkeletonCard/>
+                            </div>
+                        </div>
                     }
                 </div>
             }
@@ -98,7 +103,8 @@
             {
                 <div class="gallery-stats-container mb-3">
                     <div class="gallery-stats">
-                        Showing @pagedArtists.Data.Count of @pagedArtists.Count artists &mdash; page @CurrentPage of @TotalPages
+                        Showing @pagedArtists.Data.Count of @pagedArtists.Count artists &mdash;
+                        page @CurrentPage of @TotalPages
                     </div>
                 </div>
 
@@ -107,14 +113,15 @@
                     {
                         <div class="col">
                             <div class="painting-card">
-                                <ArtistCard Artist="artist" OnArtistDeleted="HandleArtistDeleted" />
+                                <ArtistCard Artist="artist" OnArtistDeleted="HandleArtistDeleted"/>
                             </div>
                         </div>
                     }
                 </div>
 
                 <div class="pagination-container">
-                    <Pagination CurrentPage="CurrentPage" TotalPages="TotalPages" OnPageChanged="ChangePage" AriaLabel="Artists navigation" />
+                    <Pagination CurrentPage="CurrentPage" TotalPages="TotalPages" OnPageChanged="ChangePage"
+                                AriaLabel="Artists navigation"/>
                 </div>
             }
             else if (!string.IsNullOrEmpty(errorMessage))
@@ -128,7 +135,7 @@
             else
             {
                 <EmptyState Icon="bi bi-person-x fs-1" Title="No Artists Found"
-                            Message="Try adjusting your search or filter parameters." />
+                            Message="Try adjusting your search or filter parameters."/>
             }
         </div>
     </div>
@@ -138,23 +145,24 @@
     private Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null? pagedArtists;
     private bool isLoading = true;
     private string? errorMessage;
-        private bool isAdministrator;
+    private bool isAdministrator;
     private ICollection<string>? nationalities;
 
     private bool HasActiveFilters => !string.IsNullOrEmpty(Nationality);
 
     [Parameter] [SupplyParameterFromQuery] public int CurrentPage { get; set; } = 1;
-    [Parameter] [SupplyParameterFromQuery] public int PageSize    { get; set; } = 6;
+    [Parameter] [SupplyParameterFromQuery] public int PageSize { get; set; } = 6;
     [Parameter] [SupplyParameterFromQuery] public string? ActiveSearch { get; set; }
     [Parameter] [SupplyParameterFromQuery] public string CurrentSort { get; set; } = "lastName";
     [Parameter] [SupplyParameterFromQuery] public string Nationality { get; set; } = string.Empty;
     [Parameter] [SupplyParameterFromQuery] public int? FromYear { get; set; }
-    [Parameter] [SupplyParameterFromQuery] public int? ToYear   { get; set; }
+    [Parameter] [SupplyParameterFromQuery] public int? ToYear { get; set; }
 
     public string? CurrentSearch { get; set; }
 
     public int TotalPages => (pagedArtists?.Count > 0 && PageSize > 0)
-        ? (int)Math.Ceiling((double)pagedArtists.Count / PageSize) : 0;
+        ? (int)Math.Ceiling((double)pagedArtists.Count / PageSize)
+        : 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -176,7 +184,10 @@
 
     private async Task LoadNationalities()
     {
-        try { nationalities = await ArtistService.GetNationalitiesAsync(); }
+        try
+        {
+            nationalities = await ArtistService.GetNationalitiesAsync();
+        }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error loading nationalities");
@@ -187,7 +198,7 @@
     protected override async Task OnParametersSetAsync()
     {
         if (CurrentPage < 1) CurrentPage = 1;
-        if (PageSize    < 1) PageSize    = 6;
+        if (PageSize < 1) PageSize = 6;
 
         if (string.IsNullOrEmpty(CurrentSearch) && !string.IsNullOrEmpty(ActiveSearch))
             CurrentSearch = ActiveSearch;
@@ -195,11 +206,11 @@
             CurrentSearch = string.Empty;
 
         await LoadArtistData();
-        }
+    }
 
     private async Task LoadArtistData()
     {
-        isLoading    = true;
+        isLoading = true;
         errorMessage = null;
         try
         {
@@ -207,7 +218,7 @@
             {
                 "-lastName" => "lastname_desc",
                 "birthDate" => "birthdate",
-                _           => "lastName"
+                _ => "lastName"
             };
 
             pagedArtists = await ArtistService.GetArtistsAsync(
@@ -235,43 +246,65 @@
             pagedArtists = new Pagination_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
                 { Data = new List<ArtistDto>(), Count = 0, PageIndex = CurrentPage, PageSize = PageSize };
         }
-        finally { isLoading = false; }
+        finally
+        {
+            isLoading = false;
+        }
+
         StateHasChanged();
     }
 
-    private void ApplySearch() { ActiveSearch = CurrentSearch; CurrentPage = 1; NavigateToPage(); }
-    private void ApplyFilters() { CurrentPage = 1; NavigateToPage(); }
-    private void OnSortChanged() { CurrentPage = 1; NavigateToPage(); }
+    private void ApplySearch()
+    {
+        ActiveSearch = CurrentSearch;
+        CurrentPage = 1;
+        NavigateToPage();
+    }
+
+    private void ApplyFilters()
+    {
+        CurrentPage = 1;
+        NavigateToPage();
+    }
+
+    private void OnSortChanged()
+    {
+        CurrentPage = 1;
+        NavigateToPage();
+    }
 
     private void ClearAllFilters()
     {
-        Nationality = string.Empty; CurrentPage = 1;
+        Nationality = string.Empty;
+        CurrentPage = 1;
         var q = new Dictionary<string, object?>
         {
-            ["currentPage"]  = "1",
-            ["pageSize"]     = PageSize.ToString(),
+            ["currentPage"] = "1",
+            ["pageSize"] = PageSize.ToString(),
             ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
-            ["currentSort"]  = CurrentSort
+            ["currentSort"] = CurrentSort
         };
         var baseUri = NavigationManager.Uri.Split('?')[0];
         NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(baseUri,
-            q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!),
+                q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!),
             forceLoad: false, replace: true);
     }
 
     private void ClearSearch()
     {
-        CurrentSearch = string.Empty; ActiveSearch = null; CurrentPage = 1;
+        CurrentSearch = string.Empty;
+        ActiveSearch = null;
+        CurrentPage = 1;
         var q = new Dictionary<string, object?>
         {
             ["currentPage"] = "1",
-            ["pageSize"]    = PageSize.ToString(),
+            ["pageSize"] = PageSize.ToString(),
             ["currentSort"] = CurrentSort,
             ["nationality"] = string.IsNullOrEmpty(Nationality) ? null : Nationality
         };
         var baseUri = NavigationManager.Uri.Split('?')[0];
         NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(baseUri,
-            q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!),
+                q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!),
             forceLoad: false, replace: true);
     }
 
@@ -286,21 +319,25 @@
     {
         var q = new Dictionary<string, object?>
         {
-            ["currentPage"]  = CurrentPage.ToString(),
-            ["pageSize"]     = PageSize.ToString(),
+            ["currentPage"] = CurrentPage.ToString(),
+            ["pageSize"] = PageSize.ToString(),
             ["activeSearch"] = string.IsNullOrWhiteSpace(ActiveSearch) ? null : ActiveSearch,
-            ["currentSort"]  = CurrentSort,
-            ["nationality"]  = string.IsNullOrEmpty(Nationality) ? null : Nationality,
-            ["fromYear"]     = FromYear?.ToString(),
-            ["toYear"]       = ToYear?.ToString()
+            ["currentSort"] = CurrentSort,
+            ["nationality"] = string.IsNullOrEmpty(Nationality) ? null : Nationality,
+            ["fromYear"] = FromYear?.ToString(),
+            ["toYear"] = ToYear?.ToString()
         };
-        var newUri = NavigationManager.GetUriWithQueryParameters(
+        var baseUri = NavigationManager.Uri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri,
             q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!);
         if (NavigationManager.Uri != newUri || isPageAdjustment)
             NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
     }
 
-    private void HandleKeyUp(KeyboardEventArgs e) { if (e.Key == "Enter") ApplySearch(); }
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") ApplySearch();
+    }
 
     private async Task HandleArtistDeleted(Guid artistId)
     {
@@ -308,5 +345,6 @@
         Toast.Success("Artist deleted successfully.");
         await LoadArtistData();
     }
+
 }
 

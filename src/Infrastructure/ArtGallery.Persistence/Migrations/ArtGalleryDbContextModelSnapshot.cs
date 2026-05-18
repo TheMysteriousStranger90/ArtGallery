@@ -73,7 +73,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21122"),
                             BirthDate = new DateTime(1848, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4866),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1239),
                             DeathDate = new DateTime(1926, 7, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Viktor",
                             IsDeleted = false,
@@ -84,7 +84,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21123"),
                             BirthDate = new DateTime(1856, 3, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4878),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1244),
                             DeathDate = new DateTime(1910, 4, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Mikhail",
                             IsDeleted = false,
@@ -95,7 +95,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21124"),
                             BirthDate = new DateTime(1817, 7, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4882),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1249),
                             DeathDate = new DateTime(1900, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Ivan",
                             IsDeleted = false,
@@ -106,7 +106,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21125"),
                             BirthDate = new DateTime(1830, 5, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4885),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1253),
                             DeathDate = new DateTime(1897, 10, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Alexei",
                             IsDeleted = false,
@@ -117,7 +117,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21212"),
                             BirthDate = new DateTime(1452, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4887),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1256),
                             DeathDate = new DateTime(1519, 5, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Leonardo",
                             IsDeleted = false,
@@ -128,7 +128,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21213"),
                             BirthDate = new DateTime(1475, 3, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4891),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1260),
                             DeathDate = new DateTime(1564, 2, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Michelangelo",
                             IsDeleted = false,
@@ -139,7 +139,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21214"),
                             BirthDate = new DateTime(1445, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4906),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1274),
                             DeathDate = new DateTime(1510, 5, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Sandro",
                             IsDeleted = false,
@@ -150,7 +150,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21215"),
                             BirthDate = new DateTime(1571, 9, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4909),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1280),
                             DeathDate = new DateTime(1610, 7, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Michelangelo Merisi",
                             IsDeleted = false,
@@ -205,7 +205,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("0c6aeae0-5c40-4085-8993-7d7b5db21130"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21122"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5009),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1446),
                             IsDeleted = false,
                             IsMain = true,
                             PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/4/4e/Wiktor_Michajlowitsch_Wassnezow_003.jpg",
@@ -215,7 +215,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("0c6aeae0-5c40-4085-8993-7d7b5db21131"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21123"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5012),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1455),
                             IsDeleted = false,
                             IsMain = true,
                             PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/f/fb/Mikhail_Vrubel_-_self-portrait_%281904%2C_GTG%29.jpg",
@@ -225,7 +225,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("0c6aeae0-5c40-4085-8993-7d7b5db21132"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21124"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5015),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1458),
                             IsDeleted = false,
                             IsMain = true,
                             PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c6/Aivazovsky_-_Self-portrait_1874.jpg",
@@ -235,7 +235,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("0c6aeae0-5c40-4085-8993-7d7b5db21133"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21125"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5016),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1462),
                             IsDeleted = false,
                             IsMain = true,
                             PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7a/Savrasov_photo.JPG",
@@ -245,7 +245,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("0c6aeae0-5c40-4085-8993-7d7b5db21220"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21212"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5020),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1465),
                             IsDeleted = false,
                             IsMain = true,
                             PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Leonardo_self.jpg/256px-Leonardo_self.jpg",
@@ -255,7 +255,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("0c6aeae0-5c40-4085-8993-7d7b5db21221"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21213"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5022),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1470),
                             IsDeleted = false,
                             IsMain = true,
                             PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Miguel_%C3%81ngel%2C_por_Daniele_da_Volterra_%28detalle%29.jpg/256px-Miguel_%C3%81ngel%2C_por_Daniele_da_Volterra_%28detalle%29.jpg",
@@ -265,7 +265,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("0c6aeae0-5c40-4085-8993-7d7b5db21222"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21214"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5025),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1474),
                             IsDeleted = false,
                             IsMain = true,
                             PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Sandro_Botticelli_083.jpg/256px-Sandro_Botticelli_083.jpg",
@@ -275,7 +275,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("0c6aeae0-5c40-4085-8993-7d7b5db21223"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21215"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5027),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1477),
                             IsDeleted = false,
                             IsMain = true,
                             PictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bild-Ottavio_Leoni%2C_Caravaggio.jpg/256px-Bild-Ottavio_Leoni%2C_Caravaggio.jpg",
@@ -334,7 +334,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("fc6aeae0-5c40-4085-8993-7d7b5db21126"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21122"),
                             Content = "Viktor Mikhailovich Vasnetsov was a Russian painter who specialized in mythological and historical subjects. He is considered the co-founder of Russian folklorist and romantic nationalistic painting and a key figure in the Russian revivalist movement. His notable works include After Prince Igor's Battle with the Polovtsy, Knight at the Crossroads, Bogatyrs, and Alyonushka.",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4950),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1343),
                             IsDeleted = false,
                             References = "Korotkevich, V.N. Viktor Vasnetsov: The Artist's Work. Leningrad, 1962.",
                             ShortDescription = "One of the key figures in the Russian revivalist movement"
@@ -344,7 +344,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("fc6aeae0-5c40-4085-8993-7d7b5db21127"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21123"),
                             Content = "Mikhail Aleksandrovich Vrubel was a Russian painter who specialized in symbolist paintings of mythological themes. His contemporaries often saw him as strange and mentally unstable due to his unique style of painting. At the time of his death, Vrubel was among the most controversial painters in Russian art. His innovative art is now considered a bridge connecting the traditional art of the 19th century with the modernism of the 20th century.",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4955),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1349),
                             IsDeleted = false,
                             References = "Gomberg-Verzhbinskaia, E.P. Vrubel. Moscow, 1959.",
                             ShortDescription = "A Russian symbolist painter known for his unusual style and technique"
@@ -354,7 +354,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("fc6aeae0-5c40-4085-8993-7d7b5db21128"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21124"),
                             Content = "Ivan Konstantinovich Aivazovsky was a Russian Romantic painter who is considered one of the greatest masters of marine art. He was born into an Armenian family in the town of Feodosia in Crimea and was mostly known for his seascapes, which constitute more than half of his paintings. During his almost 60-year career, he created around 6,000 paintings, making him one of the most prolific artists of his time.",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4957),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1353),
                             IsDeleted = false,
                             References = "Caffiero, G., Samarine, I. Seas, Cities & Dreams: The Paintings of Ivan Aivazovsky. London, 2000.",
                             ShortDescription = "One of the greatest masters of marine art in history"
@@ -364,7 +364,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("fc6aeae0-5c40-4085-8993-7d7b5db21129"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21125"),
                             Content = "Alexei Kondratyevich Savrasov was a Russian landscape painter and creator of the 'mood landscape' genre. He is credited with developing the lyrical landscape style, and his painting The Rooks Have Come Back (1871) is considered one of the most significant works of Russian landscape painting. Savrasov's life was marked by personal tragedy and alcoholism in his later years, but his influence on Russian landscape painting was immense.",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4960),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1357),
                             IsDeleted = false,
                             References = "Novouspensky, N. Alexei Savrasov. Leningrad, 1982.",
                             ShortDescription = "Founder of the lyrical landscape style in Russian painting"
@@ -374,7 +374,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("fc6aeae0-5c40-4085-8993-7d7b5db21216"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21212"),
                             Content = "Leonardo da Vinci was an Italian polymath of the High Renaissance who was active as a painter, draughtsman, engineer, scientist, theorist, sculptor and architect. While his fame initially rested on his achievements as a painter, he also became known for his notebooks, in which he made drawings and notes on science and invention. These involved a variety of subjects including anatomy, astronomy, botany, cartography, painting, and paleontology.",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4963),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1361),
                             IsDeleted = false,
                             References = "Kemp, Martin. Leonardo da Vinci: The Marvellous Works of Nature and Man. Oxford, 2006.",
                             ShortDescription = "Renaissance polymath and painter of the Mona Lisa"
@@ -384,7 +384,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("fc6aeae0-5c40-4085-8993-7d7b5db21217"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21213"),
                             Content = "Michelangelo di Lodovico Buonarroti Simoni was an Italian sculptor, painter, architect, and poet of the High Renaissance. Born in the Republic of Florence, his work exerted an unparalleled influence on the development of Western art. Considered the greatest living artist during his lifetime, he has since been described as one of the greatest artists of all time.",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4966),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1366),
                             IsDeleted = false,
                             References = "Wallace, William E. Michelangelo: The Artist, the Man and His Times. Cambridge, 2010.",
                             ShortDescription = "Renaissance master sculptor and painter of the Sistine Chapel"
@@ -394,7 +394,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("fc6aeae0-5c40-4085-8993-7d7b5db21218"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21214"),
                             Content = "Alessandro di Mariano di Vanni Filipepi, known as Sandro Botticelli, was an Italian painter of the Early Renaissance. Botticelli's posthumous reputation suffered until the late 19th century, when he was rediscovered by the Pre-Raphaelites who stimulated a reappraisal of his work. Since then, his paintings have been seen to represent the linear grace of Early Renaissance painting.",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4969),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1369),
                             IsDeleted = false,
                             References = "Lightbown, Ronald. Sandro Botticelli: Life and Work. London, 1989.",
                             ShortDescription = "Early Renaissance painter famous for The Birth of Venus"
@@ -404,7 +404,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("fc6aeae0-5c40-4085-8993-7d7b5db21219"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21215"),
                             Content = "Michelangelo Merisi da Caravaggio was an Italian painter active in Rome for most of his artistic life. During the final four years of his life he moved between Naples, Malta, and Sicily until his death. His paintings have been characterized by art critics as combining a realistic observation of the human state, both physical and emotional, with a dramatic use of lighting.",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4971),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1375),
                             IsDeleted = false,
                             References = "Langdon, Helen. Caravaggio: A Life. New York, 1998.",
                             ShortDescription = "Baroque painter renowned for his revolutionary use of light and shadow"
@@ -451,7 +451,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("9c6aeae0-5c40-4085-8993-7d7b5db21107"),
                             CountryId = new Guid("8c6aeae0-5c40-4085-8993-7d7b5db21106"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4650),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(910),
                             IsDeleted = false,
                             Name = "Moscow"
                         },
@@ -459,7 +459,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("9c6aeae0-5c40-4085-8993-7d7b5db21108"),
                             CountryId = new Guid("8c6aeae0-5c40-4085-8993-7d7b5db21106"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4652),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(913),
                             IsDeleted = false,
                             Name = "Saint Petersburg"
                         },
@@ -467,7 +467,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("9c6aeae0-5c40-4085-8993-7d7b5db21201"),
                             CountryId = new Guid("8c6aeae0-5c40-4085-8993-7d7b5db21200"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4654),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(917),
                             IsDeleted = false,
                             Name = "Florence"
                         },
@@ -475,7 +475,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("9c6aeae0-5c40-4085-8993-7d7b5db21202"),
                             CountryId = new Guid("8c6aeae0-5c40-4085-8993-7d7b5db21200"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4657),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(920),
                             IsDeleted = false,
                             Name = "Rome"
                         });
@@ -524,7 +524,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("8c6aeae0-5c40-4085-8993-7d7b5db21106"),
                             Code = "RU",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4383),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(566),
                             IsDeleted = false,
                             Name = "Russia"
                         },
@@ -532,7 +532,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("8c6aeae0-5c40-4085-8993-7d7b5db21200"),
                             Code = "IT",
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4387),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(575),
                             IsDeleted = false,
                             Name = "Italy"
                         });
@@ -627,7 +627,7 @@ namespace ArtGallery.Persistence.Migrations
                         new
                         {
                             Id = new Guid("cc6aeae0-5c40-4085-8993-7d7b5db21111"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4738),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1056),
                             Description = "Art depicting scenes from mythology or folklore",
                             IsDeleted = false,
                             Name = "Mythological Art"
@@ -635,7 +635,7 @@ namespace ArtGallery.Persistence.Migrations
                         new
                         {
                             Id = new Guid("cc6aeae0-5c40-4085-8993-7d7b5db21112"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4740),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1059),
                             Description = "Art depicting natural scenery, such as mountains, valleys, trees, rivers, and forests",
                             IsDeleted = false,
                             Name = "Landscape"
@@ -643,7 +643,7 @@ namespace ArtGallery.Persistence.Migrations
                         new
                         {
                             Id = new Guid("cc6aeae0-5c40-4085-8993-7d7b5db21113"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4742),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1062),
                             Description = "Art depicting the sea or maritime scenes",
                             IsDeleted = false,
                             Name = "Seascape"
@@ -651,7 +651,7 @@ namespace ArtGallery.Persistence.Migrations
                         new
                         {
                             Id = new Guid("cc6aeae0-5c40-4085-8993-7d7b5db21114"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4744),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1065),
                             Description = "Art that emphasizes the expression of ideas through symbols",
                             IsDeleted = false,
                             Name = "Symbolism"
@@ -659,7 +659,7 @@ namespace ArtGallery.Persistence.Migrations
                         new
                         {
                             Id = new Guid("cc6aeae0-5c40-4085-8993-7d7b5db21205"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4746),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1068),
                             Description = "Art from the Renaissance period characterized by realistic depiction and classical themes",
                             IsDeleted = false,
                             Name = "Renaissance"
@@ -667,7 +667,7 @@ namespace ArtGallery.Persistence.Migrations
                         new
                         {
                             Id = new Guid("cc6aeae0-5c40-4085-8993-7d7b5db21206"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4747),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1070),
                             Description = "Art depicting religious themes and biblical scenes",
                             IsDeleted = false,
                             Name = "Religious Art"
@@ -675,7 +675,7 @@ namespace ArtGallery.Persistence.Migrations
                         new
                         {
                             Id = new Guid("cc6aeae0-5c40-4085-8993-7d7b5db21207"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4749),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1073),
                             Description = "Art depicting individual persons or groups of people",
                             IsDeleted = false,
                             Name = "Portrait"
@@ -737,7 +737,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("bc6aeae0-5c40-4085-8993-7d7b5db21109"),
                             Address = "Lavrushinsky Ln, 10, Moscow, Russia, 119017",
                             CityId = new Guid("9c6aeae0-5c40-4085-8993-7d7b5db21107"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4698),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(986),
                             Description = "The State Tretyakov Gallery is an art gallery in Moscow, Russia, the foremost depository of Russian fine art in the world.",
                             IsDeleted = false,
                             Name = "The State Tretyakov Gallery",
@@ -748,7 +748,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("bc6aeae0-5c40-4085-8993-7d7b5db21110"),
                             Address = "Inzhenernaya St, 4, St Petersburg, Russia, 191186",
                             CityId = new Guid("9c6aeae0-5c40-4085-8993-7d7b5db21108"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4701),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(991),
                             Description = "The State Russian Museum is the world's largest depository of Russian fine art. It is also one of the largest museums in the country.",
                             IsDeleted = false,
                             Name = "The State Russian Museum",
@@ -759,7 +759,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("bc6aeae0-5c40-4085-8993-7d7b5db21203"),
                             Address = "Piazzale degli Uffizi, 6, 50122 Firenze FI, Italy",
                             CityId = new Guid("9c6aeae0-5c40-4085-8993-7d7b5db21201"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4704),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(995),
                             Description = "The Uffizi Gallery is a prominent art museum located adjacent to the Piazza della Signoria in the Historic Centre of Florence in the region of Tuscany, Italy.",
                             IsDeleted = false,
                             Name = "Uffizi Gallery",
@@ -770,7 +770,7 @@ namespace ArtGallery.Persistence.Migrations
                             Id = new Guid("bc6aeae0-5c40-4085-8993-7d7b5db21204"),
                             Address = "00120 Vatican City",
                             CityId = new Guid("9c6aeae0-5c40-4085-8993-7d7b5db21202"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4707),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(999),
                             Description = "The Vatican Museums are the public museums of the Vatican City. They display works from the immense collection amassed by the Catholic Church and the papacy throughout the centuries.",
                             IsDeleted = false,
                             Name = "Vatican Museums",
@@ -854,7 +854,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21134"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21122"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5219),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1552),
                             CreationYear = 1898,
                             Description = "Also known as Three Bogatyrs, this painting depicts three of the most legendary bogatyrs (medieval Russian knights): Dobrynya Nikitich, Ilya Muromets and Alyosha Popovich. They are portrayed on patrol together in the frontier of the Russian land.",
                             Dimensions = "295.3 cm × 446 cm (116.3 in × 175.6 in)",
@@ -870,7 +870,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21135"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21122"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5226),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1560),
                             CreationYear = 1881,
                             Description = "A painting depicting a young woman, Alyonushka, a character from Russian folk tales, sitting forlornly by a pond. The painting is notable for its depiction of the Russian landscape and its melancholic mood.",
                             Dimensions = "177 cm × 121 cm (69.7 in × 47.6 in)",
@@ -886,7 +886,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21136"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21123"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5231),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1568),
                             CreationYear = 1890,
                             Description = "One of Vrubel's most famous works, depicting a winged demon sitting in a pensive pose. The painting is characterized by its unusual crystalline form and vibrant colors.",
                             Dimensions = "114 cm × 211 cm (44.9 in × 83.1 in)",
@@ -902,7 +902,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21137"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21123"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5236),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1574),
                             CreationYear = 1902,
                             Description = "The last of Vrubel's Demon series, showing the defeated demon with broken wings. This painting is associated with the deterioration of Vrubel's mental health.",
                             Dimensions = "139 cm × 387 cm (54.7 in × 152.4 in)",
@@ -918,7 +918,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21138"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21124"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5241),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1581),
                             CreationYear = 1850,
                             Description = "Aivazovsky's most famous painting, showing a group of people clinging to debris from a shipwreck, facing a large wave at sunrise. The title refers to the nautical belief that the ninth wave is the largest in a series of waves.",
                             Dimensions = "221 cm × 332 cm (87.0 in × 130.7 in)",
@@ -934,7 +934,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21139"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21124"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5246),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1592),
                             CreationYear = 1849,
                             Description = "A dramatic seascape depicting a violent storm at night, with a ship struggling against massive waves. The painting showcases Aivazovsky's mastery in depicting light and water.",
                             Dimensions = "100 cm × 141 cm (39.4 in × 55.5 in)",
@@ -950,7 +950,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21140"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21125"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5250),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1598),
                             CreationYear = 1871,
                             Description = "Savrasov's most famous work, depicting the early spring landscape with rooks nesting in birch trees. The painting conveys the sense of awakening nature and hope.",
                             Dimensions = "62 cm × 48.5 cm (24.4 in × 19.1 in)",
@@ -966,7 +966,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21141"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21125"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5264),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1605),
                             CreationYear = 1873,
                             Description = "A serene landscape depicting a countryside road in rural Russia. The painting demonstrates Savrasov's talent for capturing the subtle poetry of simple Russian landscapes.",
                             Dimensions = "58.8 cm × 80.5 cm (23.1 in × 31.7 in)",
@@ -982,7 +982,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21224"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21212"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5268),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1612),
                             CreationYear = 1503,
                             Description = "The Mona Lisa is a half-length portrait painting by Italian artist Leonardo da Vinci. Considered an archetypal masterpiece of the Italian Renaissance, it has been described as 'the best known, the most visited, the most written about, the most sung about, the most parodied work of art in the world'.",
                             Dimensions = "77 cm × 53 cm (30 in × 21 in)",
@@ -998,7 +998,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21225"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21212"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5274),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1620),
                             CreationYear = 1498,
                             Description = "The Last Supper is a mural painting by Italian High Renaissance Leonardo da Vinci housed by the refectory of the Convent of Santa Maria delle Grazie in Milan, Italy. It depicts the scene of the Last Supper of Jesus with his apostles.",
                             Dimensions = "460 cm × 880 cm (181 in × 346 in)",
@@ -1014,7 +1014,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21226"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21213"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5278),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1626),
                             CreationYear = 1512,
                             Description = "The Creation of Adam is a fresco painting by Italian artist Michelangelo, which forms part of the Sistine Chapel's ceiling, painted c. 1508–1512. It illustrates the Biblical creation narrative from the Book of Genesis in which God gives life to Adam, the first man.",
                             Dimensions = "280 cm × 570 cm (110 in × 224 in)",
@@ -1030,7 +1030,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21227"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21213"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5283),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1633),
                             CreationYear = 1541,
                             Description = "The Last Judgment is a fresco by the Italian Renaissance painter Michelangelo covering the whole altar wall of the Sistine Chapel in Vatican City. It is a depiction of the Second Coming of Christ and the final and eternal judgment by God of all humanity.",
                             Dimensions = "1370 cm × 1200 cm (539 in × 472 in)",
@@ -1046,7 +1046,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21228"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21214"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5287),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1640),
                             CreationYear = 1485,
                             Description = "The Birth of Venus is a painting by Italian artist Sandro Botticelli, probably executed in the mid 1480s. It depicts the goddess Venus arriving at the shore after her birth, when she had emerged from the sea fully-grown.",
                             Dimensions = "172.5 cm × 278.9 cm (67.9 in × 109.6 in)",
@@ -1062,7 +1062,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21229"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21214"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5293),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1646),
                             CreationYear = 1482,
                             Description = "Primavera, also known as Allegory of Spring, is a large panel painting in tempera paint by the Italian Renaissance painter Sandro Botticelli made in the late 1470s or early 1480s. The painting has been described as one of the most written about, and most controversial paintings in the world.",
                             Dimensions = "202 cm × 314 cm (80 in × 124 in)",
@@ -1078,7 +1078,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21230"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21215"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5297),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1654),
                             CreationYear = 1600,
                             Description = "The Calling of Saint Matthew is a masterpiece by Michelangelo Merisi da Caravaggio, depicting the moment when Jesus Christ inspires Matthew to follow him. It was completed in 1599-1600 for the Contarelli Chapel in the church of the French congregation San Luigi dei Francesi in Rome.",
                             Dimensions = "322 cm × 340 cm (127 in × 134 in)",
@@ -1094,7 +1094,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             Id = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21231"),
                             ArtistId = new Guid("ec6aeae0-5c40-4085-8993-7d7b5db21215"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5301),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1660),
                             CreationYear = 1602,
                             Description = "Judith Beheading Holofernes is a painting by the Italian early Baroque artist Caravaggio, painted in 1598-1602. The painting depicts Judith beheading Holofernes, a scene from the deuterocanonical Book of Judith in the Old Testament.",
                             Dimensions = "144 cm × 195 cm (57 in × 77 in)",
@@ -1220,7 +1220,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21134"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21115"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5357),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1736),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21142"),
                             IsDeleted = false
                         },
@@ -1228,7 +1228,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21134"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21116"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5360),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1739),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21143"),
                             IsDeleted = false
                         },
@@ -1236,7 +1236,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21134"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21119"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5362),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1742),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21144"),
                             IsDeleted = false
                         },
@@ -1244,7 +1244,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21224"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21208"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5364),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1746),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21232"),
                             IsDeleted = false
                         },
@@ -1252,7 +1252,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21224"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21209"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5367),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1748),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21233"),
                             IsDeleted = false
                         },
@@ -1260,7 +1260,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21224"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21210"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5369),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1752),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21234"),
                             IsDeleted = false
                         },
@@ -1268,7 +1268,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21228"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21208"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5372),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1756),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21235"),
                             IsDeleted = false
                         },
@@ -1276,7 +1276,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21228"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21209"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5374),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1759),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21236"),
                             IsDeleted = false
                         },
@@ -1284,7 +1284,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21230"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21208"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5376),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1762),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21237"),
                             IsDeleted = false
                         },
@@ -1292,7 +1292,7 @@ namespace ArtGallery.Persistence.Migrations
                         {
                             PaintingId = new Guid("1c6aeae0-5c40-4085-8993-7d7b5db21230"),
                             TagId = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21211"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(5379),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1766),
                             Id = new Guid("2c6aeae0-5c40-4085-8993-7d7b5db21238"),
                             IsDeleted = false
                         });
@@ -1332,77 +1332,77 @@ namespace ArtGallery.Persistence.Migrations
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21115"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4783),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1123),
                             IsDeleted = false,
                             Name = "Russian Art"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21116"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4786),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1128),
                             IsDeleted = false,
                             Name = "19th Century"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21117"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4789),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1131),
                             IsDeleted = false,
                             Name = "Early 20th Century"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21118"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4790),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1133),
                             IsDeleted = false,
                             Name = "Romanticism"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21119"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4792),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1136),
                             IsDeleted = false,
                             Name = "Folklore"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21120"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4795),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1140),
                             IsDeleted = false,
                             Name = "Sea"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21121"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4797),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1142),
                             IsDeleted = false,
                             Name = "Spring"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21208"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4798),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1145),
                             IsDeleted = false,
                             Name = "Italian Art"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21209"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4800),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1148),
                             IsDeleted = false,
                             Name = "Renaissance"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21210"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4802),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1151),
                             IsDeleted = false,
                             Name = "Classical"
                         },
                         new
                         {
                             Id = new Guid("dc6aeae0-5c40-4085-8993-7d7b5db21211"),
-                            CreatedDate = new DateTime(2025, 6, 15, 7, 27, 51, 383, DateTimeKind.Utc).AddTicks(4804),
+                            CreatedDate = new DateTime(2026, 5, 18, 12, 11, 14, 906, DateTimeKind.Utc).AddTicks(1154),
                             IsDeleted = false,
                             Name = "Baroque"
                         });

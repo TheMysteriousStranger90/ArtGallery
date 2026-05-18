@@ -123,3 +123,6 @@ dist/
 .fake/
 .paket/
 paket-files/
+
+lscache/
+*.lscache

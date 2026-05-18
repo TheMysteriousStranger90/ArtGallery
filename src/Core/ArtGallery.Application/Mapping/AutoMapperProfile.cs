@@ -22,8 +22,12 @@ public class ArtistMappingProfile : Profile
 
         CreateMap<Artist, ArtistBriefDto>();
         CreateMap<Artist, CreateArtistDto>();
-        CreateMap<CreateArtistCommand, Artist>();
-        CreateMap<UpdateArtistCommand, Artist>();
+        CreateMap<CreateArtistCommand, Artist>()
+            .ForMember(d => d.BirthDate, o => o.MapFrom(s => s.BirthDate.HasValue ? s.BirthDate.Value.DateTime : (DateTime?)null))
+            .ForMember(d => d.DeathDate, o => o.MapFrom(s => s.DeathDate.HasValue ? s.DeathDate.Value.DateTime : (DateTime?)null));
+        CreateMap<UpdateArtistCommand, Artist>()
+            .ForMember(d => d.BirthDate, o => o.MapFrom(s => s.BirthDate.HasValue ? s.BirthDate.Value.DateTime : (DateTime?)null))
+            .ForMember(d => d.DeathDate, o => o.MapFrom(s => s.DeathDate.HasValue ? s.DeathDate.Value.DateTime : (DateTime?)null));
 
         // Biography and image mappings
         CreateMap<Biography, BiographyDto>();
@@ -49,7 +53,10 @@ public class ArtistMappingProfile : Profile
                     : "Unknown Artist"));
 
         CreateMap<PaintingImage, PaintingImageDto>();
-        CreateMap<Tag, PaintingTagDto>();
+        CreateMap<Tag, PaintingTagDto>()
+            .ForMember(dest => dest.TagId, opt => opt.MapFrom(src => src.Id));
+        CreateMap<Tag, TagDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
         CreateMap<CreatePaintingCommand, Painting>();
         CreateMap<UpdatePaintingCommand, Painting>();
 
@@ -82,11 +89,15 @@ public class ArtistMappingProfile : Profile
         CreateMap<Genre, GenreDto>();
         CreateMap<Museum, MuseumBriefDto>()
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City != null ? src.City.Name : string.Empty))
-            .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.City != null && src.City.Country != null ? src.City.Country.Name : string.Empty));
+            .ForMember(dest => dest.Country,
+                opt => opt.MapFrom(src =>
+                    src.City != null && src.City.Country != null ? src.City.Country.Name : string.Empty));
 
         CreateMap<Museum, MuseumDetailDto>()
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City != null ? src.City.Name : string.Empty))
-            .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.City != null && src.City.Country != null ? src.City.Country.Name : string.Empty))
+            .ForMember(dest => dest.Country,
+                opt => opt.MapFrom(src =>
+                    src.City != null && src.City.Country != null ? src.City.Country.Name : string.Empty))
             .ForMember(dest => dest.Paintings, opt => opt.MapFrom(src => src.Paintings));
 
         // User mappings
@@ -132,3 +143,4 @@ public class ArtistMappingProfile : Profile
             .ForMember(dest => dest.Nationality, opt => opt.MapFrom(src => src.Artist.Nationality));
     }
 }
+

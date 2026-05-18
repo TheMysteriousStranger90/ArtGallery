@@ -53,4 +53,6 @@ public interface IPaintingService
     Task<bool> DeletePaintingAsync(Guid id, string apiVersion = Const.DefaultApiVersion);
     Task<bool> AddPaintingToFavoritesAsync(Guid paintingId, string apiVersion = Const.DefaultApiVersion);
     Task<UserFavoritePaintingsResponse> GetFavoritePaintingsAsync(string apiVersion = Const.DefaultApiVersion);
+    Task<bool> RemovePaintingFromFavoritesAsync(Guid paintingId, string apiVersion = Const.DefaultApiVersion);
 }
+

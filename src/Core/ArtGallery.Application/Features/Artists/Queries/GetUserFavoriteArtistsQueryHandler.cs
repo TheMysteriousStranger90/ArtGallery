@@ -5,7 +5,8 @@ using MediatR;
 
 namespace ArtGallery.Application.Features.Artists.Queries;
 
-public class GetUserFavoriteArtistsQueryHandler : IRequestHandler<GetUserFavoriteArtistsQuery, UserFavoriteArtistsResponse>
+public class
+    GetUserFavoriteArtistsQueryHandler : IRequestHandler<GetUserFavoriteArtistsQuery, UserFavoriteArtistsResponse>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
@@ -16,7 +17,8 @@ public class GetUserFavoriteArtistsQueryHandler : IRequestHandler<GetUserFavorit
         _mapper = mapper;
     }
 
-    public async Task<UserFavoriteArtistsResponse> Handle(GetUserFavoriteArtistsQuery request, CancellationToken cancellationToken)
+    public async Task<UserFavoriteArtistsResponse> Handle(GetUserFavoriteArtistsQuery request,
+        CancellationToken cancellationToken)
     {
         var response = new UserFavoriteArtistsResponse();
 

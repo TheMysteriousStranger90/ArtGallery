@@ -10,11 +10,11 @@ namespace ArtGallery.ClientApp.Services;
 public class FavoritesStateService
 {
     private readonly IPaintingService _paintingService;
-    private readonly IArtistService  _artistService;
+    private readonly IArtistService _artistService;
     private readonly ILogger<FavoritesStateService> _logger;
 
     private HashSet<Guid> _favoritePaintingIds = new();
-    private HashSet<Guid> _favoriteArtistIds   = new();
+    private HashSet<Guid> _favoriteArtistIds = new();
 
     private bool _paintingsLoaded;
     private bool _artistsLoaded;
@@ -27,16 +27,17 @@ public class FavoritesStateService
         ILogger<FavoritesStateService> logger)
     {
         _paintingService = paintingService;
-        _artistService   = artistService;
-        _logger          = logger;
+        _artistService = artistService;
+        _logger = logger;
     }
 
     public bool IsPaintingFavorite(Guid id) => _favoritePaintingIds.Contains(id);
-    public bool IsArtistFavorite(Guid id)   => _favoriteArtistIds.Contains(id);
+    public bool IsArtistFavorite(Guid id) => _favoriteArtistIds.Contains(id);
 
     public async Task LoadPaintingFavoritesAsync()
     {
         if (_paintingsLoaded) { return; }
+
         try
         {
             var result = await _paintingService.GetFavoritePaintingsAsync();
@@ -45,6 +46,7 @@ public class FavoritesStateService
                 _favoritePaintingIds = result.FavoritePaintings
                     .Select(p => p.Id).ToHashSet();
             }
+
             _paintingsLoaded = true;
             OnChange?.Invoke();
         }
@@ -57,6 +59,7 @@ public class FavoritesStateService
     public async Task LoadArtistFavoritesAsync()
     {
         if (_artistsLoaded) { return; }
+
         try
         {
             var result = await _artistService.GetFavoriteArtistsAsync();
@@ -65,6 +68,7 @@ public class FavoritesStateService
                 _favoriteArtistIds = result.FavoriteArtists
                     .Select(a => a.Id).ToHashSet();
             }
+
             _artistsLoaded = true;
             OnChange?.Invoke();
         }
@@ -86,16 +90,26 @@ public class FavoritesStateService
         OnChange?.Invoke();
     }
 
+
+    public void UnmarkPaintingFavorite(Guid id)
+    {
+        _favoritePaintingIds.Remove(id);
+        OnChange?.Invoke();
+    }
+
+    public void UnmarkArtistFavorite(Guid id)
+    {
+        _favoriteArtistIds.Remove(id);
+        OnChange?.Invoke();
+    }
     /// <summary>Call after logout so stale data is not shown on next login.</summary>
     public void Clear()
     {
         _favoritePaintingIds.Clear();
         _favoriteArtistIds.Clear();
         _paintingsLoaded = false;
-        _artistsLoaded   = false;
+        _artistsLoaded = false;
         OnChange?.Invoke();
     }
 }
-
-
 
