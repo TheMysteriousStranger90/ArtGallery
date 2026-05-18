@@ -48,8 +48,8 @@ public class CreateArtistCommandHandler : IRequestHandler<CreateArtistCommand, C
                 {
                     FirstName = request.FirstName!,
                     LastName = request.LastName!,
-                    BirthDate = request.BirthDate,
-                    DeathDate = request.DeathDate,
+                    BirthDate = request.BirthDate?.DateTime,
+                    DeathDate = request.DeathDate?.DateTime,
                     Nationality = request.Nationality!
                 };
 

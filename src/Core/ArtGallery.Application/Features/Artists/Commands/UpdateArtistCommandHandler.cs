@@ -102,8 +102,8 @@ public class UpdateArtistCommandHandler : IRequestHandler<UpdateArtistCommand, U
 
                 artistToUpdate.FirstName = request.FirstName!;
                 artistToUpdate.LastName = request.LastName!;
-                artistToUpdate.BirthDate = request.BirthDate;
-                artistToUpdate.DeathDate = request.DeathDate;
+                artistToUpdate.BirthDate = request.BirthDate?.DateTime;
+                artistToUpdate.DeathDate = request.DeathDate?.DateTime;
                 artistToUpdate.Nationality = request.Nationality!;
 
                 await _unitOfWork.ArtistRepository.UpdateAsync(artistToUpdate);

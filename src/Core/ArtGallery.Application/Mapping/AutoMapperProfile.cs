@@ -22,8 +22,12 @@ public class ArtistMappingProfile : Profile
 
         CreateMap<Artist, ArtistBriefDto>();
         CreateMap<Artist, CreateArtistDto>();
-        CreateMap<CreateArtistCommand, Artist>();
-        CreateMap<UpdateArtistCommand, Artist>();
+        CreateMap<CreateArtistCommand, Artist>()
+            .ForMember(d => d.BirthDate, o => o.MapFrom(s => s.BirthDate.HasValue ? s.BirthDate.Value.DateTime : (DateTime?)null))
+            .ForMember(d => d.DeathDate, o => o.MapFrom(s => s.DeathDate.HasValue ? s.DeathDate.Value.DateTime : (DateTime?)null));
+        CreateMap<UpdateArtistCommand, Artist>()
+            .ForMember(d => d.BirthDate, o => o.MapFrom(s => s.BirthDate.HasValue ? s.BirthDate.Value.DateTime : (DateTime?)null))
+            .ForMember(d => d.DeathDate, o => o.MapFrom(s => s.DeathDate.HasValue ? s.DeathDate.Value.DateTime : (DateTime?)null));
 
         // Biography and image mappings
         CreateMap<Biography, BiographyDto>();
