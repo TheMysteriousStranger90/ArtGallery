@@ -327,7 +327,8 @@
             ["fromYear"] = FromYear?.ToString(),
             ["toYear"] = ToYear?.ToString()
         };
-        var newUri = NavigationManager.GetUriWithQueryParameters(
+        var baseUri = NavigationManager.Uri.Split('?')[0];
+        var newUri = NavigationManager.GetUriWithQueryParameters(baseUri,
             q.Where(kv => kv.Value != null).ToDictionary(kv => kv.Key, kv => kv.Value)!);
         if (NavigationManager.Uri != newUri || isPageAdjustment)
             NavigationManager.NavigateTo(newUri, forceLoad: false, replace: true);
