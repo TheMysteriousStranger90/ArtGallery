@@ -209,9 +209,10 @@
         get => _currentSort;
         set
         {
-            if (_currentSort != value)
+            var safeValue = string.IsNullOrEmpty(value) ? "title" : value;
+            if (_currentSort != safeValue)
             {
-                _currentSort = value;
+                _currentSort = safeValue;
                 if (_hasCompletedInitialParameterSet)
                 {
                     CurrentPage = 1;
@@ -415,9 +416,9 @@
         {
             var sort = CurrentSort switch
             {
+                null or "" => "title",
                 var s when s.StartsWith("-") => $"{s[1..]}_desc",
-                var s when !string.IsNullOrEmpty(s) => s,
-                _ => "title"
+                var s => s
             };
 
             pagedPaintings = await PaintingService.GetPaintingsAsync(
